@@ -4239,7 +4239,7 @@ input.ant-input.ant-input-sm {
 }
 
 
-/* 菜单内容区:占据剩余宽度,独立滚动(内容暂时移除,仅保留容器) */
+/* 菜单内容区:占据剩余宽度,独立滚动 */
 .content-area {
   flex: 1 1 0;
   min-width: 0;
@@ -4249,98 +4249,678 @@ input.ant-input.ant-input-sm {
   background: var(--surface-container-lowest);
 }
 
-
-/* 首页:左栏固定 33.75rem + 右栏自适应地图 */
-.overview-view {
+/* 首页态:左侧会话卡片贴边占满,右侧地图区域自适应 */
+.content-area.is-overview {
   display: flex;
-  gap: var(--spacing-section);
-  align-items: stretch;
+  padding: 0;
+  overflow: hidden;
 }
 
-/* 左栏:固定宽度,内容纵向排布 */
-.overview-left {
-  flex: 0 0 33.75rem;
-  width: 33.75rem;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-section);
-}
-
-/* 右栏:吃掉剩余宽度,地图卡纵向撑满 */
-.overview-right {
+.overview-aside {
   flex: 1 1 0;
   min-width: 0;
+  min-height: 0;
   display: flex;
+  padding: 1.5rem;
+  overflow: hidden;
 }
 
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-gutter);
+
+/* 会话卡片:总览核心区左侧面板(540px × 100%)
+   结构:session-main(背景图区域,32px 内边距) + session-composer(输入框,无背景图) */
+.session-card {
+  flex: 0 0 33.75rem; /* 540px */
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
 }
 
-.kpi-card {
+/* ---------- 背景图区域(不含底部输入框) ---------- */
+.session-main {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem; /* 上下左右 32px */
+  background-color: var(--surface-container-high);
+  background-image: url("./assets/uploads/bg-1.png");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+/* ---------- 区域一:标题 + 时间范围下拉 ---------- */
+.session-head {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: var(--surface-container-highest);
-  border-radius: var(--radius-container);
-  box-shadow: var(--shadow-card);
+  justify-content: space-between;
 }
 
-.kpi-icon {
+.session-title {
+  margin: 0;
+  font: var(--font-headline-m);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.range-select {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+/* ---------- 区域二:守护概览(左文本 + 右图片) ---------- */
+.session-hero {
+  flex-shrink: 0;
+  margin-top: 3.9375rem; /* 标题下 63px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.session-hero-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hero-title {
+  font: var(--font-headline-m);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.hero-num {
+  font-style: normal;
+  font-weight: var(--font-weight-bold);
+  color: var(--success);
+}
+
+.hero-line {
+  margin: 0.78125rem 0 0; /* 标题下 12.5px */
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+.hero-line + .hero-line {
+  margin-top: 0.25rem; /* 行间 4px */
+}
+
+.hero-strong {
+  font-weight: var(--font-weight-bold);
+  color: var(--on-surface);
+}
+
+.hero-art {
   flex: 0 0 auto;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: 5.9375rem; /* 95px */
+  height: 5.3125rem; /* 85px */
+  margin-right: 0.8125rem; /* 额外 13px,与区域外缘合计 45px */
+}
+
+/* ---------- 区域三:左右指标小卡片 ---------- */
+.session-metrics {
+  flex-shrink: 0;
+  margin-top: 1.6875rem; /* 27px */
+  display: flex;
+  gap: 0.5rem; /* 8px */
+}
+
+.metric-card {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 1rem; /* 16px */
+  border-radius: 0.75rem; /* 12px */
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.dark .session-card .metric-card {
+  background: rgba(28, 28, 30, 0.72);
+}
+
+.metric-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 图标距标题 8px */
+}
+
+.metric-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.metric-icon.is-fault {
+  color: var(--error);
+}
+
+.metric-icon.is-network {
+  color: var(--info);
+}
+
+.metric-title {
+  min-width: 0;
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-value {
+  margin-top: 0.75rem; /* 12px */
+  font-size: var(--font-size-3xl); /* 24px */
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-xs);
+  color: var(--on-surface);
+}
+
+.metric-label {
+  margin-top: 0.25rem;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+}
+
+/* ---------- 区域四:待您关注 ---------- */
+.session-attention {
+  margin-top: 1.5rem; /* 24px */
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.attention-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.attention-title {
+  margin: 0;
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.attention-more {
+  font: var(--font-body-s);
+  color: var(--interactive-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.attention-more:hover {
+  color: var(--interactive-link-hover);
+}
+
+/* 胶囊形 tab:平分宽度,整体与单项均为椭圆 */
+.pill-tabs {
+  flex-shrink: 0;
+  margin-top: 1.25rem; /* 20px */
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.dark .session-card .pill-tabs {
+  background: rgba(20, 20, 20, 0.45);
+}
+
+.pill-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1875rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font: var(--font-body-s);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.pill-tab:hover {
+  color: var(--on-surface);
+}
+
+.pill-tab.is-active {
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+  font-weight: var(--font-weight-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+.pill-count {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* 数据列表:超出显示细小滚动条 */
+.attention-list {
+  margin-top: 0.9375rem; /* 15px */
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding-right: 0.25rem;
+}
+
+.attention-list::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.attention-list::-webkit-scrollbar-thumb {
+  background: rgba(25, 25, 25, 0.18);
+  border-radius: var(--radius-full);
+}
+
+.dark .session-card .attention-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.attention-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem; /* 图标距文本 12px */
+  padding: 1rem; /* 16px */
+  border-radius: 0.75rem; /* 12px */
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dark .session-card .attention-card {
+  background: rgba(30, 30, 32, 0.88);
+}
+
+.attention-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem; /* 26px */
+  height: 1.625rem;
+}
+
+.attention-icon.is-fault {
+  color: var(--error);
+}
+
+.attention-icon.is-network {
+  color: var(--info);
+}
+
+.attention-body {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.attention-card-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.attention-card-desc {
+  margin-top: 0.25rem; /* 4px */
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+  line-height: var(--line-height-md);
+  word-break: break-all;
+}
+
+/* ---------- 底部 AI 输入框(背景图区域内,边距由 session-main 的 32px 内边距提供) ---------- */
+.session-composer {
+  flex-shrink: 0;
+  margin-top: 1rem;
+}
+
+.composer-frame {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.09375rem; /* 1.5px 渐变彩边 */
+  border: none;
+  border-radius: 1.5rem; /* 24px */
+  text-align: left;
+  background: linear-gradient(120deg, #7c3aed, #2563eb, #06b6d4, #8b5cf6, #7c3aed);
+  background-size: 300% 300%;
+  animation: ai-flow 8s ease infinite;
+}
+
+@keyframes ai-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.composer-frame.is-small {
+  display: block;
+  cursor: text;
+}
+
+.composer-frame.is-small:focus-visible {
+  outline: var(--focus-ring) solid var(--outline-width-focus);
+  outline-offset: var(--outline-offset-gap);
+}
+
+.composer-inner {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: 3rem; /* 初始 48px */
+  padding: 0 0.75rem 0 1.25rem;
+  border-radius: 1.40625rem;
+  background: var(--surface-container-highest);
+}
+
+.composer-frame.is-big .composer-inner {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  height: 7.5rem; /* 展开后 120px */
+  padding: 0.75rem 0.625rem 0.5rem 1rem;
+}
+
+.composer-placeholder {
+  flex: 1 1 0;
+  min-width: 0;
+  font: var(--font-body-m);
+  color: var(--text-placeholder);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.composer-send-mini {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--primary);
+}
+
+.composer-input {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.composer-input textarea {
+  height: 100% !important;
+  padding: 0;
+  resize: none;
+  font: var(--font-body-m);
+  color: var(--on-surface);
+}
+
+.composer-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.composer-tools-left {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.composer-tools-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.scene-select {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+.scene-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  border-radius: var(--radius-full);
+  background: var(--surface-variant);
+  color: var(--on-surface-variant);
+  font: var(--font-body-s);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+
+.tool-btn:hover {
+  color: var(--on-surface);
+}
+
+.tool-btn.is-active {
+  background: var(--primary-container);
+  color: var(--primary);
+}
+
+.tool-btn-text {
+  max-width: 8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tool-btn-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.125rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.tool-btn-clear:hover {
+  color: var(--error);
+}
+
+.word-count {
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+}
+
+.icon-tool {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.icon-tool:hover {
+  background: var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.send-btn {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--surface-variant);
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.send-btn.is-active {
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  color: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 0.5rem rgba(124, 58, 237, 0.4);
+}
+
+.composer-hint {
+  margin-top: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
-}
-
-.kpi-icon.brand { background: var(--info-container); color: var(--info); }
-.kpi-icon.success { background: var(--success-container); color: var(--success); }
-.kpi-icon.error { background: var(--error-container); color: var(--error); }
-.kpi-icon.warning { background: var(--warning-container); color: var(--critical); }
-
-.kpi-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  min-width: 0;
-}
-
-.kpi-label {
-  font: var(--font-body-s);
-  color: var(--on-surface-variant);
-}
-
-.kpi-value {
-  font: var(--font-display-s);
-  font-weight: var(--font-weight-semibold);
-  color: var(--on-surface);
-  line-height: 1.2;
-}
-
-.kpi-unit {
-  margin-left: 0.25rem;
-  font: var(--font-body-s);
-  font-weight: var(--font-weight-normal);
-  color: var(--on-surface-variant);
-}
-
-.kpi-trend {
-  display: inline-flex;
-  align-items: center;
   gap: 0.25rem;
   font: var(--font-caption-m);
   color: var(--on-surface-variant);
 }
 
-.kpi-trend.up { color: var(--success); }
-.kpi-trend.down { color: var(--error); }
+/* ---------- 模板库浮层弹窗(354px 高,明暗主题适配) ---------- */
+.ant-popover.tpl-popover .ant-popover-inner {
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--surface-container-high);
+  box-shadow: var(--shadow-popover);
+  color: var(--on-surface);
+}
+
+.dark .ant-popover.tpl-popover .ant-popover-inner {
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+}
+
+.tpl-popover .ant-popover-inner-content {
+  padding: 0;
+}
+
+.tpl-panel {
+  width: 18.75rem;
+  height: 22.125rem; /* 354px */
+  display: flex;
+  flex-direction: column;
+}
+
+.tpl-title {
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.tpl-tabs {
+  margin-top: 0.625rem;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 0.375rem;
+  border-bottom: var(--border-width-thin) solid var(--divider);
+}
+
+.tpl-tab {
+  padding: 0.25rem 0;
+  border: none;
+  background: transparent;
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.tpl-tab.is-active {
+  color: var(--primary);
+  font-weight: var(--font-weight-medium);
+  box-shadow: inset 0 -0.125rem 0 0 var(--primary);
+}
+
+.tpl-list {
+  margin-top: 0.625rem;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem; /* 10px */
+  padding-right: 0.125rem;
+}
+
+.tpl-list::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.tpl-list::-webkit-scrollbar-thumb {
+  background: rgba(25, 25, 25, 0.18);
+  border-radius: var(--radius-full);
+}
+
+.dark .tpl-panel .tpl-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.tpl-item {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.5rem; /* 40px */
+  padding: 0 0.75rem;
+  border: none;
+  border-radius: 0.5rem; /* 8px */
+  background: var(--surface-variant);
+  color: var(--on-surface);
+  font: var(--font-body-m);
+  cursor: pointer;
+  text-align: left;
+}
+
+.tpl-item:hover {
+  background: var(--primary-container);
+}
+
+.tpl-item.is-active {
+  background: var(--primary-container);
+  color: var(--primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.tpl-name {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* 首页右侧:地图卡撑满 aside 区域 */
+.overview-view {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
 
 .chart-card {
   display: flex;
@@ -4426,6 +5006,205 @@ input.ant-input.ant-input-sm {
   white-space: nowrap;
   /* 浅色地图上保证白字可读 */
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 4px rgba(0, 0, 0, 0.35);
+}
+
+
+/* AI 会话:左侧 540px × 100% 面板(导航栏 + 居中欢迎内容 + AI 输入框) */
+.ai-chat {
+  flex: 0 0 33.75rem; /* 540px */
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
+  border-right: var(--border-width-thin) solid var(--divider);
+}
+
+/* ---------- 顶部导航栏(50px) ---------- */
+.ai-nav {
+  flex-shrink: 0;
+  height: 3.125rem; /* 50px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+}
+
+.ai-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.ai-nav-btn {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.ai-nav-btn:hover {
+  background: var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.ai-nav-title {
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 会话中心:水平垂直居中 ---------- */
+.ai-center {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.ai-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ai-gem {
+  width: 3.75rem; /* 60px */
+  height: 3.75rem;
+}
+
+.ai-brand-name {
+  font-size: var(--font-size-3xl); /* 24px */
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-xs);
+  color: var(--on-surface);
+}
+
+.ai-intro {
+  margin: 1.5rem 0 0; /* 24px */
+  font: var(--font-body-m);
+  color: var(--on-surface-variant);
+}
+
+/* 信息区域:左文案 | 右刷新+换一批,两端对齐 */
+.ai-scene-bar {
+  margin-top: 2.25rem; /* 36px */
+  width: 26.25rem; /* 420px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ai-scene-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+}
+
+.ai-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0;
+  border: none;
+  background: transparent;
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.ai-refresh:hover {
+  color: var(--primary);
+}
+
+/* ---------- 三张场景卡片(420px × 72px, 间距8px, 圆角16px) ---------- */
+.ai-cards {
+  margin-top: 1rem; /* 16px */
+  width: 26.25rem; /* 420px */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 8px */
+}
+
+.ai-card {
+  height: 4.5rem; /* 72px */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  border-radius: 1rem; /* 16px */
+  background: var(--surface-container-highest); /* 浅色白卡 */
+  box-shadow: var(--shadow-md); /* 增强阴影,浅色下轮廓清晰 */
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.ai-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 暗色:提亮卡片背景与纯黑区域拉开对比,阴影改为 hover 提亮 */
+.dark .ai-chat .ai-card {
+  background: var(--color-bg-3);
+  box-shadow: none;
+}
+
+.dark .ai-chat .ai-card:hover {
+  background: var(--color-bg-4);
+  box-shadow: none;
+}
+
+/* 暗色:导航按钮 hover 背景(默认 token 在暗色下不可见) */
+.dark .ai-chat .ai-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ai-card-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--primary);
+}
+
+.ai-card-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ai-card-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+}
+
+.ai-card-desc {
+  margin-top: 0.125rem;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 底部 AI 输入框(复用 Composer,左右/底部留白 32px) ---------- */
+.ai-chat .session-composer {
+  padding: 0 2rem 2rem;
 }
 
 
@@ -4989,26 +5768,46 @@ function useApp() {
 /* ===== assets/shared/icon.jsx ===== */
 (function () {
   const LUCIDE = {
-    "activity": [["path",{"d":"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"}]],
+    "arrow-left": [["path",{"d":"m12 19-7-7 7-7"}],["path",{"d":"M19 12H5"}]],
+    "arrow-left-right": [["path",{"d":"M8 3 4 7l4 4"}],["path",{"d":"M4 7h16"}],["path",{"d":"m16 21 4-4-4-4"}],["path",{"d":"M20 17H4"}]],
     "bell": [["path",{"d":"M10.268 21a2 2 0 0 0 3.464 0"}],["path",{"d":"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"}]],
+    "bell-off": [["path",{"d":"M10.268 21a2 2 0 0 0 3.464 0"}],["path",{"d":"M17 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 .258-1.742"}],["path",{"d":"m2 2 20 20"}],["path",{"d":"M8.668 3.01A6 6 0 0 1 18 8c0 2.687.77 4.653 1.707 6.05"}]],
+    "book-open": [["path",{"d":"M12 5v16"}],["path",{"d":"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"}]],
+    "bug": [["path",{"d":"M12 20v-9"}],["path",{"d":"M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z"}],["path",{"d":"M14.12 3.88 16 2"}],["path",{"d":"M21 21a4 4 0 0 0-3.81-4"}],["path",{"d":"M21 5a4 4 0 0 1-3.55 3.97"}],["path",{"d":"M22 13h-4"}],["path",{"d":"M3 21a4 4 0 0 1 3.81-4"}],["path",{"d":"M3 5a4 4 0 0 0 3.55 3.97"}],["path",{"d":"M6 13H2"}],["path",{"d":"m8 2 1.88 1.88"}],["path",{"d":"M9 7.13V6a3 3 0 1 1 6 0v1.13"}]],
     "building-2": [["path",{"d":"M10 12h4"}],["path",{"d":"M10 8h4"}],["path",{"d":"M14 21v-3a2 2 0 0 0-4 0v3"}],["path",{"d":"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"}],["path",{"d":"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"}]],
     "check": [["path",{"d":"M20 6 9 17l-5-5"}]],
     "circle-question-mark": [["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"}],["path",{"d":"M12 17h.01"}]],
+    "ellipsis": [["circle",{"cx":"12","cy":"12","r":"1"}],["circle",{"cx":"19","cy":"12","r":"1"}],["circle",{"cx":"5","cy":"12","r":"1"}]],
     "eye": [["path",{"d":"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"}],["circle",{"cx":"12","cy":"12","r":"3"}]],
     "file-text": [["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],
-    "gauge": [["path",{"d":"m12 14 4-4"}],["path",{"d":"M3.34 19a10 10 0 1 1 17.32 0"}]],
+    "globe": [["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"}],["path",{"d":"M2 12h20"}]],
     "house": [["path",{"d":"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"}],["path",{"d":"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"}]],
+    "layout-template": [["rect",{"width":"18","height":"7","x":"3","y":"3","rx":"1"}],["rect",{"width":"9","height":"7","x":"3","y":"14","rx":"1"}],["rect",{"width":"5","height":"7","x":"16","y":"14","rx":"1"}]],
+    "link": [["path",{"d":"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"}],["path",{"d":"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"}]],
+    "lock": [["rect",{"width":"18","height":"11","x":"3","y":"11","rx":"2","ry":"2"}],["path",{"d":"M7 11V7a5 5 0 0 1 10 0v4"}]],
     "menu": [["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],
+    "mic": [["path",{"d":"M12 19v3"}],["path",{"d":"M19 10v2a7 7 0 0 1-14 0v-2"}],["rect",{"x":"9","y":"2","width":"6","height":"13","rx":"3"}]],
     "moon": [["path",{"d":"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"}]],
+    "network": [["rect",{"x":"16","y":"16","width":"6","height":"6","rx":"1"}],["rect",{"x":"2","y":"16","width":"6","height":"6","rx":"1"}],["rect",{"x":"9","y":"2","width":"6","height":"6","rx":"1"}],["path",{"d":"M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"}],["path",{"d":"M12 12V8"}]],
     "pencil": [["path",{"d":"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"}],["path",{"d":"m15 5 4 4"}]],
     "plus": [["path",{"d":"M5 12h14"}],["path",{"d":"M12 5v14"}]],
+    "refresh-cw": [["path",{"d":"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"}],["path",{"d":"M21 3v5h-5"}],["path",{"d":"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"}],["path",{"d":"M8 16H3v5"}]],
     "rotate-cw": [["path",{"d":"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"}],["path",{"d":"M21 3v5h-5"}]],
+    "scale": [["path",{"d":"M12 3v18"}],["path",{"d":"m19 8 3 8a5 5 0 0 1-6 0zV7"}],["path",{"d":"M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"}],["path",{"d":"m5 8 3 8a5 5 0 0 1-6 0zV7"}],["path",{"d":"M7 21h10"}]],
     "search": [["path",{"d":"m21 21-4.34-4.34"}],["circle",{"cx":"11","cy":"11","r":"8"}]],
+    "send": [["path",{"d":"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"}],["path",{"d":"m21.854 2.147-10.94 10.939"}]],
     "server": [["rect",{"width":"20","height":"8","x":"2","y":"2","rx":"2","ry":"2"}],["rect",{"width":"20","height":"8","x":"2","y":"14","rx":"2","ry":"2"}],["line",{"x1":"6","x2":"6.01","y1":"6","y2":"6"}],["line",{"x1":"6","x2":"6.01","y1":"18","y2":"18"}]],
     "settings": [["path",{"d":"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"}],["circle",{"cx":"12","cy":"12","r":"3"}]],
+    "shield-check": [["path",{"d":"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}],["path",{"d":"m9 12 2 2 4-4"}]],
+    "sliders-horizontal": [["path",{"d":"M10 5H3"}],["path",{"d":"M12 19H3"}],["path",{"d":"M14 3v4"}],["path",{"d":"M16 17v4"}],["path",{"d":"M21 12h-9"}],["path",{"d":"M21 19h-5"}],["path",{"d":"M21 5h-7"}],["path",{"d":"M8 10v4"}],["path",{"d":"M8 12H3"}]],
+    "sparkles": [["path",{"d":"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"}],["path",{"d":"M20 2v4"}],["path",{"d":"M22 4h-4"}],["circle",{"cx":"4","cy":"20","r":"2"}]],
+    "split": [["path",{"d":"M16 3h5v5"}],["path",{"d":"M8 3H3v5"}],["path",{"d":"M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"}],["path",{"d":"m15 9 6-6"}]],
     "sun": [["circle",{"cx":"12","cy":"12","r":"4"}],["path",{"d":"M12 2v2"}],["path",{"d":"M12 20v2"}],["path",{"d":"m4.93 4.93 1.41 1.41"}],["path",{"d":"m17.66 17.66 1.41 1.41"}],["path",{"d":"M2 12h2"}],["path",{"d":"M20 12h2"}],["path",{"d":"m6.34 17.66-1.41 1.41"}],["path",{"d":"m19.07 4.93-1.41 1.41"}]],
     "trash-2": [["path",{"d":"M10 11v6"}],["path",{"d":"M14 11v6"}],["path",{"d":"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"}],["path",{"d":"M3 6h18"}],["path",{"d":"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"}]],
     "user": [["path",{"d":"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}],["circle",{"cx":"12","cy":"7","r":"4"}]],
+    "workflow": [["rect",{"width":"8","height":"8","x":"3","y":"3","rx":"2"}],["path",{"d":"M7 11v4a2 2 0 0 0 2 2h4"}],["rect",{"width":"8","height":"8","x":"13","y":"13","rx":"2"}]],
+    "wrench": [["path",{"d":"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"}]],
+    "x": [["path",{"d":"M18 6 6 18"}],["path",{"d":"m6 6 12 12"}]],
   };
   const { useState, useEffect, useRef, useLayoutEffect } = React;
 // ---- Lucide (offline fallback, table injected at build time) ----
@@ -5473,6 +6272,7 @@ const MENU_ITEMS = [
   { key: "devices", icon: "server", label: "设备管理" },
   { key: "alarms", icon: "bell", label: "告警管理" },
   { key: "settings", icon: "settings", label: "系统设置" },
+  { key: "ai", icon: "sparkles", label: "AI" },
 ];
 
 function SideMenu() {
@@ -5521,71 +6321,501 @@ function SideMenu() {
   Object.assign(__export, { SideMenu });
 })();
 
-/* ===== assets/shared/chart.jsx ===== */
+/* ===== src/mock/session.js ===== */
 (function () {
-  const { useRef, useEffect, useState, forwardRef, useImperativeHandle } = React;
-// Chart — HUICharts 的 React 封装(命令式 → 声明式)
-// 底层: echarts + hui-charts.umd.js(全局 HUICharts),配置项 option 原样透传给 setSimpleOption。
-// 暗色联动:自动监听 <html> 的 .dark class,切换 hdesign-light / hdesign-dark 主题并重建图表。
-const Chart = forwardRef(function Chart(
-  { name, option, className, style, onChartRendered },
-  ref
-) {
-  const containerRef = useRef(null);
-  const chartRef = useRef(null);
-  const renderedRef = useRef(onChartRendered);
-  renderedRef.current = onChartRendered;
+// Layer 2: 会话卡片 mock 数据 — 时间范围 / 处置场景 / 待关注事件 / 提示词模板
 
-  // .dark 切换 → 递增 tick 触发主 effect 重建(走同一条 init/dispose 路径)
-  const [darkTick, setDarkTick] = useState(0);
+const RANGE_OPTIONS = [
+  { value: "3d", label: "最近三天" },
+  { value: "week", label: "最近一周" },
+  { value: "month", label: "最近一月" },
+];
+
+const SCENE_OPTIONS = [
+  { value: "config", label: "配置变更" },
+  { value: "fault", label: "故障处置" },
+  { value: "alarm", label: "告警分析" },
+  { value: "inspect", label: "安全巡检" },
+];
+
+const ATTENTION_ITEMS = [
+  {
+    key: "attn-1",
+    icon: "network",
+    iconTone: "is-network",
+    title: "【网络配置辅助生成】嘉定DC的互联网区域的Leaf1-2设备扩容",
+    desc: "2025-06-03 15:36｜嘉定DC的互联网区域的Leaf1-2设备扩容",
+    status: "processing",
+  },
+  {
+    key: "attn-2",
+    icon: "network",
+    iconTone: "is-network",
+    title: "【网络配置辅助生成】桃浦DC核心区的Spine-3设备端口扩容与路由策略调整",
+    desc: "2025-06-03 14:21｜桃浦DC核心区的Spine-3设备端口扩容与路由策略调整",
+    status: "processing",
+  },
+  {
+    key: "attn-3",
+    icon: "wrench",
+    iconTone: "is-fault",
+    title: "【故障自处置】嘉定DC出口链路丢包异常的自动隔离与流量调度",
+    desc: "2025-06-03 11:08｜嘉定DC出口链路丢包异常的自动隔离与流量调度",
+    status: "processing",
+  },
+  {
+    key: "attn-4",
+    icon: "network",
+    iconTone: "is-network",
+    title: "【网络配置辅助生成】金桥DC互联网区Firewall安全策略的批量下发",
+    desc: "2025-06-02 18:45｜金桥DC互联网区Firewall安全策略的批量下发",
+    status: "processing",
+  },
+  {
+    key: "attn-5",
+    icon: "wrench",
+    iconTone: "is-fault",
+    title: "【故障自处置】机房MPLS VPN标签泄漏事件等待人工复核接管",
+    desc: "2025-06-02 16:12｜机房MPLS VPN标签泄漏事件等待人工复核接管",
+    status: "manual",
+  },
+];
+
+const TEMPLATES = [
+  {
+    key: "tpl-1",
+    name: "域名改造",
+    category: "app",
+    icon: "globe",
+    prompt:
+      "请协助制定域名改造方案：将嘉定DC互联网区域的业务域名统一从 HTTP 迁移到 HTTPS，并梳理现有解析记录。",
+  },
+  {
+    key: "tpl-2",
+    name: "应用互访",
+    category: "app",
+    icon: "arrow-left-right",
+    prompt: "请生成两个业务系统之间的应用互访策略：包含访问端口、协议与安全域隔离要求。",
+  },
+  {
+    key: "tpl-3",
+    name: "负载均衡",
+    category: "app",
+    icon: "scale",
+    prompt: "请为互联网出口设计负载均衡策略：说明流量分发模式与健康检查机制。",
+  },
+  {
+    key: "tpl-4",
+    name: "设备巡检",
+    category: "device",
+    icon: "search",
+    prompt: "请对嘉定DC全部核心设备执行例行巡检，并输出巡检报告与风险项清单。",
+  },
+  {
+    key: "tpl-5",
+    name: "端口扩容",
+    category: "device",
+    icon: "network",
+    prompt: "请生成Leaf设备的端口扩容配置：包含端口聚合、VLAN 与链路带宽规划。",
+  },
+  {
+    key: "tpl-6",
+    name: "系统升级",
+    category: "device",
+    icon: "refresh-cw",
+    prompt: "请编排设备系统版本升级方案：包含升级窗口、回滚步骤与影响评估。",
+  },
+  {
+    key: "tpl-7",
+    name: "告警降噪",
+    category: "device",
+    icon: "bell-off",
+    prompt: "请对最近一周的重复告警做降噪分析，并给出收敛规则建议。",
+  },
+  {
+    key: "tpl-8",
+    name: "网络割接",
+    category: "device",
+    icon: "split",
+    prompt: "请生成周末割接实施方案：包含割接步骤、验证清单与应急回退预案。",
+  },
+  {
+    key: "tpl-9",
+    name: "安全策略",
+    category: "security",
+    icon: "shield-check",
+    prompt: "请辅助生成防火墙安全策略基线：覆盖分区隔离、最小开放端口原则。",
+  },
+  {
+    key: "tpl-10",
+    name: "访问控制",
+    category: "security",
+    icon: "lock",
+    prompt: "请为运维入口设计访问控制策略：包含账号权限分级与登录源限制。",
+  },
+  {
+    key: "tpl-11",
+    name: "漏洞修复",
+    category: "security",
+    icon: "bug",
+    prompt: "请梳理近期高危漏洞的修复建议：包含影响设备范围、补丁版本与验证方式。",
+  },
+];
+  Object.assign(__export, { RANGE_OPTIONS, SCENE_OPTIONS, ATTENTION_ITEMS, TEMPLATES });
+})();
+
+/* ===== src/views/session-card/composer.jsx ===== */
+(function () {
+  const { useEffect, useRef, useState } = React;
+  const { Input, Popover, Select } = antd;
+  const { Icon, SCENE_OPTIONS, TEMPLATES } = __export;
+const { TextArea } = Input;
+
+const TPL_TABS = [
+  { key: "all", label: "全部" },
+  { key: "device", label: "设备" },
+  { key: "app", label: "应用" },
+  { key: "security", label: "安全" },
+];
+
+const MAX_LEN = 2000;
+const PLACEHOLDER = "输入问题或输入“/”触发提示词";
+
+// 模板库浮层面板:标题 + 分类tab + 模板列表(354px,超出滚动)
+function TplPanel({ tab, onTab, selectedKey, onPick }) {
+  const list = TEMPLATES.filter((t) => tab === "all" || t.category === tab);
+  return (
+    <div className="tpl-panel">
+      <div className="tpl-title">模板列表</div>
+      <div className="tpl-tabs">
+        {TPL_TABS.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            className={t.key === tab ? "tpl-tab is-active" : "tpl-tab"}
+            onClick={() => onTab(t.key)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div className="tpl-list">
+        {list.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            className={t.key === selectedKey ? "tpl-item is-active" : "tpl-item"}
+            onClick={() => onPick(t)}
+          >
+            <Icon name={t.icon} size="0.875rem" />
+            <span className="tpl-name">{t.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// AI 输入框:初始 48px 单行,点击展开为 120px 完整输入区(渐变彩边 + 模板库 + 字数 + 发送)
+// 展开后保持大输入框状态,不因点击外部而收起;defaultExpanded 可指定初始即展开
+function Composer({ defaultExpanded = false }) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [text, setText] = useState("");
+  const [scene, setScene] = useState("config");
+  const [tplOpen, setTplOpen] = useState(false);
+  const [tplTab, setTplTab] = useState("all");
+  const [selectedTpl, setSelectedTpl] = useState(null);
+  const taRef = useRef(null);
+
   useEffect(() => {
-    const mo = new MutationObserver(() => setDarkTick((t) => t + 1));
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => mo.disconnect();
-  }, []);
+    if (expanded && taRef.current) taRef.current.focus();
+  }, [expanded]);
 
-  useEffect(() => {
-    const dom = containerRef.current;
-    if (!dom || !window.HUICharts) return;
+  const canSend = text.trim().length > 0;
+  const tplLabel = selectedTpl ? selectedTpl.name : "模板库";
 
-    const isDark = document.documentElement.classList.contains("dark");
-    const chart = new HUICharts();
-    chart.init(dom, { renderer: "svg"});
-    chart.setSimpleOption(name, {
-      theme: isDark ? "hdesign-dark" : "hdesign-light",
-      a2ui: true,
-      ...option,
-    });
-    chart.render();
-    chartRef.current = chart;
-    if (renderedRef.current) renderedRef.current(chart);
+  const pickTpl = (tpl) => {
+    setSelectedTpl(tpl);
+    setText(tpl.prompt);
+    setTplOpen(false);
+    if (taRef.current) taRef.current.focus();
+  };
 
-    // 容器尺寸变化(侧栏折叠/窗口缩放/响应式) → 同步画布
-    const ro = new ResizeObserver(() => {
-      if (chartRef.current && !chartRef.current._disposed) chart.resize();
-    });
-    ro.observe(dom);
+  const clearTpl = () => {
+    setSelectedTpl(null);
+    setText("");
+  };
 
-    return () => {
-      ro.disconnect();
-      try { chart.dispose(); } catch (e) { /* 容器已卸载时静默 */ }
-      chartRef.current = null;
-    };
-    // JSON.stringify 作 dep:option 是 JSX 内联对象,内容不变则不重建
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, JSON.stringify(option), darkTick]);
+  if (!expanded) {
+    // 初始态:48px 小输入框,点击展开
+    return (
+      <div className="session-composer">
+        <button
+          type="button"
+          className="composer-frame is-small"
+          onClick={() => setExpanded(true)}
+          aria-label="展开输入框"
+        >
+          <span className="composer-inner">
+            <span className="composer-placeholder">{text || PLACEHOLDER}</span>
+            <span className="composer-send-mini">
+              <Icon name="send" size="1rem" />
+            </span>
+          </span>
+        </button>
+      </div>
+    );
+  }
 
-  useImperativeHandle(ref, () => ({
-    getEchartsInstance: () => (chartRef.current ? chartRef.current.getEchartsInstance() : null),
-    resizeHandler: () => {
-      if (chartRef.current) chartRef.current.resize();
-    },
-  }), []);
+  // 展开态:120px 大输入框 + 工具栏 + AI 提示(保持展开,不自动收起)
+  return (
+    <div className="session-composer">
+      <div className="composer-frame is-big">
+        <div className="composer-inner">
+          <div className="composer-input">
+            <TextArea
+              ref={taRef}
+              variant="borderless"
+              value={text}
+              placeholder={PLACEHOLDER}
+              maxLength={MAX_LEN}
+              onChange={(e) => setText(e.target.value)}
+              style={{ height: "100%", resize: "none" }}
+            />
+          </div>
+          <div className="composer-toolbar">
+            <div className="composer-tools-left">
+              <Select
+                className="scene-select"
+                variant="borderless"
+                value={scene}
+                onChange={setScene}
+                popupMatchSelectWidth={false}
+                options={SCENE_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: (
+                    <span className="scene-label">
+                      <Icon name="sliders-horizontal" size="0.75rem" />
+                      {o.label}
+                    </span>
+                  ),
+                }))}
+              />
+              <Popover
+                arrow={false}
+                trigger="click"
+                placement="topLeft"
+                open={tplOpen}
+                onOpenChange={setTplOpen}
+                overlayClassName="tpl-popover"
+                content={
+                  <TplPanel
+                    tab={tplTab}
+                    onTab={setTplTab}
+                    selectedKey={selectedTpl ? selectedTpl.key : ""}
+                    onPick={pickTpl}
+                  />
+                }
+              >
+                <div
+                  className={selectedTpl ? "tool-btn is-active" : "tool-btn"}
+                  role="button"
+                  tabIndex={0}
+                  aria-label="打开模板库"
+                >
+                  <Icon name="layout-template" size="0.75rem" />
+                  <span className="tool-btn-text">{tplLabel}</span>
+                  {selectedTpl ? (
+                    <span
+                      className="tool-btn-clear"
+                      role="button"
+                      tabIndex={0}
+                      title="清除模板"
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        clearTpl();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.stopPropagation();
+                          clearTpl();
+                        }
+                      }}
+                    >
+                      <Icon name="x" size="0.75rem" />
+                    </span>
+                  ) : null}
+                </div>
+              </Popover>
+              <span className="word-count">
+                {text.length}/{MAX_LEN}
+              </span>
+            </div>
+            <div className="composer-tools-right">
+              <button type="button" className="icon-tool" title="插入链接">
+                <Icon name="link" size="1rem" />
+              </button>
+              <button type="button" className="icon-tool" title="语音输入">
+                <Icon name="mic" size="1rem" />
+              </button>
+              <button
+                type="button"
+                className={canSend ? "send-btn is-active" : "send-btn"}
+                title="发送"
+              >
+                <Icon name="send" size="1rem" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="composer-hint">
+        <span>内容由ai生成，无法确保准确性和完整性，仅供参考。</span>
+        <Icon name="circle-question-mark" size="0.75rem" />
+      </div>
+    </div>
+  );
+}
+  Object.assign(__export, { Composer });
+})();
 
-  const wrapperStyle = { width: "100%", height: "100%", ...style };
-  return <div ref={containerRef} className={className} style={wrapperStyle} />;
-});
-  Object.assign(__export, { Chart });
+/* ===== src/views/session-card/index.jsx ===== */
+(function () {
+  const { useMemo, useState } = React;
+  const { Select } = antd;
+  const { Icon, ATTENTION_ITEMS, RANGE_OPTIONS } = __export;
+  const Composer = __export.Composer;
+// Layer 4: 会话卡片 — 总览核心区左侧的 AI 助手面板(540px × 100%, 背景图 + 32px 内边距)
+const ATTENTION_TABS = [
+  { key: "all", label: "全部" },
+  { key: "manual", label: "人工待接管" },
+  { key: "processing", label: "处置中" },
+];
+
+function SessionCard() {
+  const [range, setRange] = useState("week");
+  const [tab, setTab] = useState("all");
+
+  const counts = useMemo(
+    () => ({
+      all: ATTENTION_ITEMS.length,
+      manual: ATTENTION_ITEMS.filter((i) => i.status === "manual").length,
+      processing: ATTENTION_ITEMS.filter((i) => i.status === "processing").length,
+    }),
+    []
+  );
+
+  const list = useMemo(
+    () => ATTENTION_ITEMS.filter((i) => tab === "all" || i.status === tab),
+    [tab]
+  );
+
+  return (
+    <section className="session-card">
+      <div className="session-main">
+        {/* 区域一:标题 + 时间范围下拉(无边框) */}
+        <header className="session-head">
+          <h2 className="session-title">单域网络智能体</h2>
+          <Select
+            className="range-select"
+            variant="borderless"
+            value={range}
+            onChange={setRange}
+            popupMatchSelectWidth={false}
+            options={RANGE_OPTIONS}
+          />
+        </header>
+
+        {/* 区域二:守护概览(左文本 + 右示意图片) */}
+        <div className="session-hero">
+          <div className="session-hero-text">
+            <div className="hero-title">
+              本周处理 <em className="hero-num">465</em> 件
+            </div>
+            <p className="hero-line">
+              当前网络状态良好，已经连续守护<strong className="hero-strong">158</strong> 天
+            </p>
+            <p className="hero-line">累计共处置1465个事件。</p>
+          </div>
+          <img
+            className="hero-art"
+            src="./assets/uploads/hero-illustration.svg"
+            alt="网络守护示意"
+          />
+        </div>
+
+        {/* 区域三:左右指标小卡片 */}
+        <div className="session-metrics">
+          <div className="metric-card">
+            <div className="metric-head">
+              <span className="metric-icon is-fault">
+                <Icon name="wrench" size="0.875rem" />
+              </span>
+              <span className="metric-title">故障自处置</span>
+            </div>
+            <div className="metric-value">12/24/20</div>
+            <div className="metric-label">待分析/分析中/已处置</div>
+          </div>
+          <div className="metric-card">
+            <div className="metric-head">
+              <span className="metric-icon is-network">
+                <Icon name="network" size="0.875rem" />
+              </span>
+              <span className="metric-title">网络配置辅助生成</span>
+            </div>
+            <div className="metric-value">4/12</div>
+            <div className="metric-label">处置中/处置完成</div>
+          </div>
+        </div>
+
+        {/* 区域四:待您关注(标题 + 胶囊tab + 数据列表) */}
+        <div className="session-attention">
+          <div className="attention-head">
+            <h3 className="attention-title">待您关注</h3>
+            <a
+              className="attention-more"
+              href="#"
+              onClick={(e) => e.preventDefault()}
+            >
+              更多
+            </a>
+          </div>
+          <div className="pill-tabs">
+            {ATTENTION_TABS.map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                className={t.key === tab ? "pill-tab is-active" : "pill-tab"}
+                onClick={() => setTab(t.key)}
+              >
+                {t.label}
+                <span className="pill-count">{counts[t.key]}</span>
+              </button>
+            ))}
+          </div>
+          <div className="attention-list">
+            {list.map((item) => (
+              <div key={item.key} className="attention-card">
+                <span className={`attention-icon ${item.iconTone}`}>
+                  <Icon name={item.icon} size="1.625rem" />
+                </span>
+                <div className="attention-body">
+                  <div className="attention-card-title">{item.title}</div>
+                  <div className="attention-card-desc">{item.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 底部:AI 输入框(背景图区域内,固定最底部) */}
+        <Composer />
+      </div>
+    </section>
+  );
+}
+  Object.assign(__export, { SessionCard });
 })();
 
 /* ===== src/mock/china-map.js ===== */
@@ -5906,6 +7136,167 @@ function ChinaMap() {
   Object.assign(__export, { ChinaMap });
 })();
 
+/* ===== src/views/overview-view/index.jsx ===== */
+(function () {
+  const ChinaMap = __export.ChinaMap;
+// Layer 4: 首页右侧 — 全国设备分布地图(左侧会话卡片由 content-area 装配)
+function OverviewView() {
+  return (
+    <div className="overview-view">
+      <div className="chart-card map-card">
+        <h3 className="chart-card-title">全国设备分布</h3>
+        <div className="map-body">
+          <ChinaMap />
+        </div>
+      </div>
+    </div>
+  );
+}
+  Object.assign(__export, { OverviewView });
+})();
+
+/* ===== src/mock/ai-chat.js ===== */
+(function () {
+// Layer 2: AI 会话 mock 数据 — 智能运维场景卡片(换一批轮换两组)
+const AI_CARD_GROUPS = [
+  [
+    {
+      key: "manual",
+      icon: "book-open",
+      title: "操作手册",
+      desc: "操作手册描述文本",
+    },
+    {
+      key: "mop-sample",
+      icon: "workflow",
+      title: "MOP工作流样例",
+      desc: "可直接使用的样例，无需修改",
+    },
+    {
+      key: "mop-tpl",
+      icon: "file-text",
+      title: "MOP工作流模版",
+      desc: "空置的工作流模版，需要您填入配置后上传使用",
+    },
+  ],
+  [
+    {
+      key: "baseline",
+      icon: "shield-check",
+      title: "安全基线核查",
+      desc: "一键核查设备安全基线并生成整改报告",
+    },
+    {
+      key: "cutover",
+      icon: "network",
+      title: "网络割接方案",
+      desc: "按向导生成割接步骤、验证清单与回退预案",
+    },
+    {
+      key: "vuln",
+      icon: "bug",
+      title: "漏洞处置建议",
+      desc: "匹配近期高危漏洞并给出修复指引",
+    },
+  ],
+];
+  Object.assign(__export, { AI_CARD_GROUPS });
+})();
+
+/* ===== src/views/ai-view/index.jsx ===== */
+(function () {
+  const { useState } = React;
+  const { Icon, useApp, AI_CARD_GROUPS } = __export;
+  const Composer = __export.Composer;
+// Layer 4: AI 会话 — 左侧 540px × 100% 会话卡片
+// 结构:顶部导航栏(50px) + 会话中心(水平垂直居中) + 底部 AI 输入框(始终展开)
+function AiChat({ title = "" }) {
+  const { setActiveMenu } = useApp();
+  const [groupIndex, setGroupIndex] = useState(0);
+  const cards = AI_CARD_GROUPS[groupIndex];
+
+  const refreshCards = () =>
+    setGroupIndex((i) => (i + 1) % AI_CARD_GROUPS.length);
+
+  return (
+    <section className="ai-chat">
+      {/* 顶部导航栏:返回 + 会话标题(无标题则不展示) | 更多 */}
+      <nav className="ai-nav">
+        <div className="ai-nav-left">
+          <button
+            type="button"
+            className="ai-nav-btn"
+            title="返回"
+            onClick={() => setActiveMenu("overview")}
+          >
+            <Icon name="arrow-left" size="1rem" />
+          </button>
+          {title ? <span className="ai-nav-title">{title}</span> : null}
+        </div>
+        <button type="button" className="ai-nav-btn" title="更多">
+          <Icon name="ellipsis" size="1rem" />
+        </button>
+      </nav>
+
+      {/* 会话中心:水平垂直居中 */}
+      <div className="ai-center">
+        <div className="ai-brand">
+          <img
+            className="ai-gem"
+            src="./assets/uploads/aico-gem.svg"
+            alt="Aico 五色石"
+          />
+          <span className="ai-brand-name">Aico</span>
+        </div>
+        <p className="ai-intro">我是Aico，可以帮你解决以下问题</p>
+        <div className="ai-scene-bar">
+          <span className="ai-scene-title">智能运维场景</span>
+          <button type="button" className="ai-refresh" onClick={refreshCards}>
+            <Icon name="refresh-cw" size="0.875rem" />
+            <span>换一批</span>
+          </button>
+        </div>
+        <div className="ai-cards">
+          {cards.map((card) => (
+            <div key={card.key} className="ai-card">
+              <span className="ai-card-icon">
+                <Icon name={card.icon} size="1.75rem" />
+              </span>
+              <div className="ai-card-body">
+                <div className="ai-card-title">{card.title}</div>
+                <div className="ai-card-desc">{card.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 底部:AI 输入框(与总览展开态一致,始终为大输入框) */}
+      <Composer defaultExpanded />
+    </section>
+  );
+}
+  Object.assign(__export, { AiChat });
+})();
+
+/* ===== src/components/status-tag/index.jsx ===== */
+(function () {
+  const { Tag } = antd;
+// Layer 3: 设备状态标签 — 设备状态 → Tag 预设色/文案 统一映射
+const DEVICE_STATUS = {
+  online: { color: "success", label: "在线" },
+  offline: { color: "default", label: "离线" },
+  alarm: { color: "error", label: "告警" },
+  maintaining: { color: "warning", label: "维护中" },
+};
+
+function StatusTag({ status }) {
+  const item = DEVICE_STATUS[status] || DEVICE_STATUS.offline;
+  return <Tag color={item.color}>{item.label}</Tag>;
+}
+  Object.assign(__export, { StatusTag });
+})();
+
 /* ===== src/mock/device.js ===== */
 (function () {
 // Layer 2: 设备域 mock 数据
@@ -5950,215 +7341,6 @@ const DEVICES = [
   { id: 22, name: "NE8000-M1", ip: "10.1.2.2", type: "路由器", location: "北京-数据中心C", status: "online", cpuUsage: 22, memUsage: 44, uptime: "2026-06-12 08:47" },
 ];
   Object.assign(__export, { DEVICE_TYPES, DEVICE_TYPE_OPTIONS, DEVICE_STATUS_OPTIONS, DEVICES });
-})();
-
-/* ===== src/mock/alarm.js ===== */
-(function () {
-// Layer 2: 告警域 mock 数据
-
-const ALARM_SEVERITY_OPTIONS = [
-  { value: "all", label: "全部级别" },
-  { value: "critical", label: "紧急" },
-  { value: "major", label: "重要" },
-  { value: "minor", label: "次要" },
-  { value: "info", label: "提示" },
-];
-
-const ALARM_STATUS_OPTIONS = [
-  { value: "all", label: "全部状态" },
-  { value: "pending", label: "未处理" },
-  { value: "processing", label: "处理中" },
-  { value: "cleared", label: "已清除" },
-];
-
-const ALARMS = [
-  { id: 1, time: "2026-10-23 08:42", severity: "critical", device: "NE8000-M8", description: "设备CPU利用率超过阈值（87% > 80%）", status: "processing" },
-  { id: 2, time: "2026-10-23 08:15", severity: "major", device: "USG6315E-FW2", description: "防火墙并发会话数超过告警阈值（85%）", status: "pending" },
-  { id: 3, time: "2026-10-23 07:58", severity: "minor", device: "S5731-S24P4X-31", description: "端口GE0/0/24入方向流量突增，超过基线300%", status: "processing" },
-  { id: 4, time: "2026-10-23 07:30", severity: "critical", device: "NE8000-M8", description: "BGP邻居10.2.1.1中断，持续时长56秒", status: "cleared" },
-  { id: 5, time: "2026-10-23 06:47", severity: "major", device: "USG6315E-FW2", description: "IPsec隧道协商失败，对端10.3.1.1不可达", status: "pending" },
-  { id: 6, time: "2026-10-23 05:12", severity: "minor", device: "AirEngine5761-11", description: "AP离线超过5分钟，请检查PoE供电", status: "cleared" },
-  { id: 7, time: "2026-10-22 23:40", severity: "info", device: "S6730-H24X-11", description: "MAC地址表项使用率超过60%", status: "cleared" },
-  { id: 8, time: "2026-10-22 22:05", severity: "major", device: "S5731-S24P4X-31", description: "光模块GE0/0/1接收光功率过低（-18.6dBm）", status: "pending" },
-  { id: 9, time: "2026-10-22 20:31", severity: "info", device: "S5735-L48T4X-21", description: "系统日志存储空间即将告满（92%）", status: "processing" },
-  { id: 10, time: "2026-10-22 18:26", severity: "minor", device: "NE40E-X8A-01", description: "OSPF邻居状态震荡，邻居10.1.1.2", status: "cleared" },
-];
-  Object.assign(__export, { ALARM_SEVERITY_OPTIONS, ALARM_STATUS_OPTIONS, ALARMS });
-})();
-
-/* ===== src/mock/overview.js ===== */
-(function () {
-// Layer 2: 总览域 mock 数据（图表）
-
-// 24小时流量趋势（每2小时采样，单位 Mbps）
-const TRAFFIC_TREND = [
-  { "时间": "00:00", "上行流量": 132, "下行流量": 348 },
-  { "时间": "02:00", "上行流量": 118, "下行流量": 302 },
-  { "时间": "04:00", "上行流量": 126, "下行流量": 315 },
-  { "时间": "06:00", "上行流量": 205, "下行流量": 486 },
-  { "时间": "08:00", "上行流量": 356, "下行流量": 762 },
-  { "时间": "10:00", "上行流量": 412, "下行流量": 798 },
-  { "时间": "12:00", "上行流量": 328, "下行流量": 654 },
-  { "时间": "14:00", "上行流量": 372, "下行流量": 715 },
-  { "时间": "16:00", "上行流量": 405, "下行流量": 744 },
-  { "时间": "18:00", "上行流量": 298, "下行流量": 592 },
-  { "时间": "20:00", "上行流量": 344, "下行流量": 638 },
-  { "时间": "22:00", "上行流量": 216, "下行流量": 452 },
-];
-
-// TOP5 设备流量（单位 Gbps）
-const TOP_DEVICE_FLOW = [
-  { device: "NE8000-M8", value: 820 },
-  { device: "NE40E-X8A-01", value: 645 },
-  { device: "S12700E-4", value: 512 },
-  { device: "USG6605E-FW1", value: 386 },
-  { device: "S12700E-5", value: 340 },
-];
-  Object.assign(__export, { TRAFFIC_TREND, TOP_DEVICE_FLOW });
-})();
-
-/* ===== src/views/overview-view/index.jsx ===== */
-(function () {
-  const { Icon, DEVICES, ALARMS, TRAFFIC_TREND, TOP_DEVICE_FLOW } = __export;
-  const Chart = __export.Chart;
-  const ChinaMap = __export.ChinaMap;
-// Layer 4: 首页 — 左栏固定 33.75rem(KPI + 图表纵排),右栏自适应(canvas 中国省份地图)
-function buildKpiCards() {
-  const total = DEVICES.length;
-  const onlineCount = DEVICES.filter((d) => d.status === "online").length;
-  const onlineRate = ((onlineCount / total) * 100).toFixed(1);
-  const activeAlarms = ALARMS.filter((a) => a.status !== "cleared").length;
-  return [
-    {
-      key: "devices",
-      icon: "server",
-      tone: "brand",
-      label: "纳管设备",
-      value: String(total),
-      unit: "台",
-      trend: "较上周 +2 台",
-      trendIcon: "trending-up",
-      trendTone: "up",
-    },
-    {
-      key: "online",
-      icon: "activity",
-      tone: "success",
-      label: "设备在线率",
-      value: onlineRate,
-      unit: "%",
-      trend: "较昨日 +0.6%",
-      trendIcon: "trending-up",
-      trendTone: "up",
-    },
-    {
-      key: "alarms",
-      icon: "bell",
-      tone: "error",
-      label: "活跃告警",
-      value: String(activeAlarms),
-      unit: "条",
-      trend: "较昨日 +1 条",
-      trendIcon: "trending-up",
-      trendTone: "down",
-    },
-    {
-      key: "port",
-      icon: "gauge",
-      tone: "warning",
-      label: "端口利用率",
-      value: "62.4",
-      unit: "%",
-      trend: "较昨日 -1.8%",
-      trendIcon: "trending-up",
-      trendTone: "up",
-    },
-  ];
-}
-
-function OverviewView() {
-  const kpiCards = buildKpiCards();
-
-  return (
-    <div className="overview-view">
-      <div className="overview-left">
-        <div className="kpi-grid">
-          {kpiCards.map((card) => (
-            <div key={card.key} className="kpi-card">
-              <div className={`kpi-icon ${card.tone}`}>
-                <Icon name={card.icon} size="1.25rem" />
-              </div>
-              <div className="kpi-body">
-                <span className="kpi-label">{card.label}</span>
-                <span className="kpi-value">
-                  {card.value}
-                  <span className="kpi-unit">{card.unit}</span>
-                </span>
-                <span className={`kpi-trend ${card.trendTone}`}>
-                  <Icon name={card.trendIcon} size="0.75rem" />
-                  {card.trend}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="chart-card">
-          <h3 className="chart-card-title">24 小时流量趋势</h3>
-          <Chart
-            name="LineChart"
-            option={{
-              data: TRAFFIC_TREND,
-              xAxis: { data: "时间", name: "时间" },
-              yAxisTitle: "流量 (Mbps)",
-              smooth: true,
-            }}
-            style={{ height: "17rem" }}
-          />
-        </div>
-        <div className="chart-card">
-          <h3 className="chart-card-title">TOP5 设备流量</h3>
-          <Chart
-            name="BarChart"
-            option={{
-              data: TOP_DEVICE_FLOW.map((d) => ({ "设备": d.device, "流量": d.value })),
-              xAxis: { data: "设备" },
-              yAxisTitle: "流量 (Gbps)",
-              direction: "horizontal",
-            }}
-            style={{ height: "17rem" }}
-          />
-        </div>
-      </div>
-      <div className="overview-right">
-        <div className="chart-card map-card">
-          <h3 className="chart-card-title">全国设备分布</h3>
-          <div className="map-body">
-            <ChinaMap />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-  Object.assign(__export, { OverviewView });
-})();
-
-/* ===== src/components/status-tag/index.jsx ===== */
-(function () {
-  const { Tag } = antd;
-// Layer 3: 设备状态标签 — 设备状态 → Tag 预设色/文案 统一映射
-const DEVICE_STATUS = {
-  online: { color: "success", label: "在线" },
-  offline: { color: "default", label: "离线" },
-  alarm: { color: "error", label: "告警" },
-  maintaining: { color: "warning", label: "维护中" },
-};
-
-function StatusTag({ status }) {
-  const item = DEVICE_STATUS[status] || DEVICE_STATUS.offline;
-  return <Tag color={item.color}>{item.label}</Tag>;
-}
-  Object.assign(__export, { StatusTag });
 })();
 
 /* ===== src/views/device-view/index.jsx ===== */
@@ -6331,6 +7513,40 @@ function DeviceView() {
   );
 }
   Object.assign(__export, { DeviceView });
+})();
+
+/* ===== src/mock/alarm.js ===== */
+(function () {
+// Layer 2: 告警域 mock 数据
+
+const ALARM_SEVERITY_OPTIONS = [
+  { value: "all", label: "全部级别" },
+  { value: "critical", label: "紧急" },
+  { value: "major", label: "重要" },
+  { value: "minor", label: "次要" },
+  { value: "info", label: "提示" },
+];
+
+const ALARM_STATUS_OPTIONS = [
+  { value: "all", label: "全部状态" },
+  { value: "pending", label: "未处理" },
+  { value: "processing", label: "处理中" },
+  { value: "cleared", label: "已清除" },
+];
+
+const ALARMS = [
+  { id: 1, time: "2026-10-23 08:42", severity: "critical", device: "NE8000-M8", description: "设备CPU利用率超过阈值（87% > 80%）", status: "processing" },
+  { id: 2, time: "2026-10-23 08:15", severity: "major", device: "USG6315E-FW2", description: "防火墙并发会话数超过告警阈值（85%）", status: "pending" },
+  { id: 3, time: "2026-10-23 07:58", severity: "minor", device: "S5731-S24P4X-31", description: "端口GE0/0/24入方向流量突增，超过基线300%", status: "processing" },
+  { id: 4, time: "2026-10-23 07:30", severity: "critical", device: "NE8000-M8", description: "BGP邻居10.2.1.1中断，持续时长56秒", status: "cleared" },
+  { id: 5, time: "2026-10-23 06:47", severity: "major", device: "USG6315E-FW2", description: "IPsec隧道协商失败，对端10.3.1.1不可达", status: "pending" },
+  { id: 6, time: "2026-10-23 05:12", severity: "minor", device: "AirEngine5761-11", description: "AP离线超过5分钟，请检查PoE供电", status: "cleared" },
+  { id: 7, time: "2026-10-22 23:40", severity: "info", device: "S6730-H24X-11", description: "MAC地址表项使用率超过60%", status: "cleared" },
+  { id: 8, time: "2026-10-22 22:05", severity: "major", device: "S5731-S24P4X-31", description: "光模块GE0/0/1接收光功率过低（-18.6dBm）", status: "pending" },
+  { id: 9, time: "2026-10-22 20:31", severity: "info", device: "S5735-L48T4X-21", description: "系统日志存储空间即将告满（92%）", status: "processing" },
+  { id: 10, time: "2026-10-22 18:26", severity: "minor", device: "NE40E-X8A-01", description: "OSPF邻居状态震荡，邻居10.1.1.2", status: "cleared" },
+];
+  Object.assign(__export, { ALARM_SEVERITY_OPTIONS, ALARM_STATUS_OPTIONS, ALARMS });
 })();
 
 /* ===== src/views/alarm-view/index.jsx ===== */
@@ -6630,13 +7846,16 @@ function SettingsView() {
 /* ===== src/views/content-area/index.jsx ===== */
 (function () {
   const { useApp } = __export;
+  const SessionCard = __export.SessionCard;
   const OverviewView = __export.OverviewView;
+  const AiChat = __export.AiChat;
   const DeviceView = __export.DeviceView;
   const AlarmView = __export.AlarmView;
   const SettingsView = __export.SettingsView;
 // Layer 4: 菜单内容区 — 按当前激活菜单项渲染对应视图
+// 首页:左侧会话卡片(33.75rem × 100%,贴边) + 右侧地图自适应
+// AI:左侧 AI 会话卡片(33.75rem × 100%,贴边) + 右侧留白
 const VIEW_MAP = {
-  overview: OverviewView,
   devices: DeviceView,
   alarms: AlarmView,
   settings: SettingsView,
@@ -6644,7 +7863,28 @@ const VIEW_MAP = {
 
 function ContentArea() {
   const { activeMenu } = useApp();
-  const ActiveView = VIEW_MAP[activeMenu] || OverviewView;
+
+  if (activeMenu === "overview") {
+    return (
+      <main className="content-area is-overview">
+        <SessionCard />
+        <div className="overview-aside">
+          <OverviewView />
+        </div>
+      </main>
+    );
+  }
+
+  if (activeMenu === "ai") {
+    return (
+      <main className="content-area is-overview">
+        <AiChat />
+        <div className="overview-aside" />
+      </main>
+    );
+  }
+
+  const ActiveView = VIEW_MAP[activeMenu] || DeviceView;
   return (
     <main className="content-area">
       <ActiveView />

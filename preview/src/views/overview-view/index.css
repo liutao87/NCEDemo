@@ -1,94 +1,10 @@
-/* 首页:左栏固定 33.75rem + 右栏自适应地图 */
+/* 首页右侧:地图卡撑满 aside 区域 */
 .overview-view {
-  display: flex;
-  gap: var(--spacing-section);
-  align-items: stretch;
-}
-
-/* 左栏:固定宽度,内容纵向排布 */
-.overview-left {
-  flex: 0 0 33.75rem;
-  width: 33.75rem;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-section);
-}
-
-/* 右栏:吃掉剩余宽度,地图卡纵向撑满 */
-.overview-right {
   flex: 1 1 0;
   min-width: 0;
+  min-height: 0;
   display: flex;
 }
-
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-gutter);
-}
-
-.kpi-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.25rem;
-  background: var(--surface-container-highest);
-  border-radius: var(--radius-container);
-  box-shadow: var(--shadow-card);
-}
-
-.kpi-icon {
-  flex: 0 0 auto;
-  width: 2.75rem;
-  height: 2.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-md);
-}
-
-.kpi-icon.brand { background: var(--info-container); color: var(--info); }
-.kpi-icon.success { background: var(--success-container); color: var(--success); }
-.kpi-icon.error { background: var(--error-container); color: var(--error); }
-.kpi-icon.warning { background: var(--warning-container); color: var(--critical); }
-
-.kpi-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  min-width: 0;
-}
-
-.kpi-label {
-  font: var(--font-body-s);
-  color: var(--on-surface-variant);
-}
-
-.kpi-value {
-  font: var(--font-display-s);
-  font-weight: var(--font-weight-semibold);
-  color: var(--on-surface);
-  line-height: 1.2;
-}
-
-.kpi-unit {
-  margin-left: 0.25rem;
-  font: var(--font-body-s);
-  font-weight: var(--font-weight-normal);
-  color: var(--on-surface-variant);
-}
-
-.kpi-trend {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font: var(--font-caption-m);
-  color: var(--on-surface-variant);
-}
-
-.kpi-trend.up { color: var(--success); }
-.kpi-trend.down { color: var(--error); }
 
 .chart-card {
   display: flex;

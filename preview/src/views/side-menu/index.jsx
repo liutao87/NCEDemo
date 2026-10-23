@@ -9,6 +9,7 @@ const MENU_ITEMS = [
   { key: "devices", icon: "server", label: "设备管理" },
   { key: "alarms", icon: "bell", label: "告警管理" },
   { key: "settings", icon: "settings", label: "系统设置" },
+  { key: "ai", icon: "sparkles", label: "AI" },
 ];
 
 export default function SideMenu() {
