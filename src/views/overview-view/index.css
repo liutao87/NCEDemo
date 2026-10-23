@@ -1,0 +1,98 @@
+/* 总览:KPI 指标卡 + 图表卡片 */
+.overview-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-gutter);
+}
+
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: var(--surface-container-highest);
+  border-radius: var(--radius-container);
+  box-shadow: var(--shadow-card);
+}
+
+.kpi-icon {
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+.kpi-icon.brand { background: var(--info-container); color: var(--info); }
+.kpi-icon.success { background: var(--success-container); color: var(--success); }
+.kpi-icon.error { background: var(--error-container); color: var(--error); }
+.kpi-icon.warning { background: var(--warning-container); color: var(--critical); }
+
+.kpi-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.kpi-label {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+.kpi-value {
+  font: var(--font-display-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+  line-height: 1.2;
+}
+
+.kpi-unit {
+  margin-left: 0.25rem;
+  font: var(--font-body-s);
+  font-weight: var(--font-weight-normal);
+  color: var(--on-surface-variant);
+}
+
+.kpi-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+}
+
+.kpi-trend.up { color: var(--success); }
+.kpi-trend.down { color: var(--error); }
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--spacing-gutter);
+  align-items: stretch;
+}
+
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1rem 0.75rem;
+  background: var(--surface-container-highest);
+  border-radius: var(--radius-container);
+  box-shadow: var(--shadow-card);
+}
+
+.chart-card-title {
+  margin: 0 0 0.75rem;
+  padding-left: 0.25rem;
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
