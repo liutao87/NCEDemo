@@ -1,11 +1,12 @@
 import { Icon } from "../../../assets/shared/icon.jsx";
 import Chart from "../../../assets/shared/chart.jsx";
+import ChinaMap from "../../components/china-map/index.jsx";
 import { DEVICES } from "../../mock/device.js";
 import { ALARMS } from "../../mock/alarm.js";
 import { TRAFFIC_TREND, TOP_DEVICE_FLOW } from "../../mock/overview.js";
 import "./index.css";
 
-// Layer 4: 总览 — KPI 指标卡 + 流量趋势折线图 + TOP5 设备流量条形图
+// Layer 4: 首页 — 左栏固定 33.75rem(KPI + 图表纵排),右栏自适应(canvas 中国省份地图)
 function buildKpiCards() {
   const total = DEVICES.length;
   const onlineCount = DEVICES.filter((d) => d.status === "online").length;
@@ -64,27 +65,27 @@ export default function OverviewView() {
 
   return (
     <div className="overview-view">
-      <div className="kpi-grid">
-        {kpiCards.map((card) => (
-          <div key={card.key} className="kpi-card">
-            <div className={`kpi-icon ${card.tone}`}>
-              <Icon name={card.icon} size="1.25rem" />
+      <div className="overview-left">
+        <div className="kpi-grid">
+          {kpiCards.map((card) => (
+            <div key={card.key} className="kpi-card">
+              <div className={`kpi-icon ${card.tone}`}>
+                <Icon name={card.icon} size="1.25rem" />
+              </div>
+              <div className="kpi-body">
+                <span className="kpi-label">{card.label}</span>
+                <span className="kpi-value">
+                  {card.value}
+                  <span className="kpi-unit">{card.unit}</span>
+                </span>
+                <span className={`kpi-trend ${card.trendTone}`}>
+                  <Icon name={card.trendIcon} size="0.75rem" />
+                  {card.trend}
+                </span>
+              </div>
             </div>
-            <div className="kpi-body">
-              <span className="kpi-label">{card.label}</span>
-              <span className="kpi-value">
-                {card.value}
-                <span className="kpi-unit">{card.unit}</span>
-              </span>
-              <span className={`kpi-trend ${card.trendTone}`}>
-                <Icon name={card.trendIcon} size="0.75rem" />
-                {card.trend}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="chart-grid">
+          ))}
+        </div>
         <div className="chart-card">
           <h3 className="chart-card-title">24 小时流量趋势</h3>
           <Chart
@@ -110,6 +111,14 @@ export default function OverviewView() {
             }}
             style={{ height: "17rem" }}
           />
+        </div>
+      </div>
+      <div className="overview-right">
+        <div className="chart-card map-card">
+          <h3 className="chart-card-title">全国设备分布</h3>
+          <div className="map-body">
+            <ChinaMap />
+          </div>
         </div>
       </div>
     </div>

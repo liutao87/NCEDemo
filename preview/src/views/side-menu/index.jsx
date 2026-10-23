@@ -5,7 +5,7 @@ import "./index.css";
 
 // Layer 4: 侧边菜单 — 收起 3rem / 展开 16rem,底部按钮切换(抽屉式伸缩)
 const MENU_ITEMS = [
-  { key: "overview", icon: "layout-dashboard", label: "总览" },
+  { key: "overview", icon: "house", label: "首页" },
   { key: "devices", icon: "server", label: "设备管理" },
   { key: "alarms", icon: "bell", label: "告警管理" },
   { key: "settings", icon: "settings", label: "系统设置" },

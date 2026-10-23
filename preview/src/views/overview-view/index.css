@@ -1,13 +1,30 @@
-/* 总览:KPI 指标卡 + 图表卡片 */
+/* 首页:左栏固定 33.75rem + 右栏自适应地图 */
 .overview-view {
+  display: flex;
+  gap: var(--spacing-section);
+  align-items: stretch;
+}
+
+/* 左栏:固定宽度,内容纵向排布 */
+.overview-left {
+  flex: 0 0 33.75rem;
+  width: 33.75rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--spacing-section);
 }
 
+/* 右栏:吃掉剩余宽度,地图卡纵向撑满 */
+.overview-right {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+}
+
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-gutter);
 }
 
@@ -73,13 +90,6 @@
 .kpi-trend.up { color: var(--success); }
 .kpi-trend.down { color: var(--error); }
 
-.chart-grid {
-  display: grid;
-  grid-template-columns: 3fr 2fr;
-  gap: var(--spacing-gutter);
-  align-items: stretch;
-}
-
 .chart-card {
   display: flex;
   flex-direction: column;
@@ -95,4 +105,16 @@
   font: var(--font-headline-s);
   font-weight: var(--font-weight-semibold);
   color: var(--on-surface);
+}
+
+/* 地图卡:占满右栏,画布区域吃掉剩余高度(canvas 需要明确高度反馈) */
+.map-card {
+  flex: 1 1 0;
+  min-height: 34rem;
+}
+
+.map-body {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
 }
