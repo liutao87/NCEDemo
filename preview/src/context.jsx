@@ -6,7 +6,7 @@ import { useState, useEffect, createContext, useContext } from "react";
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(true);
   // 侧边菜单默认收起(3rem 宽),点击底部按钮/头部汉堡图标可展开为 16rem
   const [menuCollapsed, setMenuCollapsed] = useState(true);
   // 当前激活的菜单项 key

@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { CHINA_PROVINCES, NINE_DASH_LINES, MAP_MARKERS, MAP_HUBS } from "../../mock/china-map.js";
 import { Icon } from "../../../assets/shared/icon.jsx";
 import { useApp } from "../../context.jsx";
+import { CHINA_PROVINCES, NINE_DASH_LINES, MAP_MARKERS, MAP_HUBS } from "../../mock/china-map.js";
 import "./index.css";
 
-// Layer 3: 中国省份地图 — canvas 绘制真实边界 + 省份文本
-// 投影:等距圆柱 + 中纬度经度收缩;颜色取组件级地图变量,暗色模式自动跟随重绘
+// Layer 3: 中国地图 — canvas 绘制(阿里 DataV 高德行政区划数据)
+// 双层边界:省界线(细,浅色) + 国界/海岸线(粗,深色,CHINA_BORDER)
+// 其余:省份文本 + 绿色标注点 + 连线 + 枢纽 logo(DOM 叠加) + 南海附图,明暗配色自动跟随
 
 const LON_MIN = 73.2;
 const LON_MAX = 135.8;
@@ -97,6 +98,8 @@ export default function ChinaMap() {
   const { isDark } = useApp();
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
+  // 视图状态:交互缩放/平移(ref 存放,重绘时读取,不触发 React 渲染)
+  const viewRef = useRef({ zoom: 1, panX: 0, panY: 0 });
   const [hubPos, setHubPos] = useState([]);
 
   useEffect(() => {
@@ -119,32 +122,51 @@ export default function ChinaMap() {
 
       // 颜色取自组件 CSS 中的地图专属变量(浅/暗两套,.dark 切换后随之变化)
       const cFill = readToken(wrap, "--map-fill", "#F0F0F0");
-      const cLine = readToken(wrap, "--map-line", "#D9D9D9");
+      const cLine = readToken(wrap, "--map-line", "#D9D9D9"); // 省界线
       const cText = readToken(wrap, "--map-text", "#595959");
       const cSub = readToken(wrap, "--map-text-sub", "#8C8C8C");
-      const cMarker = readToken(wrap, "--success", "#00A870");
-      const cLink = readToken(wrap, "--map-link", "#06A46F");
+      const cMarker = readToken(wrap, "--map-link", "#08A471"); // 标注点
+      const cLink = readToken(wrap, "--map-link", "#08A471"); // 连线/logo
+      const cStripe = readToken(wrap, "--map-stripe", "#202020"); // 背景条纹
 
-      // 投影参数(等比缩放 + 居中)
+      // 0. 背景竖直条纹(条纹与间隔交替布满画布,省份多边形覆盖其上)
+      const stripeW = 3; // 条纹宽 3px
+      const stripeGap = 2; // 间隙 2px
+      ctx.fillStyle = cStripe;
+      for (let x = 0; x < w; x += stripeW + stripeGap) {
+        ctx.fillRect(x, 0, stripeW, h);
+      }
+
+      // 基础投影(等比缩放 + 居中,整体放大 1.3 倍)
+      const ZOOM = 1.3;
       const pad = 10;
-      const scale = Math.min((w - pad * 2) / SPAN_X, (h - pad * 2) / SPAN_Y);
+      const scale =
+        ZOOM * Math.min((w - pad * 2) / SPAN_X, (h - pad * 2) / SPAN_Y);
       const offsetX = (w - SPAN_X * scale) / 2;
       const offsetY = (h - SPAN_Y * scale) / 2;
-      const project = (lon, lat) => [
-        offsetX + (lon - LON_MIN) * MID_LAT_K * scale,
-        offsetY + (LAT_MAX - lat) * scale,
-      ];
-
-      // 1. 省份多边形:填充 + 描边
-      ctx.lineJoin = "round";
-      CHINA_PROVINCES.forEach((p) => {
+      // 视图变换:绕画布中心缩放 + 平移(滚轮缩放/拖拽交互)
+      const { zoom, panX, panY } = viewRef.current;
+      const cx = w / 2;
+      const cy = h / 2;
+      const project = (lon, lat) => {
+        const bx = offsetX + (lon - LON_MIN) * MID_LAT_K * scale;
+        const by = offsetY + (LAT_MAX - lat) * scale;
+        return [(bx - cx) * zoom + cx + panX, (by - cy) * zoom + cy + panY];
+      };
+      const strokePath = (points) => {
         ctx.beginPath();
-        p.points.forEach(([lon, lat], i) => {
+        points.forEach(([lon, lat], i) => {
           const [x, y] = project(lon, lat);
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         });
         ctx.closePath();
+      };
+
+      // 1. 省份:填充 + 省界线(细,浅色)
+      ctx.lineJoin = "round";
+      CHINA_PROVINCES.forEach((p) => {
+        strokePath(p.points);
         ctx.fillStyle = cFill;
         ctx.fill();
         ctx.strokeStyle = cLine;
@@ -152,8 +174,10 @@ export default function ChinaMap() {
         ctx.stroke();
       });
 
-      // 2. 省份文本(字号随画布宽度整体缩放)
-      const fontScale = Math.min(Math.max(w / 760, 0.78), 1.15);
+      // 2. 省份文本(字号随画布宽度 + 视图缩放整体缩放,设上下限)
+      const fontScale =
+        Math.min(Math.max(w / 760, 0.78), 1.15) *
+        Math.min(Math.max(zoom, 0.6), 2);
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       CHINA_PROVINCES.forEach((p) => {
@@ -164,22 +188,40 @@ export default function ChinaMap() {
         ctx.fillText(p.name, lx, ly);
       });
 
-      // 3. 站点连线(标注点 → 枢纽真实投影点;logo 图标仅做视觉偏移,不改变汇聚位置)
+      // 4. 站点连线:每个站点标注点与前海/嘉定/外高桥三个枢纽全部互联
       const remPx = parseFloat(window.getComputedStyle(document.documentElement).fontSize) || 16;
       ctx.lineWidth = 1;
       ctx.strokeStyle = cLink;
       MAP_MARKERS.forEach((m) => {
-        const hub = MAP_HUBS.find((hb) => hb.id === m.hub);
-        if (!hub) return;
         const [x1, y1] = project(m.lon, m.lat);
-        const [x2, y2] = project(hub.lon, hub.lat);
+        MAP_HUBS.forEach((hub) => {
+          const [x2, y2] = project(hub.lon, hub.lat);
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        });
+      });
+
+      // 4.5 枢纽骨干互联(前海 ↔ 嘉定 ↔ 外高桥 三角骨干环,线加粗与站点接入线区分)
+      ctx.lineWidth = 1.5;
+      const hubPairs = [
+        ["qianhai", "jiading"],
+        ["jiading", "waigaoqiao"],
+        ["waigaoqiao", "qianhai"],
+      ];
+      hubPairs.forEach(([idA, idB]) => {
+        const h1 = MAP_HUBS.find((hb) => hb.id === idA);
+        const h2 = MAP_HUBS.find((hb) => hb.id === idB);
+        if (!h1 || !h2) return;
+        const [x1, y1] = project(h1.lon, h1.lat);
+        const [x2, y2] = project(h2.lon, h2.lat);
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.stroke();
       });
-
-      // 4. 省份标注点(绿色实心圆)
+      ctx.lineWidth = 1;
       MAP_MARKERS.forEach((m) => {
         const [x, y] = project(m.lon, m.lat);
         ctx.beginPath();
@@ -188,15 +230,71 @@ export default function ChinaMap() {
         ctx.fill();
       });
 
-      // 5. 枢纽位置输出给 DOM 叠加层(logo 圆 + 名称,含水平偏移,嘉定靠左/外高桥靠右)
-      setHubPos(
-        MAP_HUBS.map((hb) => {
-          const [x, y] = project(hb.lon, hb.lat);
-          return { id: hb.id, label: hb.label, x: x + (hb.offsetX || 0) * remPx, y };
-        }),
-      );
+      // 5.5 枢纽标注点(绿色实心圆,连线汇聚处,logo 悬浮其上)
+      MAP_HUBS.forEach((hb) => {
+        const [x, y] = project(hb.lon, hb.lat);
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = cMarker;
+        ctx.fill();
+      });
 
-      // 6. 南海诸岛附图(右下角,真实九段线 + 台湾/海南轮廓)
+      // 6. 枢纽位置输出给 DOM 叠加层
+      // 前海:无偏移;嘉定/外高桥:对角偏移 + 最小分离(缩小时推开保证间隙),
+      // 放大(≥1.8x 起过渡,2.4x 到位)后切换为两点中点上方左右并排
+      const logoD = 3 * remPx; // logo 直径
+      const gapMin = 0.3 * remPx; // 期望间隙
+      const dMin = logoD + gapMin;
+      const pos = MAP_HUBS.map((hb) => {
+        const [x, y] = project(hb.lon, hb.lat);
+        return { hb, x, y };
+      });
+      const jd = pos.find((p) => p.hb.id === "jiading");
+      const wg = pos.find((p) => p.hb.id === "waigaoqiao");
+
+      // 模式A:对角偏移(嘉定左上/外高桥右下) + 最小分离推开
+      let A1 = { x: jd.x + jd.hb.offsetX * remPx, y: jd.y + jd.hb.offsetY * remPx };
+      let A2 = { x: wg.x + wg.hb.offsetX * remPx, y: wg.y + wg.hb.offsetY * remPx };
+      let ddx = A2.x - A1.x;
+      let ddy = A2.y - A1.y;
+      let dist = Math.hypot(ddx, ddy) || 0.001;
+      if (dist < dMin) {
+        const midX = (A1.x + A2.x) / 2;
+        const midY = (A1.y + A2.y) / 2;
+        const nx = ddx / dist;
+        const ny = ddy / dist;
+        A1 = { x: midX - (nx * dMin) / 2, y: midY - (ny * dMin) / 2 };
+        A2 = { x: midX + (nx * dMin) / 2, y: midY + (ny * dMin) / 2 };
+      }
+
+      // 模式B:logo 严格悬浮于标注点正中心上方(圆下缘贴住点,水平与点居中对齐)
+      const lift = logoD / 2;
+      const B1 = { x: jd.x, y: jd.y - lift };
+      const B2 = { x: wg.x, y: wg.y - lift };
+
+      // zoom 阈值平滑插值(1.8x 起过渡,2.4x 完全到位)
+      const z1 = 1.8;
+      const z2 = 2.4;
+      let tv = (zoom - z1) / (z2 - z1);
+      tv = Math.min(Math.max(tv, 0), 1);
+      tv = tv * tv * (3 - 2 * tv); // smoothstep
+      const lerp = (a, b, k) => a + (b - a) * k;
+
+      const hubPosOf = (p, a, b) => ({
+        id: p.hb.id,
+        label: p.hb.label,
+        x: lerp(a.x, b.x, tv),
+        y: lerp(a.y, b.y, tv),
+      });
+      setHubPos([
+        ...pos
+          .filter((p) => p.hb.id !== "jiading" && p.hb.id !== "waigaoqiao")
+          .map((p) => ({ id: p.hb.id, label: p.hb.label, x: p.x, y: p.y })),
+        hubPosOf(jd, A1, B1),
+        hubPosOf(wg, A2, B2),
+      ]);
+
+      // 7. 南海诸岛附图(右下角,真实九段线 + 台湾/海南轮廓)
       const sw = 88;
       const sh = 64;
       const hainanP = CHINA_PROVINCES.find((p) => p.name === "海南");
@@ -212,7 +310,68 @@ export default function ChinaMap() {
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(wrap);
-    return () => ro.disconnect();
+
+    // ---------- 地图交互:滚轮缩放(以鼠标为锚点) + 拖拽平移 ----------
+    const onWheel = (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left;
+      const my = e.clientY - rect.top;
+      const v = viewRef.current;
+      const ccx = rect.width / 2;
+      const ccy = rect.height / 2;
+      const factor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
+      const z2 = Math.min(Math.max(v.zoom * factor, 0.5), 8);
+      // 反推鼠标点对应的基础投影坐标,保持缩放锚点地理不动
+      const bx = (mx - ccx - v.panX) / v.zoom + ccx;
+      const by = (my - ccy - v.panY) / v.zoom + ccy;
+      viewRef.current = {
+        zoom: z2,
+        panX: mx - ccx - (bx - ccx) * z2,
+        panY: my - ccy - (by - ccy) * z2,
+      };
+      draw();
+    };
+
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    const onDown = (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      canvas.style.cursor = "grabbing";
+    };
+    const onMove = (e) => {
+      if (!dragging) return;
+      const v = viewRef.current;
+      viewRef.current = {
+        ...v,
+        panX: v.panX + (e.clientX - lastX),
+        panY: v.panY + (e.clientY - lastY),
+      };
+      lastX = e.clientX;
+      lastY = e.clientY;
+      draw();
+    };
+    const onUp = () => {
+      if (!dragging) return;
+      dragging = false;
+      canvas.style.cursor = "grab";
+    };
+
+    canvas.addEventListener("wheel", onWheel, { passive: false });
+    canvas.addEventListener("mousedown", onDown);
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+
+    return () => {
+      ro.disconnect();
+      canvas.removeEventListener("wheel", onWheel);
+      canvas.removeEventListener("mousedown", onDown);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+    };
   }, [isDark]);
 
   return (
