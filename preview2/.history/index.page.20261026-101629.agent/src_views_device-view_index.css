@@ -1,0 +1,58 @@
+/* 设备管理:筛选工具栏 + 表格卡片 */
+.device-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+}
+
+.toolbar-card {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface-container-highest);
+  border-radius: var(--radius-container);
+  box-shadow: var(--shadow-card);
+}
+
+.toolbar-search {
+  width: 18rem;
+}
+
+.toolbar-spacer {
+  flex: 1 1 auto;
+}
+
+.table-card {
+  padding: 0 1rem 1rem;
+  background: var(--surface-container-highest);
+  border-radius: var(--radius-container);
+  box-shadow: var(--shadow-card);
+}
+
+/* 表格链接式操作 */
+.table-link {
+  color: var(--interactive-link);
+  cursor: pointer;
+}
+
+.table-link:hover {
+  color: var(--interactive-link-hover);
+}
+
+/* 操作列纯图标:间距 1rem,hover 品牌色 */
+.table-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.table-action-icon {
+  color: var(--on-surface-variant);
+  transition: color 0.15s ease;
+}
+
+.table-action-icon:hover {
+  color: var(--color-brand);
+}

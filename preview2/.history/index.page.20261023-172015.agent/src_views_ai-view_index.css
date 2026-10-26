@@ -1,0 +1,197 @@
+/* AI 会话:左侧 540px × 100% 面板(导航栏 + 居中欢迎内容 + AI 输入框) */
+.ai-chat {
+  flex: 0 0 33.75rem; /* 540px */
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
+  border-right: var(--border-width-thin) solid var(--divider);
+}
+
+/* ---------- 顶部导航栏(50px) ---------- */
+.ai-nav {
+  flex-shrink: 0;
+  height: 3.125rem; /* 50px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+}
+
+.ai-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.ai-nav-btn {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.ai-nav-btn:hover {
+  background: var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.ai-nav-title {
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 会话中心:水平垂直居中 ---------- */
+.ai-center {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.ai-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ai-gem {
+  width: 3.75rem; /* 60px */
+  height: 3.75rem;
+}
+
+.ai-brand-name {
+  font-size: var(--font-size-3xl); /* 24px */
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-xs);
+  color: var(--on-surface);
+}
+
+.ai-intro {
+  margin: 1.5rem 0 0; /* 24px */
+  font: var(--font-body-m);
+  color: var(--on-surface-variant);
+}
+
+/* 信息区域:左文案 | 右刷新+换一批,两端对齐 */
+.ai-scene-bar {
+  margin-top: 2.25rem; /* 36px */
+  width: 26.25rem; /* 420px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ai-scene-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+}
+
+.ai-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0;
+  border: none;
+  background: transparent;
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.ai-refresh:hover {
+  color: var(--primary);
+}
+
+/* ---------- 三张场景卡片(420px × 72px, 间距8px, 圆角16px) ---------- */
+.ai-cards {
+  margin-top: 1rem; /* 16px */
+  width: 26.25rem; /* 420px */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 8px */
+}
+
+.ai-card {
+  height: 4.5rem; /* 72px */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  border-radius: 1rem; /* 16px */
+  background: var(--surface-container-highest); /* 浅色白卡 */
+  box-shadow: var(--shadow-md); /* 增强阴影,浅色下轮廓清晰 */
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.ai-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 暗色:提亮卡片背景与纯黑区域拉开对比,阴影改为 hover 提亮 */
+.dark .ai-chat .ai-card {
+  background: var(--color-bg-3);
+  box-shadow: none;
+}
+
+.dark .ai-chat .ai-card:hover {
+  background: var(--color-bg-4);
+  box-shadow: none;
+}
+
+/* 暗色:导航按钮 hover 背景(默认 token 在暗色下不可见) */
+.dark .ai-chat .ai-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ai-card-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--primary);
+}
+
+.ai-card-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ai-card-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+}
+
+.ai-card-desc {
+  margin-top: 0.125rem;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 底部 AI 输入框(复用 Composer,左右/底部留白 32px) ---------- */
+.ai-chat .session-composer {
+  padding: 0 2rem 2rem;
+}

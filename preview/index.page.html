@@ -4292,6 +4292,12 @@ input.ant-input.ant-input-sm {
   background-repeat: no-repeat;
 }
 
+/* 深色主题:浅色背景图上叠深色蒙层,保证白色标题/正文可读 */
+.dark .session-card .session-main {
+  background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.62)),
+    url("./assets/uploads/bg-1.png");
+}
+
 /* ---------- 区域一:标题 + 时间范围下拉 ---------- */
 .session-head {
   flex-shrink: 0;
@@ -4360,6 +4366,7 @@ input.ant-input.ant-input-sm {
   width: 5.9375rem; /* 95px */
   height: 5.3125rem; /* 85px */
   margin-right: 0.8125rem; /* 额外 13px,与区域外缘合计 45px */
+  object-fit: contain; /* 任意比例图片均不拉伸变形 */
 }
 
 /* ---------- 区域三:左右指标小卡片 ---------- */
@@ -4708,14 +4715,14 @@ input.ant-input.ant-input-sm {
   align-items: center;
   gap: 0.375rem;
   height: 1.75rem;
-  padding: 0 0.625rem;
+  padding: 0 1.125rem;
   border-radius: var(--radius-full);
   background: var(--surface-variant);
   color: var(--on-surface-variant);
   font: var(--font-body-s);
   cursor: pointer;
   user-select: none;
-  transition: color 0.2s ease, background 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
 .tool-btn:hover {
@@ -4728,7 +4735,7 @@ input.ant-input.ant-input-sm {
 }
 
 .tool-btn-text {
-  max-width: 8rem;
+  max-width: 14rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -4799,6 +4806,52 @@ input.ant-input.ant-input-sm {
   gap: 0.25rem;
   font: var(--font-caption-m);
   color: var(--on-surface-variant);
+}
+
+/* ---------- 深色输入框:场景下拉与模板库按钮统一胶囊圆角 + 白色系描边 ----------
+   覆盖 AI 面板(永久深色)与首页(深色应用下),两个输入框样式一致 */
+.ai-chat .composer-tools-left .tool-btn,
+.dark .session-card .composer-tools-left .tool-btn {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ai-chat .composer-tools-left .tool-btn:hover,
+.dark .session-card .composer-tools-left .tool-btn:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* 场景下拉 Select(borderless 变体):补胶囊圆角 + 白色描边,与模板库按钮对齐 */
+.ai-chat .scene-select .ant-select-selector,
+.dark .session-card .scene-select .ant-select-selector {
+  height: 1.75rem !important;
+  min-height: 1.75rem !important;
+  padding: 0 0.875rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: var(--radius-full) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ai-chat .scene-select .ant-select-selector:hover,
+.dark .session-card .scene-select .ant-select-selector:hover {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.ai-chat .scene-select .ant-select-selection-item,
+.dark .session-card .scene-select .ant-select-selection-item {
+  color: rgba(255, 255, 255, 0.85) !important;
+  line-height: 1.5rem;
+}
+
+.ai-chat .scene-select .ant-select-arrow,
+.dark .session-card .scene-select .ant-select-arrow {
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* ---------- 模板库浮层弹窗(354px 高,明暗主题适配) ---------- */
@@ -5216,6 +5269,37 @@ input.ant-input.ant-input-sm {
   border-right: var(--border-width-thin) solid var(--divider);
 }
 
+/* ---------- AI 面板固定深色皮肤(应用浅色/深色下均为深色) ----------
+   根节点自带 .dark 类 → dark.css 的 --color-* 深色值在本域生效;
+   此处补齐 theme.css 语义令牌的本域映射(令牌在 :root 处求值,需局部重声明),
+   使面板内自绘样式(气泡/卡片/输入框/思考区等)同步走深色 */
+.ai-chat.dark {
+  --primary: var(--color-brand);
+  --on-primary: var(--color-text-inverse);
+  --primary-hover: var(--color-brand-hover);
+  --primary-active: var(--color-brand-active);
+  --primary-container: var(--color-info-primary-subtler);
+  --on-primary-container: var(--color-text-primary);
+  --surface: var(--color-bg-1);
+  --on-surface: var(--color-text-primary);
+  --surface-variant: var(--color-bg-4);
+  --on-surface-variant: var(--color-text-secondary);
+  --surface-container-lowest: var(--color-bg-1); /* 面板底 */
+  --surface-container-low: var(--color-bg-2);
+  --surface-container: var(--color-bg-2);
+  --surface-container-high: var(--color-bg-2);
+  --surface-container-highest: var(--color-bg-3); /* 回答/欢迎/输入卡片 */
+  --text-placeholder: var(--color-text-placeholder);
+  --text-disabled: var(--color-text-disabled);
+  --divider: var(--color-border-separator);
+  --outline: var(--color-border);
+  --focus-ring: var(--color-border-focus);
+  --interactive-link: var(--color-link);
+  --success: var(--color-success);
+  --error: var(--color-error);
+  --info: var(--color-info-primary);
+}
+
 /* ---------- 顶部导航栏(50px) ---------- */
 .ai-nav {
   flex-shrink: 0;
@@ -5399,6 +5483,1565 @@ input.ant-input.ant-input-sm {
 /* ---------- 底部 AI 输入框(复用 Composer,左右/底部留白 32px) ---------- */
 .ai-chat .session-composer {
   padding: 0 2rem 2rem;
+}
+
+/* ==================================================================
+   对话流(发送后):时间 + 用户蓝色卡片(三圆角) + AI 回答卡片
+   ================================================================== */
+
+/* ---------- 对话流滚动容器 ---------- */
+.ai-thread {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem 2rem;
+}
+
+.ai-thread::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.ai-thread::-webkit-scrollbar-thumb {
+  background: rgba(25, 25, 25, 0.18);
+  border-radius: var(--radius-full);
+}
+
+.dark .ai-chat .ai-thread::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* 每组问答 */
+.ai-exchange {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+/* 顶部居中的本次对话时间 */
+.ai-chat-time {
+  text-align: center;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+}
+
+/* 用户输入卡片:蓝色背景、右上角小圆角其余三圆角、靠右、宽于回答卡片略窄 */
+.ai-msg-user {
+  align-self: flex-end;
+  max-width: 88%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem 0.25rem 0.75rem 0.75rem; /* 三个大圆角 + 右上小圆角 */
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  color: var(--on-primary);
+  font: var(--font-body-m);
+  line-height: var(--line-height-md);
+  word-break: break-word;
+  white-space: pre-wrap;
+  box-shadow: var(--shadow-sm);
+  animation: msg-in 0.3s ease-out;
+}
+
+/* ---------- AI 回答卡片(整卡,占满对话区宽度) ---------- */
+.answer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--surface-container-highest);
+  box-shadow: var(--shadow-sm);
+  animation: msg-in 0.3s ease-out;
+}
+
+.dark .ai-chat .answer-card {
+  background: var(--color-bg-3);
+  box-shadow: none;
+}
+
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 区块内容浮现 + 蓝色生成光晕(卡片生成瞬间) */
+.reveal {
+  animation: msg-in 0.35s ease-out, gen-glow 1.6s ease-out 0.1s;
+}
+
+@keyframes gen-glow {
+  0% {
+    box-shadow: 0 0 0.75rem 0.25rem rgba(0, 103, 209, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 103, 209, 0);
+  }
+}
+
+/* 发送后短暂等待行 */
+.ac-wait {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+/* ---------- 可折叠区头(思考 / 技能选择匹配) ---------- */
+.ac-section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  width: 100%;
+  padding: 0.25rem 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--on-surface);
+}
+
+.ac-lead-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+/* 思考中:图标蓝色光晕呼吸 */
+.ac-lead-icon.is-live {
+  animation: think-pulse 1.1s ease-in-out infinite;
+}
+
+@keyframes think-pulse {
+  0%,
+  100% {
+    text-shadow: none;
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 0.5rem rgba(0, 103, 209, 0.9);
+    transform: scale(1.1);
+  }
+}
+
+.ac-section-title {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: left;
+  font: var(--font-body-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ac-head-state {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--primary);
+}
+
+.ac-head-state .ac-done {
+  color: var(--success);
+}
+
+.ac-head-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--on-surface-variant);
+}
+
+/* 旋转加载图标 */
+.is-spin {
+  animation: ac-spin 1s linear infinite;
+}
+
+@keyframes ac-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 思考过程内容(浅色内嵌区) */
+.ac-think-body {
+  margin: 0.25rem 0 0.25rem 1.25rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.5rem;
+  background: var(--surface-variant);
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+.dark .ai-chat .ac-think-body {
+  background: var(--color-bg-4);
+}
+
+/* ---------- 任务拆解与规划(区块标签 + 技能小步骤) ---------- */
+.ac-block-label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0 0.125rem;
+}
+
+.ac-block-label .ac-lead-icon.is-ok {
+  color: var(--success);
+}
+
+.ac-block-name {
+  font: var(--font-body-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.ac-plan-body {
+  margin-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 步骤条图标内容居中(数字/对勾处于圆心,各状态一致) */
+.ai-chat .ac-steps .ant-steps-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.ai-chat .ac-steps .ant-steps-item-icon .ant-steps-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* 步骤条标题/描述:强制面板亮色令牌
+   antd 运行时注入的浅色主题样式晚于静态样式插入,须以更高优先级覆盖,
+   否则描述文字为浅色主题深灰,在深色面板上不可读 */
+.ai-chat .ac-steps .ant-steps-item .ant-steps-item-title {
+  color: var(--on-surface) !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item.ant-steps-item-wait .ant-steps-item-title {
+  color: var(--on-surface-variant) !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item .ant-steps-item-description {
+  color: var(--on-surface) !important;
+  font: var(--font-body-s);
+  line-height: var(--line-height-md);
+}
+
+/* 步骤一描述:标签文件胶囊 */
+.ac-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+  padding-bottom: 0.125rem;
+}
+
+.ac-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  font: var(--font-caption-m);
+}
+
+/* ---------- 总任务规划清单小卡片 ---------- */
+.plan-card {
+  margin-top: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.75rem;
+  background: var(--surface-variant);
+  animation: msg-in 0.35s ease-out, gen-glow 1.8s ease-out 0.1s;
+}
+
+.dark .ai-chat .plan-card {
+  background: var(--color-bg-4);
+}
+
+.plan-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.plan-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font: var(--font-body-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.plan-fold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.plan-fold:hover {
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+}
+
+.dark .ai-chat .plan-fold:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.plan-card-hint {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font: var(--font-caption-m);
+  color: var(--success);
+}
+
+.plan-list {
+  margin: 0.625rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.plan-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: var(--font-body-s);
+  color: var(--on-surface);
+  animation: msg-in 0.3s ease-out both;
+}
+
+/* 未轮到逐条打印的清单项:占位隐藏,保持列表高度稳定 */
+.plan-list li.is-hidden {
+  visibility: hidden;
+}
+
+.plan-idx {
+  flex: 0 0 auto;
+  width: 1.125rem;
+  height: 1.125rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  color: var(--on-primary);
+  font: var(--font-caption-s);
+}
+
+/* ---------- 确认提示(确认后才继续) ---------- */
+.ac-confirm {
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.75rem;
+  background: var(--primary-container);
+  animation: msg-in 0.35s ease-out;
+}
+
+.ac-confirm.is-shake {
+  animation: ac-shake 0.45s ease;
+}
+
+@keyframes ac-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+.ac-confirm-text {
+  font: var(--font-body-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-primary-container);
+}
+
+.ac-confirm-btns {
+  margin-top: 0.625rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ---------- 最终结果与逐字打印光效 ---------- */
+.ac-result {
+  font: var(--font-body-m);
+  color: var(--on-surface);
+}
+
+.ac-tw-line {
+  margin: 0;
+  line-height: var(--line-height-md);
+}
+
+.ac-tw-line.is-item {
+  padding-left: 0.5rem;
+}
+
+/* ---------- 打印渐变蒙层(小矩形光带) ----------
+   文字本身保持原色;上方覆盖一层与原文完全重叠的渐变文本,
+   双向遮罩取交集:横向只露末端约 11em,纵向只露最后一行高度,
+   确保光带仅出现在"正在打印的最末视觉行"的行尾,
+   前面各行的行尾不再出现渐变 */
+.tw-live {
+  position: relative;
+}
+
+.ac-tw-line.is-live {
+  position: relative;
+}
+
+.tw-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    #06b6d4 0%,
+    #2563eb 35%,
+    #7c3aed 70%,
+    #ec4899 100%
+  );
+  background-size: 11em 100%;
+  background-repeat: no-repeat;
+  background-position: right center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-mask-image: linear-gradient(
+      to right,
+      transparent calc(100% - 11em),
+      rgba(0, 0, 0, 0.9) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(100% - 1.5em),
+      rgba(0, 0, 0, 0.95) calc(100% - 1.2em),
+      rgba(0, 0, 0, 0.95) 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(
+      to right,
+      transparent calc(100% - 11em),
+      rgba(0, 0, 0, 0.9) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(100% - 1.5em),
+      rgba(0, 0, 0, 0.95) calc(100% - 1.2em),
+      rgba(0, 0, 0, 0.95) 100%
+    );
+  mask-composite: intersect;
+  filter: drop-shadow(0 0 0.375rem rgba(236, 72, 153, 0.5));
+}
+
+/* 打印光标:青→紫→粉三段渐变竖条,辉光与边缘粉色呼应 */
+.tw-caret {
+  display: inline-block;
+  width: 0.125rem;
+  height: 0.9em;
+  margin-left: 0.125rem;
+  vertical-align: -0.1em;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    180deg,
+    #06b6d4 0%,
+    #7c3aed 55%,
+    #ec4899 100%
+  );
+  box-shadow: 0 0 0.375rem rgba(236, 72, 153, 0.7),
+    0 0 0.75rem rgba(124, 58, 237, 0.5);
+  animation: caret-blink 0.9s ease-in-out infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- 底部操作条:左耗时 | 右五图标 ---------- */
+.ac-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  border-top: var(--border-width-thin) solid var(--divider);
+  animation: msg-in 0.35s ease-out;
+}
+
+.ac-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+}
+
+.ac-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.ac-action {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.ac-action:hover {
+  background: var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.ac-action.is-on {
+  color: var(--primary);
+}
+
+.dark .ai-chat .ac-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* 内容生成画布:标题 + 彩色虚线流转矩形(持续动效) */
+
+.content-gen {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- 顶部标题 ---------- */
+.gen-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.gen-title {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: var(--font-headline-m);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.gen-title svg {
+  color: var(--primary);
+  align-self: center;
+}
+
+.gen-sub {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+/* ---------- 虚线流转矩形:高度为可用区一半,垂直居中 ---------- */
+.gen-stage {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center; /* 垂直居中 */
+}
+
+.gen-frame {
+  position: relative;
+  width: 100%;
+  height: 50%; /* 高度为一半 */
+  border-radius: 1.5rem;
+}
+
+.gen-border {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 0 0.375rem rgba(37, 99, 235, 0.35));
+}
+
+/* 两层虚线矩形沿 stroke 流转(彩色渐变描边)
+   rect 自身 x/y 内缩 3px,尺寸需同步减去 6px,否则右/下边被 SVG 视口裁掉 */
+.gen-rect {
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  fill: none;
+  stroke: url(#genGrad);
+  stroke-width: 2;
+  stroke-dasharray: 10 8;
+}
+
+.gen-rect-fast {
+  animation: gen-dash 6s linear infinite;
+}
+
+.gen-rect-slow {
+  opacity: 0.45;
+  stroke-dasharray: 4 10;
+  animation: gen-dash-rev 11s linear infinite;
+}
+
+@keyframes gen-dash {
+  to {
+    stroke-dashoffset: -360;
+  }
+}
+
+@keyframes gen-dash-rev {
+  to {
+    stroke-dashoffset: 360;
+  }
+}
+
+/* ---------- 矩形中心内容 ---------- */
+.gen-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+/* 发光圆球:蓝色呼吸光晕 */
+.gen-orb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: var(--radius-full);
+  background: var(--primary-container);
+  color: var(--primary);
+  animation: orb-glow 2s ease-in-out infinite;
+}
+
+@keyframes orb-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 103, 209, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 1.25rem 0.375rem rgba(0, 103, 209, 0.25);
+  }
+}
+
+.gen-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.125rem;
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+}
+
+/* 三点跳动 */
+.gen-dots {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.1875rem;
+}
+
+.gen-dots i {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: var(--radius-full);
+  background: var(--primary);
+  animation: gen-dot 1.2s ease-in-out infinite;
+}
+
+.gen-dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.gen-dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes gen-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+  30% {
+    transform: translateY(-0.25rem);
+    opacity: 1;
+  }
+}
+
+.gen-hint {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+/* ---------- 深色主题:增强虚线发光与光晕,保证暗背景下的动效可见性 ---------- */
+.dark .content-gen .gen-border {
+  filter: drop-shadow(0 0 0.5rem rgba(37, 99, 235, 0.55));
+}
+
+.dark .content-gen .gen-rect-slow {
+  opacity: 0.6;
+}
+
+.dark .content-gen .gen-orb {
+  animation: orb-glow-dark 2s ease-in-out infinite;
+}
+
+@keyframes orb-glow-dark {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 103, 209, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 1.5rem 0.5rem rgba(0, 103, 209, 0.35);
+  }
+}
+
+
+/* ===== ChangeFlow 配置变更流程校验组件 =====
+   根容器:深色运维控制台风格,填充 AI 页右侧画布(顶栏固定 + 流程区滚动) */
+
+.cf {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  background: #141418;
+  color: #e0e0e0;
+  --cf-detail-icon-color: #dfdfdf;
+  --cf-card-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  font-family: var(--font-family);
+}
+
+/* 背景网格 */
+.cf::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.018) 1px,
+    transparent 0
+  );
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 内容层 */
+.cf-topbar,
+.cf-flow {
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== 动画定义 ===== */
+@keyframes cfFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes cfTagIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes cfSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* 流光旋转角度(需 @property 注册才能平滑插值) */
+@property --cf-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes cfFlow {
+  to {
+    --cf-angle: 360deg;
+  }
+}
+/* 箭头白色彗星流光:自上而下循环流动 */
+@keyframes cfComet {
+  0% {
+    transform: translateX(-50%) translateY(-14px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) translateY(30px);
+    opacity: 0;
+  }
+}
+
+.cf-anim {
+  opacity: 0;
+  animation: cfFadeInUp 0.7s ease-in-out forwards;
+}
+.cf-tag-load {
+  opacity: 0;
+  animation: cfTagIn 0.5s ease-in-out forwards;
+}
+
+/* ===== 顶部导航栏 ===== */
+.cf-topbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 28px;
+  background: linear-gradient(180deg, #1c1c22 0%, #18181d 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.cf-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.cf-topbar-icon {
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #7c5cfc, #a78bfa);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cf-topbar-title {
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  color: #f0f0f0;
+}
+.cf-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.cf-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  color: #b0b0b0;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.cf-btn:hover {
+  color: #fff;
+}
+
+/* 视图缩放控件 */
+.cf-zoom {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  z-index: 10;
+}
+.cf-zoom-btn {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: #b0b0b0;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+.cf-zoom-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.cf-zoom-btn:disabled {
+  color: #555;
+  cursor: not-allowed;
+}
+
+/* ===== 流程图(可滚动) ===== */
+.cf-flow {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px 24px 64px;
+  transform-origin: top center;
+}
+.cf-flow::-webkit-scrollbar {
+  width: 0.375rem;
+}
+.cf-flow::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-full);
+}
+.cf-terminal {
+  width: 60px;
+  height: 39px;
+  border-radius: 19.5px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: #ccc;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+.cf-arrow {
+  width: 1.5px;
+  height: 30px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.22),
+    rgba(255, 255, 255, 0.1)
+  );
+  position: relative;
+  overflow: hidden;
+}
+.cf-arrow::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid rgba(255, 255, 255, 0.22);
+}
+/* 白色彗星流光:仅在箭头内自上而下循环流动,加载完成后消失 */
+.cf-arrow--loading::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 3px;
+  height: 14px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.9)
+  );
+  border-radius: 2px;
+  animation: cfComet 1.4s linear infinite;
+  pointer-events: none;
+}
+
+/* ===== 条件分支 ===== */
+.cf-branch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.cf-branch-cols {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+/* 分叉/汇合贝塞尔曲线(SVG) */
+.cf-branch-fork,
+.cf-branch-join {
+  position: relative;
+  width: 840px;
+  max-width: 100%;
+  height: 50px;
+}
+.cf-branch-fork svg,
+.cf-branch-join svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.cf-branch-fork path,
+.cf-branch-join path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.cf-branch-label {
+  position: absolute;
+  top: 35px;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  color: #aeaeae;
+  background: #2a2a2a;
+  border: 1px solid rgba(174, 174, 174, 0.4);
+  border-radius: var(--radius-full);
+  padding: 2px 10px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.cf-branch-label--left {
+  left: 310px;
+}
+.cf-branch-label--right {
+  left: 530px;
+}
+
+/* ===== 步骤卡片 ===== */
+.cf-card-outer {
+  position: relative;
+  width: 400px;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.cf-card {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
+  --cf-border-color: rgba(243, 243, 243, 0.03);
+  background: #2a2a2a;
+  border: 1px solid var(--cf-border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: var(--cf-card-shadow);
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  overflow: hidden;
+  cursor: pointer;
+}
+.cf-card::after {
+  content: "";
+  pointer-events: none;
+}
+/* 悬浮:边框加粗(内圈阴影叠加,避免布局位移) */
+.cf-card:hover {
+  box-shadow: inset 0 0 0 1px var(--cf-border-color), var(--cf-card-shadow);
+}
+/* 选中:蓝色边框 */
+.cf-card--selected {
+  --cf-border-color: #3b82f6;
+}
+
+/* 加载中:外发光 + 流光边框 + 弥散光晕 */
+.cf-card-outer--loading::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: conic-gradient(
+    from var(--cf-angle) at 50% 50%,
+    #5ca2e9 0%,
+    #3f21b5 25%,
+    #7a6b44 50%,
+    #ff9566 75%,
+    #5ca2e9 100%
+  );
+  animation: cfFlow 4s linear infinite;
+  filter: blur(2px);
+  opacity: 0.4;
+  transition: opacity 0.45s ease-out;
+  z-index: 0;
+  pointer-events: none;
+}
+.cf-card--loading {
+  --cf-angle: 0deg;
+  border: none;
+  border-color: transparent;
+}
+/* 流光边框:旋转圆锥渐变 + 叠加白色流光,仅露出外圈 1.5px */
+.cf-card--loading::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: conic-gradient(
+      from var(--cf-angle) at 50% 50%,
+      transparent 0deg,
+      transparent 15deg,
+      rgba(255, 255, 255, 0.95) 35deg,
+      transparent 60deg,
+      transparent 360deg
+    ),
+    conic-gradient(
+      from var(--cf-angle) at 50% 50%,
+      #5ca2e9 0%,
+      #3f21b5 25%,
+      #7a6b44 50%,
+      #ff9566 75%,
+      #5ca2e9 100%
+    );
+  animation: cfFlow 4s linear infinite;
+  transition: opacity 0.45s ease-out;
+  z-index: 0;
+  pointer-events: none;
+}
+/* 遮罩:内缩 1.5px,露出流光边框,内部填充不透明底色 */
+.cf-card--loading::after {
+  content: "";
+  position: absolute;
+  inset: 1.5px;
+  width: auto;
+  border-radius: 6.5px;
+  background: #2a2a2a;
+  z-index: 1;
+  pointer-events: none;
+}
+/* 弥散光晕:卡片内部叠加径向渐变 */
+.cf-card-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  background: radial-gradient(
+      circle at 100% 0%,
+      rgba(0, 103, 209, 0.15) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      rgba(246, 158, 57, 0.05) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      rgba(142, 129, 244, 0.1) 0%,
+      transparent 60%
+    );
+  transition: opacity 0.45s ease-out;
+  z-index: 2;
+  pointer-events: none;
+}
+/* 卡片右侧规律点阵装饰(40%占比,透明度渐进式递增) */
+.cf-card-dots {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40%;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.12) 1px,
+    transparent 1.5px
+  );
+  background-size: 8px 8px;
+  background-position: 0 0;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.03) 20%,
+    rgba(0, 0, 0, 0.09) 40%,
+    rgba(0, 0, 0, 0.27) 60%,
+    rgba(0, 0, 0, 0.65) 80%,
+    black 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.03) 20%,
+    rgba(0, 0, 0, 0.09) 40%,
+    rgba(0, 0, 0, 0.27) 60%,
+    rgba(0, 0, 0, 0.65) 80%,
+    black 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+/* 缓出阶段:淡出加载视觉 */
+.cf-card-outer--fading::before,
+.cf-card--fading::before,
+.cf-card--fading .cf-card-glow {
+  opacity: 0;
+}
+
+/* 加载指示器 */
+.cf-loading-indicator {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: #5ca2e9;
+  border-radius: 50%;
+  animation: cfSpin 0.8s linear infinite;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+/* 卡片头部 */
+.cf-card-header {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cf-card-title {
+  font-size: 14px;
+  font-weight: var(--font-weight-medium);
+  color: #ffffff;
+}
+.cf-card-index {
+  font-weight: var(--font-weight-medium);
+  margin-right: 6px;
+}
+.cf-card-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.cf-detail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* 标签 */
+.cf-tags {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+.cf-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+  background: #333333;
+  border: none;
+}
+.cf-tag--action {
+  color: #c9c9c9;
+}
+.cf-tag--param {
+  color: #c9c9c9;
+}
+/* 动作标签异常态 */
+.cf-tag--abnormal {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  cursor: help;
+}
+.cf-tag--more {
+  color: #777;
+  background: #333333;
+  cursor: pointer;
+  font-family: inherit;
+  gap: 3px;
+}
+/* 参数字段拆分 */
+.cf-tag-param-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.cf-tag-param-type {
+  font-size: 10px;
+  color: #888;
+}
+.cf-tag-param-value {
+  font-size: 12px;
+  color: #c9c9c9;
+}
+/* 参数标签溢出浮窗 */
+.cf-tag-popup {
+  position: fixed;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 360px;
+  padding: 8px 10px;
+  background: #2a2a2a;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+}
+/* 异常动作标签悬浮提示 */
+.cf-abnormal-tip {
+  position: fixed;
+  transform: translate(-50%, -100%);
+  margin-top: -6px;
+  padding: 6px 10px;
+  background: #595959;
+  color: #ffffff;
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  pointer-events: none;
+}
+.cf-tag-icon {
+  flex-shrink: 0;
+  opacity: 1;
+}
+
+/* ===== 节点详情侧边栏 ===== */
+.cf-drawer {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  bottom: 0;
+  width: 388px;
+  max-width: 92%;
+  background: #2a2a2a;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.45);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.cf-drawer--open {
+  transform: translateX(0);
+}
+.cf-drawer-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.cf-drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  flex-shrink: 0;
+  position: relative;
+}
+.cf-drawer-header::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.cf-drawer-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: var(--font-weight-semibold);
+  color: #f0f0f0;
+}
+.cf-drawer-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.cf-drawer-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.cf-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px;
+}
+.cf-drawer-body::-webkit-scrollbar {
+  width: 0.375rem;
+}
+.cf-drawer-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-full);
+}
+.cf-drawer-row {
+  padding: 0;
+  margin-bottom: 24px;
+}
+.cf-drawer-row:last-child {
+  margin-bottom: 0;
+}
+.cf-drawer-label {
+  display: block;
+  font-size: 12px;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+.cf-drawer-value {
+  min-width: 0;
+}
+.cf-drawer-text {
+  font-size: 12px;
+  color: #e0e0e0;
+  line-height: 1.6;
+  word-break: break-all;
+}
+.cf-drawer-text--muted {
+  color: #777;
+}
+.cf-drawer-params {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.cf-drawer-code {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 10px 12px;
+  background: #191919;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  font-family: "SF Mono", "Consolas", "Menlo", monospace;
+  font-size: 13px;
+  color: #c9c9c9;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+.cf-drawer-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.cf-drawer-label-row .cf-drawer-label {
+  margin-bottom: 0;
+}
+.cf-drawer-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.cf-drawer-copy:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  .cf-topbar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .cf-topbar-right {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .cf-card {
+    padding: 16px 18px;
+  }
 }
 
 
@@ -5926,16 +7569,25 @@ const zhCN = {
 (function () {
   const { useState, useEffect, createContext, useContext } = React;
 // Layer 1: 全局状态 — 主题模式与业务状态
-// 换肤单轨驱动:isDark 只切换 <html> 的 .dark class;
-// 普通 H5 元素(token 四层)与 antd 组件(ant.css 换肤层)同源跟随,无需 React 参与换肤。
+// 换肤单轨驱动:isDark 切换 <html> 的 .dark class;
+// 普通 H5 元素(token 四层)与 antd 组件(ant.css 换肤层)同源跟随。
 const AppContext = createContext(null);
 
 function AppProvider({ children }) {
+  // 页面默认深色主题
   const [isDark, setIsDark] = useState(true);
   // 侧边菜单默认收起(3rem 宽),点击底部按钮/头部汉堡图标可展开为 16rem
   const [menuCollapsed, setMenuCollapsed] = useState(true);
   // 当前激活的菜单项 key
   const [activeMenu, setActiveMenu] = useState("overview");
+  // AI 会话是否已开始(发送首条消息后置 true,右侧主内容区展示画布)
+  const [aiChatActive, setAiChatActive] = useState(false);
+  // 配置变更流程启动标记:AI 问答点击「确认」后 +1,右侧画布切换为流程组件;
+  // 每次发送新提问重置为 0(回到"内容生成中")
+  const [aiFlowRunId, setAiFlowRunId] = useState(0);
+  // 从首页输入框/模板库携带到 AI 会话的待发送内容(跳转后自动开始问答)
+  // 形如 { text, title } —— title 为模板名(可选),用作会话标题
+  const [pendingQuestion, setPendingQuestion] = useState(null);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", isDark);
@@ -5948,6 +7600,15 @@ function AppProvider({ children }) {
     toggleMenu: () => setMenuCollapsed((c) => !c),
     activeMenu,
     setActiveMenu,
+    aiChatActive,
+    startAiChat: () => {
+      setAiChatActive(true);
+      setAiFlowRunId(0);
+    },
+    aiFlowRunId,
+    launchAiFlow: () => setAiFlowRunId((id) => id + 1),
+    pendingQuestion,
+    setPendingQuestion,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
@@ -5967,26 +7628,40 @@ function useApp() {
     "bell": [["path",{"d":"M10.268 21a2 2 0 0 0 3.464 0"}],["path",{"d":"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"}]],
     "bell-off": [["path",{"d":"M10.268 21a2 2 0 0 0 3.464 0"}],["path",{"d":"M17 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 .258-1.742"}],["path",{"d":"m2 2 20 20"}],["path",{"d":"M8.668 3.01A6 6 0 0 1 18 8c0 2.687.77 4.653 1.707 6.05"}]],
     "book-open": [["path",{"d":"M12 5v16"}],["path",{"d":"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"}]],
+    "brain": [["path",{"d":"M12 18V5"}],["path",{"d":"M15 13a4.17 4.17 0 0 1-3-4 4.17 4.17 0 0 1-3 4"}],["path",{"d":"M17.598 6.5A3 3 0 1 0 12 5a3 3 0 1 0-5.598 1.5"}],["path",{"d":"M17.997 5.125a4 4 0 0 1 2.526 5.77"}],["path",{"d":"M18 18a4 4 0 0 0 2-7.464"}],["path",{"d":"M19.967 17.483A4 4 0 1 1 12 18a4 4 0 1 1-7.967-.517"}],["path",{"d":"M6 18a4 4 0 0 1-2-7.464"}],["path",{"d":"M6.003 5.125a4 4 0 0 0-2.526 5.77"}]],
     "bug": [["path",{"d":"M12 20v-9"}],["path",{"d":"M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z"}],["path",{"d":"M14.12 3.88 16 2"}],["path",{"d":"M21 21a4 4 0 0 0-3.81-4"}],["path",{"d":"M21 5a4 4 0 0 1-3.55 3.97"}],["path",{"d":"M22 13h-4"}],["path",{"d":"M3 21a4 4 0 0 1 3.81-4"}],["path",{"d":"M3 5a4 4 0 0 0 3.55 3.97"}],["path",{"d":"M6 13H2"}],["path",{"d":"m8 2 1.88 1.88"}],["path",{"d":"M9 7.13V6a3 3 0 1 1 6 0v1.13"}]],
     "building-2": [["path",{"d":"M10 12h4"}],["path",{"d":"M10 8h4"}],["path",{"d":"M14 21v-3a2 2 0 0 0-4 0v3"}],["path",{"d":"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"}],["path",{"d":"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"}]],
     "check": [["path",{"d":"M20 6 9 17l-5-5"}]],
+    "chevron-down": [["path",{"d":"m6 9 6 6 6-6"}]],
+    "chevron-up": [["path",{"d":"m18 15-6-6-6 6"}]],
+    "chevrons-left-right": [["path",{"d":"m9 7-5 5 5 5"}],["path",{"d":"m15 7 5 5-5 5"}]],
+    "circle-check-big": [["path",{"d":"M21.801 10A10 10 0 1 1 17 3.335"}],["path",{"d":"m9 11 3 3L22 4"}]],
+    "circle-dot": [["circle",{"cx":"12","cy":"12","r":"10"}],["circle",{"cx":"12","cy":"12","r":"1"}]],
     "circle-question-mark": [["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"}],["path",{"d":"M12 17h.01"}]],
+    "clipboard-list": [["rect",{"width":"8","height":"4","x":"8","y":"2","rx":"1","ry":"1"}],["path",{"d":"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"}],["path",{"d":"M12 11h4"}],["path",{"d":"M12 16h4"}],["path",{"d":"M8 11h.01"}],["path",{"d":"M8 16h.01"}]],
+    "copy": [["rect",{"width":"14","height":"14","x":"8","y":"8","rx":"2","ry":"2"}],["path",{"d":"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"}]],
     "ellipsis": [["circle",{"cx":"12","cy":"12","r":"1"}],["circle",{"cx":"19","cy":"12","r":"1"}],["circle",{"cx":"5","cy":"12","r":"1"}]],
+    "external-link": [["path",{"d":"M15 3h6v6"}],["path",{"d":"M10 14 21 3"}],["path",{"d":"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"}]],
     "eye": [["path",{"d":"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"}],["circle",{"cx":"12","cy":"12","r":"3"}]],
+    "file-spreadsheet": [["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M8 13h2"}],["path",{"d":"M14 13h2"}],["path",{"d":"M8 17h2"}],["path",{"d":"M14 17h2"}]],
     "file-text": [["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],
     "globe": [["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"}],["path",{"d":"M2 12h20"}]],
     "house": [["path",{"d":"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"}],["path",{"d":"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"}]],
     "layout-template": [["rect",{"width":"18","height":"7","x":"3","y":"3","rx":"1"}],["rect",{"width":"9","height":"7","x":"3","y":"14","rx":"1"}],["rect",{"width":"5","height":"7","x":"16","y":"14","rx":"1"}]],
     "link": [["path",{"d":"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"}],["path",{"d":"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"}]],
+    "loader-circle": [["path",{"d":"M21 12a9 9 0 1 1-6.219-8.56"}]],
     "lock": [["rect",{"width":"18","height":"11","x":"3","y":"11","rx":"2","ry":"2"}],["path",{"d":"M7 11V7a5 5 0 0 1 10 0v4"}]],
     "menu": [["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],
     "mic": [["path",{"d":"M12 19v3"}],["path",{"d":"M19 10v2a7 7 0 0 1-14 0v-2"}],["rect",{"x":"9","y":"2","width":"6","height":"13","rx":"3"}]],
+    "minus": [["path",{"d":"M5 12h14"}]],
     "moon": [["path",{"d":"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"}]],
     "network": [["rect",{"x":"16","y":"16","width":"6","height":"6","rx":"1"}],["rect",{"x":"2","y":"16","width":"6","height":"6","rx":"1"}],["rect",{"x":"9","y":"2","width":"6","height":"6","rx":"1"}],["path",{"d":"M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"}],["path",{"d":"M12 12V8"}]],
     "pencil": [["path",{"d":"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"}],["path",{"d":"m15 5 4 4"}]],
     "plus": [["path",{"d":"M5 12h14"}],["path",{"d":"M12 5v14"}]],
+    "puzzle": [["path",{"d":"M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z"}]],
     "refresh-cw": [["path",{"d":"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"}],["path",{"d":"M21 3v5h-5"}],["path",{"d":"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"}],["path",{"d":"M8 16H3v5"}]],
     "rotate-cw": [["path",{"d":"M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"}],["path",{"d":"M21 3v5h-5"}]],
+    "router": [["rect",{"width":"20","height":"8","x":"2","y":"14","rx":"2"}],["path",{"d":"M6.01 18H6"}],["path",{"d":"M10.01 18H10"}],["path",{"d":"M15 10v4"}],["path",{"d":"M17.84 7.17a4 4 0 0 0-5.66 0"}],["path",{"d":"M20.66 4.34a8 8 0 0 0-11.31 0"}]],
     "scale": [["path",{"d":"M12 3v18"}],["path",{"d":"m19 8 3 8a5 5 0 0 1-6 0zV7"}],["path",{"d":"M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"}],["path",{"d":"m5 8 3 8a5 5 0 0 1-6 0zV7"}],["path",{"d":"M7 21h10"}]],
     "search": [["path",{"d":"m21 21-4.34-4.34"}],["circle",{"cx":"11","cy":"11","r":"8"}]],
     "send": [["path",{"d":"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"}],["path",{"d":"m21.854 2.147-10.94 10.939"}]],
@@ -5997,7 +7672,11 @@ function useApp() {
     "sparkles": [["path",{"d":"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"}],["path",{"d":"M20 2v4"}],["path",{"d":"M22 4h-4"}],["circle",{"cx":"4","cy":"20","r":"2"}]],
     "split": [["path",{"d":"M16 3h5v5"}],["path",{"d":"M8 3H3v5"}],["path",{"d":"M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"}],["path",{"d":"m15 9 6-6"}]],
     "sun": [["circle",{"cx":"12","cy":"12","r":"4"}],["path",{"d":"M12 2v2"}],["path",{"d":"M12 20v2"}],["path",{"d":"m4.93 4.93 1.41 1.41"}],["path",{"d":"m17.66 17.66 1.41 1.41"}],["path",{"d":"M2 12h2"}],["path",{"d":"M20 12h2"}],["path",{"d":"m6.34 17.66-1.41 1.41"}],["path",{"d":"m19.07 4.93-1.41 1.41"}]],
+    "thumbs-down": [["path",{"d":"M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"}],["path",{"d":"M17 14V2"}]],
+    "thumbs-up": [["path",{"d":"M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"}],["path",{"d":"M7 10v12"}]],
+    "timer": [["line",{"x1":"10","x2":"14","y1":"2","y2":"2"}],["line",{"x1":"12","x2":"15","y1":"14","y2":"11"}],["circle",{"cx":"12","cy":"14","r":"8"}]],
     "trash-2": [["path",{"d":"M10 11v6"}],["path",{"d":"M14 11v6"}],["path",{"d":"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"}],["path",{"d":"M3 6h18"}],["path",{"d":"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"}]],
+    "triangle-alert": [["path",{"d":"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"}],["path",{"d":"M12 9v4"}],["path",{"d":"M12 17h.01"}]],
     "user": [["path",{"d":"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}],["circle",{"cx":"12","cy":"7","r":"4"}]],
     "workflow": [["rect",{"width":"8","height":"8","x":"3","y":"3","rx":"2"}],["path",{"d":"M7 11v4a2 2 0 0 0 2 2h4"}],["rect",{"width":"8","height":"8","x":"13","y":"13","rx":"2"}]],
     "wrench": [["path",{"d":"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"}]],
@@ -6515,6 +8194,149 @@ function SideMenu() {
   Object.assign(__export, { SideMenu });
 })();
 
+/* ===== src/mock/change-flow.js ===== */
+(function () {
+// 左右联动时间线常量(毫秒) — 右侧流程组件的卡片节奏,左侧步骤条按此同步推进
+// 修改后两侧自动保持一致(change-flow 组件与 answer-card 的 runMore 阶段共用)
+const FLOW_TIMING = {
+  appearDelay: 500, // 首张卡片出现延迟
+  loadingMs: 1500, // 单张卡片加载时长
+  revealMs: 500, // 状态揭示动画时长
+  arrowGapMs: 200, // 箭头到下一张卡片的间隔
+};
+
+// 确认后联动展示的流程步骤:标题与左侧步骤条完全一致(配置生成/语法校验/配置审核/一致性校验/变更方案编排/结果下发)
+// 卡片 i 完成时刻 = appearDelay + i * cycle + loadingMs(cycle = loadingMs + revealMs + arrowGapMs)
+const SYNCED_FLOW_STEPS = [
+  {
+    title: "配置生成",
+    action: "生成配置脚本",
+    actionIcon: "file-text",
+    params: ["Str.vlanId", "Str.trunkId", "Str.mask"],
+    commandLine: "vlan 200\ninterface eth-trunk 200\nip address Str.mask",
+    no: 1,
+  },
+  {
+    title: "语法校验",
+    action: "CLI 语法检查",
+    actionIcon: "search",
+    params: ["Str.template"],
+    commandLine: "validate cli --template Str.template",
+    no: 2,
+  },
+  {
+    title: "配置审核",
+    action: "安全基线核对",
+    actionIcon: "shield-check",
+    params: ["Str.baseline", "Str.policy"],
+    commandLine: "check config --baseline Str.baseline --policy Str.policy",
+    no: 3,
+  },
+  {
+    title: "一致性校验",
+    action: "双机配置比对",
+    actionIcon: "arrow-left-right",
+    params: ["Str.peerNode"],
+    commandLine: "compare config --peer Str.peerNode",
+    no: 4,
+  },
+  {
+    title: "变更方案编排",
+    action: "编排执行顺序",
+    actionIcon: "workflow",
+    params: ["Str.window", "Str.order"],
+    commandLine: "plan change --window Str.window --order Str.order",
+    no: 5,
+  },
+  {
+    title: "结果下发",
+    action: "下发变更方案",
+    actionIcon: "send",
+    params: ["Str.rollback"],
+    commandLine: "deliver change --rollback Str.rollback",
+    no: 6,
+  },
+];
+
+// Layer 2: 配置变更流程 mock 数据 — Leaf 扩容网络变更示例步骤
+const LEAF_STEPS = [
+  {
+    title: "查询设备信息",
+    action: "查询设备信息",
+    params: ["Str.serverIp", "Str.serverIp", "Str.mask", "Str.gateway"],
+    commandLine: "display device information",
+    no: 1,
+  },
+  {
+    title: "创建 VLAN 200",
+    action: "创建VLAN信息",
+    params: ["Str.asnNum"],
+    commandLine: "vlan 200",
+    no: 2,
+  },
+  {
+    title: "创建 Eth-Trunk200 聚合链路",
+    action: "创建聚合链路",
+    params: ["Str.M-lag-id 89"],
+    commandLine: "interface eth-trunk 200",
+    actionAbnormal: true,
+    no: 3,
+  },
+  {
+    type: "branch",
+    condition: "是否是V2版本",
+    action: "判断设备版本",
+    params: ["Str.deviceVersion"],
+    commandLine: "display version",
+    no: 4,
+    branches: [
+      {
+        label: "是",
+        step: {
+          title: "配置BGP邻居（V2版本）",
+          action: "配置BGP邻居",
+          params: ["Str.peerIp", "Str.asNum"],
+          commandLine: "neighbor Str.peerIp as Str.asNum",
+          no: "5.1",
+        },
+      },
+      {
+        label: "否",
+        step: {
+          title: "配置BGP邻居（V3版本）",
+          action: "配置BGP邻居",
+          params: ["Str.peerIp", "Str.asNum"],
+          commandLine: "neighbor Str.peerIp as Str.asNum version 3",
+          no: "5.2",
+        },
+      },
+    ],
+  },
+  {
+    title: "成员端口加入聚合",
+    action: "配置成员端口",
+    params: ["Str.vpnInstanceName"],
+    commandLine: "eth-trunk 200\ntrunkport interface 10GE 1/0/1",
+    no: 6,
+  },
+  {
+    title: "MPP区Spine配置及验证",
+    action: "MPP区Spine配置及验证",
+    params: ["Str.vpnInstanceName"],
+    commandLine: "display mpp spine status",
+    no: 7,
+  },
+  {
+    title: "扩容POD设备SDN控制",
+    action: "扩容POD设备SDN控制",
+    params: ["Str.gatewayConnIp"],
+    commandLine: "sdn pod-expand --gateway Str.gatewayConnIp",
+    no: 8,
+  },
+];
+  Object.assign(__export, { FLOW_TIMING, SYNCED_FLOW_STEPS, LEAF_STEPS });
+})();
+
 /* ===== src/mock/session.js ===== */
 (function () {
 // Layer 2: 会话卡片 mock 数据 — 时间范围 / 处置场景 / 待关注事件 / 提示词模板
@@ -6582,77 +8404,87 @@ const TEMPLATES = [
     category: "app",
     icon: "globe",
     prompt:
-      "请协助制定域名改造方案：将嘉定DC互联网区域的业务域名统一从 HTTP 迁移到 HTTPS，并梳理现有解析记录。",
+      "请协助制定域名改造方案：将嘉定DC互联网区域的全部业务域名统一从 HTTP 迁移到 HTTPS，逐条梳理现有解析记录、CNAME 链路与证书到期情况；按业务重要性分批排期，明确每批的验证方式与回滚路径，并输出迁移前后对照清单与风险说明。",
   },
   {
     key: "tpl-2",
     name: "应用互访",
     category: "app",
     icon: "arrow-left-right",
-    prompt: "请生成两个业务系统之间的应用互访策略：包含访问端口、协议与安全域隔离要求。",
+    prompt:
+      "请生成两个业务系统之间的应用互访策略：明确访问端口、协议、流量方向与安全域隔离要求，标注双向还是单向放行；给出策略命中后的审计日志留存与到期复审建议，最终形成可直接下发到防火墙的策略清单。",
   },
   {
     key: "tpl-3",
     name: "负载均衡",
     category: "app",
     icon: "scale",
-    prompt: "请为互联网出口设计负载均衡策略：说明流量分发模式与健康检查机制。",
+    prompt:
+      "请为互联网出口设计负载均衡策略：说明流量分发模式、健康检查机制与会话保持方案，量化单节点故障时的切换时长指标与验证方法；结合当前出口带宽与峰值流量，给出扩容阈值建议与压测用例。",
   },
   {
     key: "tpl-4",
     name: "设备巡检",
     category: "device",
     icon: "search",
-    prompt: "请对嘉定DC全部核心设备执行例行巡检，并输出巡检报告与风险项清单。",
+    prompt:
+      "请对嘉定DC全部核心与汇聚设备执行例行巡检：覆盖 CPU、内存、温度、电源与风扇状态，检查 OSPF 邻居、BFD 会话与关键端口错包率；对异常项给出处置建议，并输出巡检报告与风险项跟踪清单。",
   },
   {
     key: "tpl-5",
     name: "端口扩容",
     category: "device",
     icon: "network",
-    prompt: "请生成Leaf设备的端口扩容配置：包含端口聚合、VLAN 与链路带宽规划。",
+    prompt:
+      "请生成 Leaf 设备的端口扩容配置：包含端口聚合、VLAN 划分、链路带宽规划与 QoS 标记；自动校验上下游 Spine 端口的对应配置与聚合一致性，评估扩容后的流量负载与收敛表现，并输出回退命令组。",
   },
   {
     key: "tpl-6",
     name: "系统升级",
     category: "device",
     icon: "refresh-cw",
-    prompt: "请编排设备系统版本升级方案：包含升级窗口、回滚步骤与影响评估。",
+    prompt:
+      "请编排设备系统版本升级方案：包含升级窗口选择、分批升级顺序、回滚步骤与业务影响评估；升级前完成配置全量备份与版本兼容性核对，升级后逐项验证邻居状态与业务可达性，形成升级检查单。",
   },
   {
     key: "tpl-7",
     name: "告警降噪",
     category: "device",
     icon: "bell-off",
-    prompt: "请对最近一周的重复告警做降噪分析，并给出收敛规则建议。",
+    prompt:
+      "请对最近一周的重复告警做降噪分析：识别同源同因的告警簇，统计各簇频次、持续时长与集中时段；给出收敛规则、抑制阈值与聚合维度建议，预估降噪后的告警量下降比例，并标注不可收敛的遗留项。",
   },
   {
     key: "tpl-8",
     name: "网络割接",
     category: "device",
     icon: "split",
-    prompt: "请生成周末割接实施方案：包含割接步骤、验证清单与应急回退预案。",
+    prompt:
+      "请生成周末割接实施方案：包含割接步骤、验证清单与应急回退预案，明确每步的操作窗口、责任人与回退触发条件；附业务影响评估与提前通知范围，确保全程可观测、可回退，影响控制在分钟级。",
   },
   {
     key: "tpl-9",
-    name: "安全策略",
+    name: "安全基线",
     category: "security",
     icon: "shield-check",
-    prompt: "请辅助生成防火墙安全策略基线：覆盖分区隔离、最小开放端口原则。",
+    prompt:
+      "请辅助生成防火墙安全策略基线：覆盖分区隔离、最小开放端口原则与高危端口封禁要求；对照现网策略逐条给出差距分析、整改优先级与合规依据，标注例外白名单及其到期时间。",
   },
   {
     key: "tpl-10",
     name: "访问控制",
     category: "security",
     icon: "lock",
-    prompt: "请为运维入口设计访问控制策略：包含账号权限分级与登录源限制。",
+    prompt:
+      "请为运维入口设计访问控制策略：包含账号权限分级、登录源 IP 限制与双因子认证要求；明确各类角色的最小权限集合、审批流程与定期权限复核机制，输出权限矩阵与落地配置样例。",
   },
   {
     key: "tpl-11",
     name: "漏洞修复",
     category: "security",
     icon: "bug",
-    prompt: "请梳理近期高危漏洞的修复建议：包含影响设备范围、补丁版本与验证方式。",
+    prompt:
+      "请梳理近期高危漏洞的修复建议：圈定影响设备范围、补丁版本、修复窗口与验证方式；按利用风险与暴露面排序，对暂不可修复项给出临时缓解措施，并输出修复进度跟踪表。",
   },
 ];
   Object.assign(__export, { RANGE_OPTIONS, SCENE_OPTIONS, ATTENTION_ITEMS, TEMPLATES });
@@ -6712,7 +8544,8 @@ function TplPanel({ tab, onTab, selectedKey, onPick }) {
 
 // AI 输入框:初始 48px 单行,点击展开为 120px 完整输入区(渐变彩边 + 模板库 + 字数 + 发送)
 // 展开后保持大输入框状态,不因点击外部而收起;defaultExpanded 可指定初始即展开
-function Composer({ defaultExpanded = false }) {
+// onSend:发送回调(Enter/点击发送触发),发送后清空输入;busy:回答生成中锁定发送
+function Composer({ defaultExpanded = false, busy = false, onSend }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [text, setText] = useState("");
   const [scene, setScene] = useState("config");
@@ -6725,14 +8558,27 @@ function Composer({ defaultExpanded = false }) {
     if (expanded && taRef.current) taRef.current.focus();
   }, [expanded]);
 
-  const canSend = text.trim().length > 0;
+  const canSend = Boolean(onSend) && !busy && text.trim().length > 0;
   const tplLabel = selectedTpl ? selectedTpl.name : "模板库";
 
+  // 发送:回调后清空输入内容与已选模板;携带模板名(若来自模板库)供会话标题使用
+  const doSend = () => {
+    if (!canSend) return;
+    onSend(
+      text.trim(),
+      selectedTpl ? { tplName: selectedTpl.name } : null
+    );
+    setText("");
+    setSelectedTpl(null);
+  };
+
   const pickTpl = (tpl) => {
-    setSelectedTpl(tpl);
-    setText(tpl.prompt);
+    // 点击模板列表项:直接发送(携带模板名作为会话标题),不再先填入输入框
+    if (!onSend || busy) return;
     setTplOpen(false);
-    if (taRef.current) taRef.current.focus();
+    setText("");
+    setSelectedTpl(null);
+    onSend(tpl.prompt, { tplName: tpl.name });
   };
 
   const clearTpl = () => {
@@ -6774,6 +8620,12 @@ function Composer({ defaultExpanded = false }) {
               placeholder={PLACEHOLDER}
               maxLength={MAX_LEN}
               onChange={(e) => setText(e.target.value)}
+              onPressEnter={(e) => {
+                if (!e.shiftKey) {
+                  e.preventDefault();
+                  doSend();
+                }
+              }}
               style={{ height: "100%", resize: "none" }}
             />
           </div>
@@ -6856,9 +8708,10 @@ function Composer({ defaultExpanded = false }) {
               <button
                 type="button"
                 className={canSend ? "send-btn is-active" : "send-btn"}
-                title="发送"
+                title={busy ? "回答生成中…" : "发送"}
+                onClick={doSend}
               >
-                <Icon name="send" size="1rem" />
+                <Icon name={busy ? "loader-circle" : "send"} size="1rem" className={busy ? "is-spin" : ""} />
               </button>
             </div>
           </div>
@@ -6878,7 +8731,7 @@ function Composer({ defaultExpanded = false }) {
 (function () {
   const { useMemo, useState } = React;
   const { Select } = antd;
-  const { Icon, ATTENTION_ITEMS, RANGE_OPTIONS } = __export;
+  const { Icon, useApp, ATTENTION_ITEMS, RANGE_OPTIONS } = __export;
   const Composer = __export.Composer;
 // Layer 4: 会话卡片 — 总览核心区左侧的 AI 助手面板(540px × 100%, 背景图 + 32px 内边距)
 const ATTENTION_TABS = [
@@ -6888,8 +8741,19 @@ const ATTENTION_TABS = [
 ];
 
 function SessionCard() {
+  const { setActiveMenu, setPendingQuestion } = useApp();
   const [range, setRange] = useState("week");
   const [tab, setTab] = useState("all");
+
+  // 首页发送(输入框发送或点击模板库直接发送):携带输入文字跳转到 AI 侧边栏,自动开始问答;
+  // meta.tplName(模板库点击时携带)会作为会话标题
+  const handleSend = (text, meta) => {
+    setPendingQuestion({
+      text,
+      title: meta && meta.tplName ? meta.tplName : null,
+    });
+    setActiveMenu("ai");
+  };
 
   const counts = useMemo(
     () => ({
@@ -6934,7 +8798,7 @@ function SessionCard() {
           </div>
           <img
             className="hero-art"
-            src="./assets/uploads/hero-illustration.svg"
+            src="./assets/uploads/work.png"
             alt="网络守护示意"
           />
         </div>
@@ -7003,8 +8867,8 @@ function SessionCard() {
           </div>
         </div>
 
-        {/* 底部:AI 输入框(背景图区域内,固定最底部) */}
-        <Composer />
+        {/* 底部:AI 输入框(背景图区域内,固定最底部;发送后带文字跳转 AI 会话) */}
+        <Composer onSend={handleSend} />
       </div>
     </section>
   );
@@ -7687,26 +9551,660 @@ const AI_CARD_GROUPS = [
     },
   ],
 ];
-  Object.assign(__export, { AI_CARD_GROUPS });
+
+// ---------- 问答流程 mock ----------
+
+// 思考过程:逐字打印的文案(打印完成后自动折叠)
+const AI_THINKING_TEXT =
+  "正在理解您的诉求：为园区网络生成新一轮设备配置。首先检索网络资源台账，确定核心与汇聚两级设备共 48 台的资源范围，并逐台核对在线状态与端口占用情况；随后结合安全基线、历史变更记录与业务分区策略，识别办公、访客、运维三个分区的隔离要求；再评估链路带宽与收敛时长，圈定需要优先保障的业务流量；最后拆解出从配置生成、审核、一致性校验到下发的完整执行链路，并为每一步预留回退点，确保变更过程可回退、可追溯。";
+
+// 步骤一「网络资源确定」的标签文件描述
+const AI_STEP_CHIPS = [
+  { icon: "router", label: "核心交换机 ×12" },
+  { icon: "server", label: "汇聚设备 ×36" },
+  { icon: "file-spreadsheet", label: "资源配置清单.xlsx" },
+];
+
+// 总任务规划清单内容(与确认后执行的步骤一一对应)
+const AI_TASK_PLAN = [
+  "配置生成",
+  "语法校验",
+  "配置审核",
+  "一致性校验",
+  "变更方案编排",
+  "结果下发",
+];
+
+// 最终生成结果:逐字打印("· "开头行渲染为列表项)
+const AI_FINAL_RESULT = [
+  "已根据网络资源确定结果，为核心—汇聚两级设备生成以下配置：",
+  "· 骨干互联：OSPF 区域 0 互联配置 12 条，覆盖全部核心设备，开销值按带宽自动计算",
+  "· 接入策略：VLAN 划分与端口准入策略 36 条，含办公 / 访客 / 运维三个分区，访客分区启用 Portal 认证",
+  "· 安全加固：ACL 精准防护策略 8 条，阻断高危端口跨区访问，运维分区叠加源 IP 白名单",
+  "· QoS 保障：视频会议与语音业务优先级队列已就绪，保障带宽占比 40%",
+  "· 可靠性：核心设备 BFD 快速检测与 GR 平稳重启已同步启用，故障收敛时间小于 50ms",
+  "变更影响评估：本次共涉及 48 台设备、91 条配置项，其中高风险项 3 条均已配置双重确认与回退预案；建议变更窗口避开业务高峰期，预计执行时长 25 分钟。",
+  "以上配置已全部通过语法预检与基线合规校验，可进入「配置审核」环节查看完整清单，或直接下发执行。",
+].join("\n");
+  Object.assign(__export, { AI_CARD_GROUPS, AI_THINKING_TEXT, AI_STEP_CHIPS, AI_TASK_PLAN, AI_FINAL_RESULT });
+})();
+
+/* ===== src/views/ai-view/use-typewriter.js ===== */
+(function () {
+  const { useEffect, useState } = React;
+// 逐字打印 hook:
+// - enabled 变为 true(或 runKey 变化)时从 0 重新开始,每 30ms 打印 speed 个字符
+// - enabled 变回 false 时停止但保留已打印内容(供折叠后再展开查看)
+// - done 表示已打印至末尾
+function useTypewriter(text, { runKey = 0, speed = 1, enabled = true } = {}) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!enabled) return undefined;
+    setCount(0);
+    let i = 0;
+    const timer = setInterval(() => {
+      i += speed;
+      if (i >= text.length) {
+        i = text.length;
+        clearInterval(timer);
+      }
+      setCount(i);
+    }, 30);
+    return () => clearInterval(timer);
+  }, [text, runKey, speed, enabled]);
+
+  return { shown: text.slice(0, count), done: count >= text.length };
+}
+  Object.assign(__export, { useTypewriter });
+})();
+
+/* ===== src/views/ai-view/answer-card.jsx ===== */
+(function () {
+  const { useEffect, useRef, useState } = React;
+  const { Button, Steps } = antd;
+  const { Icon, useApp, AI_THINKING_TEXT, AI_FINAL_RESULT, AI_TASK_PLAN, AI_STEP_CHIPS, FLOW_TIMING, useTypewriter } = __export;
+// 阶段顺序表:用于判断某个区块是否已进入展示时机
+const STAGE_SEQ = [
+  "wait",
+  "thinking",
+  "thinkDone",
+  "skill",
+  "steps",
+  "orchestrate",
+  "plancard",
+  "confirm",
+  "runMore",
+  "result",
+  "done",
+];
+const atLeast = (stage, target) =>
+  STAGE_SEQ.indexOf(stage) >= STAGE_SEQ.indexOf(target);
+
+// 步骤条数据:确认前运行第 0-1 步,用户点击「确认」后继续第 2-7 步(与右侧流程卡片同内容)
+const STEP_ITEMS = [
+  {
+    title: "网络资源确定",
+    description: (
+      <div className="ac-chips">
+        {AI_STEP_CHIPS.map((chip) => (
+          <span key={chip.label} className="ac-chip">
+            <Icon name={chip.icon} size="0.75rem" />
+            <span>{chip.label}</span>
+          </span>
+        ))}
+      </div>
+    ),
+  },
+  { title: "任务编排", description: "解析意图依赖，编排执行链路与执行顺序" },
+  { title: "配置生成", description: "按安全基线模板批量生成设备配置脚本" },
+  { title: "语法校验", description: "CLI 语法与模板变量合法性校验" },
+  { title: "配置审核", description: "安全策略基线核对与人工复核抽检" },
+  { title: "一致性校验", description: "主备双机配置一致性比对" },
+  { title: "变更方案编排", description: "生成变更窗口、执行顺序与回退预案" },
+  { title: "结果下发", description: "下发变更方案并输出执行报告" },
+];
+
+// 打印中文字的渲染:文字保持原色,上方覆盖一层与原文完全重叠的
+// 小矩形渐变蒙层(青→蓝→紫→粉),仅末端约 11em 露出彩色光带,
+// 光带随打印推进不断向前滑动(见 .tw-veil 样式)
+function liveContent(text, typing) {
+  if (!typing || !text) return text;
+  return (
+    <>
+      {text}
+      <span className="tw-caret" />
+      <span className="tw-veil" aria-hidden="true">
+        {text}
+      </span>
+    </>
+  );
+}
+
+// 打印文本渲染:按行拆分;打印中的末行覆盖渐变蒙层 + 蓝色光标闪烁
+function TwBlock({ shown, typing }) {
+  const lines = shown.split("\n");
+  return (
+    <div className="ac-tw">
+      {lines.map((line, idx) => {
+        const live = typing && idx === lines.length - 1;
+        const cls = [
+          line.indexOf("· ") === 0 ? "is-item" : "",
+          live ? "is-live" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+        return (
+          <p key={idx} className={cls ? `ac-tw-line ${cls}` : "ac-tw-line"}>
+            {live ? liveContent(line, true) : line || "\u00A0"}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+// 小段文字打印组件(挂载即开始逐字打印,打印完成回调 onDone)
+function TwText({ text, speed = 1, onDone }) {
+  const { shown, done } = useTypewriter(text, { speed });
+  const firedRef = useRef(false);
+
+  useEffect(() => {
+    if (done && !firedRef.current) {
+      firedRef.current = true;
+      if (onDone) onDone();
+    }
+  }, [done]);
+
+  return <span className="tw-live">{liveContent(shown, !done)}</span>;
+}
+
+// 规划清单条目打印:active 为真才开始打印,完成后解锁下一条
+function PlanItemText({ text, active, onDone }) {
+  const { shown, done } = useTypewriter(text, { speed: 1, enabled: active });
+
+  useEffect(() => {
+    if (done && active && onDone) onDone();
+  }, [done, active]);
+
+  return <span className="tw-live">{liveContent(shown, active && !done)}</span>;
+}
+
+// AI 回答卡片流程:
+// 思考(逐字打印→自动折叠) → 任务拆解与规划(技能选择匹配 + 步骤条 + 总任务规划清单)
+// → 确认提示(点击确认才继续) → 步骤续跑并整段折叠 → 最终结果逐字打印 → 底部操作条
+function AnswerCard({ onDone, onRestart }) {
+  const { launchAiFlow } = useApp();
+  const [stage, setStage] = useState("wait");
+  const [runKey, setRunKey] = useState(0);
+  const [thinkOpen, setThinkOpen] = useState(true);
+  const [planOpen, setPlanOpen] = useState(true);
+  const [planCardOpen, setPlanCardOpen] = useState(true);
+  const [skillDone, setSkillDone] = useState(false);
+  const [stepIndex, setStepIndex] = useState(-1);
+  const [showPlanCard, setShowPlanCard] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [cancelShake, setCancelShake] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [vote, setVote] = useState(0);
+  // 规划清单条目逐条打印的进度(前 typedPlanCount 条可打印)
+  const [typedPlanCount, setTypedPlanCount] = useState(1);
+  // 确认问题打印完成后才显示按钮
+  const [confirmTyped, setConfirmTyped] = useState(false);
+
+  const cbRef = useRef({ onDone, onRestart });
+  cbRef.current = { onDone, onRestart };
+
+  const think = useTypewriter(AI_THINKING_TEXT, {
+    runKey,
+    speed: 1,
+    enabled: stage === "thinking",
+  });
+  const result = useTypewriter(AI_FINAL_RESULT, {
+    runKey,
+    speed: 2,
+    enabled: stage === "result",
+  });
+
+  // 阶段推进:confirm 阶段等待用户点击确认,其余阶段定时自动流转
+  useEffect(() => {
+    const timers = [];
+    const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+
+    if (stage === "wait") {
+      later(() => setStage("thinking"), 400);
+    } else if (stage === "thinking" && think.done) {
+      later(() => {
+        setThinkOpen(false); // 思考完成自动折叠思考文案
+        setStage("thinkDone");
+      }, 700);
+    } else if (stage === "thinkDone") {
+      later(() => setStage("skill"), 500);
+    } else if (stage === "skill") {
+      later(() => {
+        setSkillDone(true);
+        setStepIndex(0);
+        setStage("steps");
+      }, 900);
+    } else if (stage === "steps") {
+      later(() => {
+        setStepIndex(1);
+        setStage("orchestrate");
+      }, 1100);
+    } else if (stage === "orchestrate") {
+      later(() => {
+        setShowPlanCard(true);
+        setStage("plancard");
+      }, 900);
+    } else if (stage === "plancard") {
+      later(() => {
+        setShowConfirm(true);
+        setStage("confirm"); // 停在这里,等待用户确认
+      }, 1000);
+    } else if (stage === "runMore") {
+      // 与右侧 ChangeFlow 流程组件共用同一条时间线(FLOW_TIMING):
+      // 右侧卡片 i 完成时刻 = appearDelay + i*cycle + loadingMs,
+      // 每张卡片完成时左侧步骤条同步前进一步,两边同时到达完成/结束
+      const cycle =
+        FLOW_TIMING.loadingMs + FLOW_TIMING.revealMs + FLOW_TIMING.arrowGapMs;
+      const cardDoneAt = (i) =>
+        FLOW_TIMING.appearDelay + i * cycle + FLOW_TIMING.loadingMs;
+      const totalCards = STEP_ITEMS.length - 2; // 确认后执行的步骤:配置生成/配置审核/结果下发
+      later(() => setStepIndex(2), 400); // 开始执行「配置生成」(右侧卡片即将出现)
+      for (let i = 0; i < totalCards; i++) {
+        later(() => setStepIndex(2 + i + 1), cardDoneAt(i)); // 卡片 i 完成 → 下一步
+      }
+      later(
+        () => {
+          setPlanOpen(false); // 与右侧「结束」端子同时,整段折叠进入结果打印
+          setStage("result");
+        },
+        FLOW_TIMING.appearDelay + totalCards * cycle + 200
+      );
+    } else if (stage === "result" && result.done) {
+      setStage("done");
+      if (cbRef.current.onDone) cbRef.current.onDone();
+    }
+
+    return () => timers.forEach((t) => clearTimeout(t));
+  }, [stage, think.done, result.done]);
+
+  const handleConfirm = () => {
+    setShowConfirm(false);
+    setStage("runMore");
+    // 右侧画布由「内容生成中」切换为配置变更流程组件
+    launchAiFlow();
+  };
+
+  const handleCancel = () => {
+    // 未确认时流程停在原地,取消按钮轻微抖动提示
+    setCancelShake(true);
+    setTimeout(() => setCancelShake(false), 500);
+  };
+
+  const handleRefresh = () => {
+    setThinkOpen(true);
+    setPlanOpen(true);
+    setPlanCardOpen(true);
+    setSkillDone(false);
+    setStepIndex(-1);
+    setShowPlanCard(false);
+    setShowConfirm(false);
+    setCopied(false);
+    setVote(0);
+    setTypedPlanCount(1);
+    setConfirmTyped(false);
+    setRunKey((k) => k + 1);
+    setStage("wait");
+    if (cbRef.current.onRestart) cbRef.current.onRestart();
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(AI_FINAL_RESULT);
+    } catch (e) {
+      // 剪贴板不可用时静默降级,仍给出已复制反馈
+    }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  };
+
+  // 发送后短暂等待:提示正在接收问题
+  if (stage === "wait") {
+    return (
+      <div className="answer-card">
+        <div className="ac-wait">
+          <Icon name="loader-circle" size="1rem" className="is-spin" />
+          <span>正在接收问题…</span>
+        </div>
+      </div>
+    );
+  }
+
+  const thinking = stage === "thinking";
+
+  return (
+    <div className="answer-card">
+      {/* 一、思考过程(可折叠:思考图标 + 文案 + 折叠图标,打印完成后自动折叠) */}
+      <div className="ac-section">
+        <button
+          type="button"
+          className="ac-section-head"
+          onClick={() => setThinkOpen((o) => !o)}
+          title={thinkOpen ? "折叠思考过程" : "展开思考过程"}
+        >
+          <span className={thinking ? "ac-lead-icon is-live" : "ac-lead-icon"}>
+            <Icon name="brain" size="0.875rem" />
+          </span>
+          <span className="ac-section-title">
+            {thinking ? "思考中" : "已完成思考"}
+          </span>
+          <span className="ac-head-toggle">
+            <Icon
+              name={thinkOpen ? "chevron-up" : "chevron-down"}
+              size="0.875rem"
+            />
+          </span>
+        </button>
+        {thinkOpen ? (
+          <div className="ac-think-body">
+            <TwBlock shown={think.shown} typing={thinking} />
+          </div>
+        ) : null}
+      </div>
+
+      {/* 二、任务拆解与规划 */}
+      {atLeast(stage, "skill") ? (
+        <div className="ac-block reveal">
+          <div className="ac-block-label">
+            <span className="ac-lead-icon is-ok">
+              <Icon name="workflow" size="0.875rem" />
+            </span>
+            <span className="ac-block-name">
+              <TwText text="任务拆解与规划" />
+            </span>
+          </div>
+
+          {/* 第一个小步骤:技能选择匹配【意图分解】(图标 + 逐字打印文案 + 折叠按钮) */}
+          <div className="ac-section">
+            <button
+              type="button"
+              className="ac-section-head"
+              onClick={() => setPlanOpen((o) => !o)}
+              title={planOpen ? "折叠执行详情" : "展开执行详情"}
+            >
+              <span className="ac-lead-icon">
+                <Icon name="puzzle" size="0.875rem" />
+              </span>
+              <span className="ac-section-title">
+                <TwText text="技能选择匹配【意图分解】" />
+              </span>
+              <span className="ac-head-state">
+                {skillDone ? (
+                  <Icon name="check" size="0.875rem" className="ac-done" />
+                ) : (
+                  <Icon
+                    name="loader-circle"
+                    size="0.875rem"
+                    className="is-spin"
+                  />
+                )}
+              </span>
+              <span className="ac-head-toggle">
+                <Icon
+                  name={planOpen ? "chevron-up" : "chevron-down"}
+                  size="0.875rem"
+                />
+              </span>
+            </button>
+            {planOpen ? (
+              <div className="ac-plan-body">
+                {atLeast(stage, "steps") ? (
+                  <Steps
+                    className="ac-steps"
+                    direction="vertical"
+                    size="small"
+                    current={stepIndex}
+                    items={STEP_ITEMS}
+                  />
+                ) : null}
+
+                {/* 总任务规划清单小卡片(标题 + 折叠按钮 + 提示文案 + 逐条打印的清单内容) */}
+                {showPlanCard ? (
+                  <div className="plan-card">
+                    <div className="plan-card-head">
+                      <span className="plan-card-title">
+                        <Icon name="clipboard-list" size="0.875rem" />
+                        <TwText text="总任务规划清单" />
+                      </span>
+                      <button
+                        type="button"
+                        className="plan-fold"
+                        title={planCardOpen ? "折叠清单" : "展开清单"}
+                        onClick={() => setPlanCardOpen((o) => !o)}
+                      >
+                        <Icon
+                          name={planCardOpen ? "chevron-up" : "chevron-down"}
+                          size="0.875rem"
+                        />
+                      </button>
+                    </div>
+                    <div className="plan-card-hint">
+                      <Icon name="circle-check-big" size="0.875rem" />
+                      <TwText
+                        text="任务编排已完成，清单与规划已生成"
+                        speed={2}
+                      />
+                    </div>
+                    {planCardOpen ? (
+                      <ol className="plan-list">
+                        {AI_TASK_PLAN.map((item, i) => (
+                          <li
+                            key={item}
+                            className={i < typedPlanCount ? "" : "is-hidden"}
+                          >
+                            <span className="plan-idx">{i + 1}</span>
+                            <span>
+                              <PlanItemText
+                                text={item}
+                                active={i < typedPlanCount}
+                                onDone={() =>
+                                  setTypedPlanCount((c) => Math.max(c, i + 2))
+                                }
+                              />
+                            </span>
+                          </li>
+                        ))}
+                      </ol>
+                    ) : null}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      {/* 确认提示:问题逐字打印,打印完成后出现按钮;点击「确认」后流程才继续 */}
+      {showConfirm ? (
+        <div className={cancelShake ? "ac-confirm is-shake" : "ac-confirm"}>
+          <div className="ac-confirm-text">
+            <TwText
+              text="请确认是否按照总任务规划清单执行？"
+              onDone={() => setConfirmTyped(true)}
+            />
+          </div>
+          {confirmTyped ? (
+            <div className="ac-confirm-btns">
+              <Button type="primary" size="small" onClick={handleConfirm}>
+                确认
+              </Button>
+              <Button size="small" onClick={handleCancel}>
+                取消
+              </Button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* 三、最终生成结果(逐字打印 + 蓝色光效) */}
+      {atLeast(stage, "result") ? (
+        <div className="ac-result">
+          <TwBlock shown={result.shown} typing={stage === "result"} />
+        </div>
+      ) : null}
+
+      {/* 四、底部操作条:左耗时 | 右五图标(刷新/复制/赞/踩/更多) */}
+      {stage === "done" ? (
+        <div className="ac-footer">
+          <span className="ac-cost">
+            <Icon name="timer" size="0.75rem" />
+            耗时1min50s
+          </span>
+          <div className="ac-actions">
+            <button
+              type="button"
+              className="ac-action"
+              title="重新生成"
+              onClick={handleRefresh}
+            >
+              <Icon name="refresh-cw" size="0.875rem" />
+            </button>
+            <button
+              type="button"
+              className="ac-action"
+              title={copied ? "已复制" : "复制结果"}
+              onClick={handleCopy}
+            >
+              <Icon name={copied ? "check" : "copy"} size="0.875rem" />
+            </button>
+            <button
+              type="button"
+              className={vote === 1 ? "ac-action is-on" : "ac-action"}
+              title="点赞"
+              onClick={() => setVote((v) => (v === 1 ? 0 : 1))}
+            >
+              <Icon name="thumbs-up" size="0.875rem" />
+            </button>
+            <button
+              type="button"
+              className={vote === 2 ? "ac-action is-on" : "ac-action"}
+              title="踩"
+              onClick={() => setVote((v) => (v === 2 ? 0 : 2))}
+            >
+              <Icon name="thumbs-down" size="0.875rem" />
+            </button>
+            <button type="button" className="ac-action" title="更多">
+              <Icon name="ellipsis" size="0.875rem" />
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+  Object.assign(__export, { AnswerCard });
+})();
+
+/* ===== src/views/ai-view/thread.jsx ===== */
+(function () {
+  const { useEffect, useRef } = React;
+  const AnswerCard = __export.AnswerCard;
+// 对话流:每组问答 = 顶部居中时间 + 右侧用户蓝色卡片(三圆角) + AI 回答卡片
+function Thread({ exchanges, onDone, onRestart }) {
+  const listRef = useRef(null);
+
+  // 内容增长(打印/阶段推进)时保持滚动到底部
+  useEffect(() => {
+    const el = listRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  });
+
+  return (
+    <div className="ai-thread" ref={listRef}>
+      {exchanges.map((ex) => (
+        <div key={ex.id} className="ai-exchange">
+          <div className="ai-chat-time">{ex.time}</div>
+          <div className="ai-msg-user">{ex.question}</div>
+          <AnswerCard onDone={onDone} onRestart={onRestart} />
+        </div>
+      ))}
+    </div>
+  );
+}
+  Object.assign(__export, { Thread });
 })();
 
 /* ===== src/views/ai-view/index.jsx ===== */
 (function () {
-  const { useState } = React;
+  const { useEffect, useRef, useState } = React;
   const { Icon, useApp, AI_CARD_GROUPS } = __export;
   const Composer = __export.Composer;
-// Layer 4: AI 会话 — 左侧 540px × 100% 会话卡片
-// 结构:顶部导航栏(50px) + 会话中心(水平垂直居中) + 底部 AI 输入框(始终展开)
-function AiChat({ title = "" }) {
-  const { setActiveMenu } = useApp();
+  const Thread = __export.Thread;
+// 从用户输入提炼简短会话标题:去口语前缀(请/帮我/我想…) → 取首个分句 → 超长截断
+function summarizeTitle(text, maxLen = 14) {
+  const clean = String(text).replace(/\s+/g, " ").trim();
+  if (!clean) return "AI 对话";
+  const stripped =
+    clean.replace(/^(请|麻烦|帮我|帮忙|我想|我想要|我要|给我)/, "").trim() ||
+    clean;
+  const firstClause =
+    stripped.split(/[，。！？；、:,.!?;\n]/)[0].trim() || stripped;
+  return firstClause.length > maxLen
+    ? `${firstClause.slice(0, maxLen)}…`
+    : firstClause;
+}
+
+// Layer 4: AI 会话 — 左侧 540px × 100% 会话面板
+// 未发送时:顶部导航 + 居中欢迎内容 + AI 输入框
+// 发送后:顶部导航 + 对话流(时间/用户卡片/AI 回答卡片) + AI 输入框
+// 导航标题为动态会话主题:默认「AI 对话」;模板发送取模板名,手动输入取提炼短标题
+function AiChat() {
+  const { setActiveMenu, startAiChat, pendingQuestion, setPendingQuestion } =
+    useApp();
   const [groupIndex, setGroupIndex] = useState(0);
+  const [exchanges, setExchanges] = useState([]);
+  const [busy, setBusy] = useState(false);
+  const [chatTitle, setChatTitle] = useState("AI 对话");
+  const idRef = useRef(0);
   const cards = AI_CARD_GROUPS[groupIndex];
 
   const refreshCards = () =>
     setGroupIndex((i) => (i + 1) % AI_CARD_GROUPS.length);
 
+  // 追加一组问答并触发右侧画布;标题优先取模板名,手动输入则提炼短标题
+  const sendQuestion = (text, titleText) => {
+    idRef.current += 1;
+    setExchanges((prev) => [
+      ...prev,
+      {
+        id: idRef.current,
+        time: dayjs().format("YYYY年M月D日 HH:mm:ss"),
+        question: text,
+      },
+    ]);
+    setBusy(true);
+    setChatTitle(titleText || summarizeTitle(text));
+    startAiChat();
+  };
+
+  // 发送事件:清空输入框(composer 内处理),追加一组问答并触发右侧画布
+  const handleSend = (text, meta) =>
+    sendQuestion(text, meta && meta.tplName ? meta.tplName : "");
+
+  // 首页输入框/模板库携带的内容:进入 AI 页后自动作为首条消息发送并开始问答
+  // pendingQuestion 形如 { text, title },title 为模板名(可选) → 直接用作会话标题
+  useEffect(() => {
+    if (pendingQuestion) {
+      sendQuestion(pendingQuestion.text, pendingQuestion.title || "");
+      setPendingQuestion(null);
+    }
+  }, [pendingQuestion]);
+
   return (
-    <section className="ai-chat">
+    // 根节点带 dark 类:AI 面板固定深色皮肤(独立于应用主题),
+    // 继承 dark.css 的 --color-* 深色值,antd 皮肤亦按 .dark 后代规则走深色
+    <section className="ai-chat dark">
       {/* 顶部导航栏:返回 + 会话标题(无标题则不展示) | 更多 */}
       <nav className="ai-nav">
         <div className="ai-nav-left">
@@ -7718,52 +10216,714 @@ function AiChat({ title = "" }) {
           >
             <Icon name="arrow-left" size="1rem" />
           </button>
-          {title ? <span className="ai-nav-title">{title}</span> : null}
+          {chatTitle ? <span className="ai-nav-title">{chatTitle}</span> : null}
         </div>
         <button type="button" className="ai-nav-btn" title="更多">
           <Icon name="ellipsis" size="1rem" />
         </button>
       </nav>
 
-      {/* 会话中心:水平垂直居中 */}
-      <div className="ai-center">
-        <div className="ai-brand">
-          <img
-            className="ai-gem"
-            src="./assets/uploads/aico-gem.svg"
-            alt="Aico 五色石"
-          />
-          <span className="ai-brand-name">Aico</span>
-        </div>
-        <p className="ai-intro">我是Aico，可以帮你解决以下问题</p>
-        <div className="ai-scene-bar">
-          <span className="ai-scene-title">智能运维场景</span>
-          <button type="button" className="ai-refresh" onClick={refreshCards}>
-            <Icon name="refresh-cw" size="0.875rem" />
-            <span>换一批</span>
-          </button>
-        </div>
-        <div className="ai-cards">
-          {cards.map((card) => (
-            <div key={card.key} className="ai-card">
-              <span className="ai-card-icon">
-                <Icon name={card.icon} size="1.75rem" />
-              </span>
-              <div className="ai-card-body">
-                <div className="ai-card-title">{card.title}</div>
-                <div className="ai-card-desc">{card.desc}</div>
+      {/* 会话中心:发送前为欢迎区,发送后变为对话组件区域 */}
+      {exchanges.length === 0 ? (
+        <div className="ai-center">
+          <div className="ai-brand">
+            <img
+              className="ai-gem"
+              src="./assets/uploads/aico-gem.svg"
+              alt="Aico 五色石"
+            />
+            <span className="ai-brand-name">Aico</span>
+          </div>
+          <p className="ai-intro">我是Aico，可以帮你解决以下问题</p>
+          <div className="ai-scene-bar">
+            <span className="ai-scene-title">智能运维场景</span>
+            <button type="button" className="ai-refresh" onClick={refreshCards}>
+              <Icon name="refresh-cw" size="0.875rem" />
+              <span>换一批</span>
+            </button>
+          </div>
+          <div className="ai-cards">
+            {cards.map((card) => (
+              <div key={card.key} className="ai-card">
+                <span className="ai-card-icon">
+                  <Icon name={card.icon} size="1.75rem" />
+                </span>
+                <div className="ai-card-body">
+                  <div className="ai-card-title">{card.title}</div>
+                  <div className="ai-card-desc">{card.desc}</div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        <Thread
+          exchanges={exchanges}
+          onDone={() => setBusy(false)}
+          onRestart={() => setBusy(true)}
+        />
+      )}
 
-      {/* 底部:AI 输入框(与总览展开态一致,始终为大输入框) */}
-      <Composer defaultExpanded />
+      {/* 底部:AI 输入框(始终展开;回答生成中锁定发送) */}
+      <Composer defaultExpanded busy={busy} onSend={handleSend} />
     </section>
   );
 }
   Object.assign(__export, { AiChat });
+})();
+
+/* ===== src/views/content-gen/index.jsx ===== */
+(function () {
+  const { Icon } = __export;
+// Layer 4: 内容生成画布 — AI 会话发送后右侧主内容区
+// 顶部标题「网络资源确定」,下方为彩色虚线流转矩形(持续动效),中心文案「内容生成中」
+function ContentGen() {
+  return (
+    <div className="content-gen">
+      <header className="gen-head">
+        <h3 className="gen-title">
+          <Icon name="network" size="1.125rem" />
+          网络资源确定
+        </h3>
+        <span className="gen-sub">Aico 正在为您生成内容</span>
+      </header>
+
+      {/* 矩形高度为可用区一半,垂直居中 */}
+      <div className="gen-stage">
+        <div className="gen-frame">
+          {/* 双层彩色虚线矩形:反向流动,叠加发光 */}
+          <svg className="gen-border" aria-hidden="true">
+            <defs>
+              <linearGradient id="genGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#06b6d4" />
+                <stop offset="35%" stopColor="#2563eb" />
+                <stop offset="70%" stopColor="#7c3aed" />
+                <stop offset="100%" stopColor="#ec4899" />
+              </linearGradient>
+            </defs>
+            <rect className="gen-rect gen-rect-fast" x="3" y="3" rx="1.25rem" />
+            <rect className="gen-rect gen-rect-slow" x="3" y="3" rx="1.25rem" />
+          </svg>
+
+          <div className="gen-center">
+            <span className="gen-orb">
+              <Icon name="sparkles" size="1.5rem" />
+            </span>
+            <div className="gen-text">
+              内容生成中
+              <span className="gen-dots">
+                <i />
+                <i />
+                <i />
+              </span>
+            </div>
+            <div className="gen-hint">正在确定网络资源范围并匹配设备清单</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+  Object.assign(__export, { ContentGen });
+})();
+
+/* ===== src/views/change-flow/index.jsx ===== */
+(function () {
+  const { useState, useEffect, Fragment, useRef, useLayoutEffect } = React;
+  const { Icon, FLOW_TIMING } = __export;
+// 累计运行时间 hook:autoPlay 时每 80ms 更新一次 elapsed(毫秒),
+// 用于按时间线驱动「加载中 → 校验完成」的状态切换
+function useElapsed(run) {
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!run) {
+      setElapsed(0);
+      return undefined;
+    }
+    const start = performance.now();
+    const id = setInterval(() => setElapsed(performance.now() - start), 80);
+    return () => clearInterval(id);
+  }, [run]);
+  return elapsed;
+}
+
+const DEFAULT_ACTIONS = [
+  { label: "新页签查看", icon: "external-link" },
+  { label: "功能设计文档", icon: "file-text" },
+];
+
+// 拆分参数字段:"Str.serverIp" → "Str."(字段类型) + "serverIp"(参数内容)
+function splitParam(p) {
+  const dot = p.indexOf(".");
+  if (dot === -1) return { type: "", content: p };
+  return { type: p.slice(0, dot + 1), content: p.slice(dot + 1) };
+}
+
+// 参数标签(拆分字段类型与参数内容)
+function ParamTag({ value, animated, delay }) {
+  const { type, content } = splitParam(value);
+  return (
+    <span
+      className={`cf-tag cf-tag--param ${animated ? "cf-tag-load" : ""}`}
+      style={animated ? { animationDelay: `${delay}s` } : undefined}
+    >
+      <Icon
+        name="chevrons-left-right"
+        size="0.75rem"
+        color="#5ca2e9"
+        strokeWidth={1.5}
+        className="cf-tag-icon"
+      />
+      <span className="cf-tag-param-group">
+        {type ? <span className="cf-tag-param-type">{type}</span> : null}
+        <span className="cf-tag-param-value">{content}</span>
+      </span>
+    </span>
+  );
+}
+
+// 单张流程步骤卡片
+function FlowCard({
+  step,
+  index,
+  loading,
+  fading,
+  delay,
+  selected,
+  onSelect,
+  showAction = true,
+  showParams = true,
+}) {
+  const params = step.params || [];
+  // 加载中:流光边框 + 外发光 + 弥散光晕;缓出阶段(fading)保留加载视觉并淡出
+  const showLoading = loading || fading;
+  const stateClass = showLoading ? "cf-card--loading" : "";
+
+  // 参数标签溢出测量 + 浮窗:固定宽度内显示不全时,用 +N 展示剩余数量
+  const tagsRef = useRef(null);
+  const moreBtnRef = useRef(null);
+  const actionTagRef = useRef(null);
+  const [hiddenCount, setHiddenCount] = useState(0);
+  const [showMore, setShowMore] = useState(false);
+  const [popupPos, setPopupPos] = useState({ top: 0, right: 0 });
+  // 异常动作标签的悬浮提示(portal 渲染到 body,不受卡片 overflow 裁剪)
+  const [abnormalTip, setAbnormalTip] = useState(false);
+  const [abnormalTipPos, setAbnormalTipPos] = useState({ top: 0, left: 0 });
+
+  const toggleMore = () => {
+    if (!showMore && moreBtnRef.current) {
+      const rect = moreBtnRef.current.getBoundingClientRect();
+      setPopupPos({
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right,
+      });
+    }
+    setShowMore(!showMore);
+  };
+
+  // 异常动作标签 hover:定位到标签正上方居中
+  const abnormal = step.actionAbnormal;
+  const handleAbnormalEnter = () => {
+    if (!abnormal || !actionTagRef.current) return;
+    const rect = actionTagRef.current.getBoundingClientRect();
+    setAbnormalTipPos({ top: rect.top, left: rect.left + rect.width / 2 });
+    setAbnormalTip(true);
+  };
+  const handleAbnormalLeave = () => setAbnormalTip(false);
+
+  useLayoutEffect(() => {
+    const container = tagsRef.current;
+    if (!container || !params.length || !showParams) return undefined;
+
+    const measure = () => {
+      const maxWidth = container.clientWidth;
+      const gap = 6;
+      // 排除 "+N" 标签,仅测量动作标签 + 参数标签
+      const nodes = Array.from(
+        container.querySelectorAll(".cf-tag")
+      ).filter((n) => !n.classList.contains("cf-tag--more"));
+      const actionW = nodes[0] ? nodes[0].offsetWidth : 0;
+      const paramWs = nodes.slice(1).map((n) => n.offsetWidth);
+
+      const countFit = (moreReserve) => {
+        let used = actionW + (moreReserve > 0 ? gap + moreReserve : 0);
+        let visible = 0;
+        for (let i = 0; i < paramWs.length; i++) {
+          if (used + gap + paramWs[i] <= maxWidth) {
+            used += gap + paramWs[i];
+            visible++;
+          } else break;
+        }
+        return visible;
+      };
+
+      let visible = countFit(0);
+      if (visible < params.length) {
+        visible = countFit(30); // 预留 "+N" 标签约 30px,避免其被裁剪
+      }
+      setHiddenCount(Math.max(0, params.length - visible));
+    };
+
+    measure();
+    // 字体加载后重新测量(字体未加载时宽度不准,可能导致标签溢出)
+    if (
+      typeof document !== "undefined" &&
+      document.fonts &&
+      document.fonts.ready
+    ) {
+      document.fonts.ready.then(measure);
+    }
+    return undefined;
+  }, [params, step.action, showAction, showParams]);
+
+  const visibleCount = Math.max(0, params.length - hiddenCount);
+  const visibleParams = params.slice(0, visibleCount);
+  const hiddenParams = params.slice(visibleCount);
+
+  return (
+    <div
+      className={`cf-card-outer ${
+        showLoading ? "cf-card-outer--loading" : ""
+      } ${fading ? "cf-card-outer--fading" : ""} cf-anim`}
+      style={{ animationDelay: `${delay}s` }}
+    >
+      <div
+        className={`cf-card ${stateClass} ${
+          selected ? "cf-card--selected" : ""
+        } ${fading ? "cf-card--fading" : ""}`}
+        onClick={() => onSelect && onSelect(index)}
+      >
+        <div className="cf-card-header">
+          <span className="cf-card-title">
+            {step.no != null ? (
+              <span className="cf-card-index">
+                {String(step.no).indexOf(".") >= 0 ? step.no : `${step.no}.`}
+              </span>
+            ) : null}
+            {step.title}
+          </span>
+          <div className="cf-card-header-right">
+            {loading ? (
+              <span className="cf-loading-indicator" />
+            ) : (
+              <span className="cf-detail-icon" title="查看详情">
+                <Icon
+                  name="file-text"
+                  size="0.875rem"
+                  color={selected ? "#3b82f6" : "#DFDFDF"}
+                />
+              </span>
+            )}
+          </div>
+        </div>
+        {showAction && step.action ? (
+          <div className="cf-tags" ref={tagsRef}>
+            <span
+              ref={actionTagRef}
+              className={`cf-tag cf-tag--action ${
+                abnormal ? "cf-tag--abnormal" : ""
+              } cf-tag-load`}
+              onMouseEnter={abnormal ? handleAbnormalEnter : undefined}
+              onMouseLeave={abnormal ? handleAbnormalLeave : undefined}
+            >
+              <Icon
+                name={abnormal ? "triangle-alert" : step.actionIcon || "circle-dot"}
+                size="0.75rem"
+                color={abnormal ? "#f87171" : "#cb8efb"}
+                strokeWidth={1.5}
+                className="cf-tag-icon"
+              />
+              {step.action}
+            </span>
+            {showParams
+              ? visibleParams.map((p, i) => (
+                  <ParamTag key={i} value={p} animated delay={i * 0.15} />
+                ))
+              : null}
+            {showParams && hiddenCount > 0 ? (
+              <button
+                ref={moreBtnRef}
+                className="cf-tag cf-tag--more cf-tag-load"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleMore();
+                }}
+              >
+                +{hiddenCount}
+                <Icon
+                  name="chevron-down"
+                  size="0.75rem"
+                  className="cf-tag-more-icon"
+                />
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+        {showLoading ? <div className="cf-card-glow" /> : null}
+        <div className="cf-card-dots" />
+      </div>
+      {showMore && hiddenCount > 0 ? (
+        <div
+          className="cf-tag-popup"
+          style={{ top: popupPos.top, right: popupPos.right }}
+        >
+          {hiddenParams.map((p, i) => (
+            <ParamTag key={i} value={p} />
+          ))}
+        </div>
+      ) : null}
+      {abnormalTip ? (
+        <div
+          className="cf-abnormal-tip"
+          style={{ top: abnormalTipPos.top, left: abnormalTipPos.left }}
+        >
+          匹配到多个重复动作包，请人工确认选择
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+// 详情行:标签 + 内容
+function DetailRow({ label, children }) {
+  return (
+    <div className="cf-drawer-row">
+      <span className="cf-drawer-label">{label}</span>
+      <div className="cf-drawer-value">{children}</div>
+    </div>
+  );
+}
+
+// 单节点详情侧边栏:节点名称 / 匹配动作 / 匹配参数 / 关联参数命令行
+function DetailPanel({ step, onClose }) {
+  if (!step) return null;
+  const params = step.params || [];
+  return (
+    <div className="cf-drawer-panel">
+      <div className="cf-drawer-header">
+        <span className="cf-drawer-title">{step.title}</span>
+        <button
+          className="cf-drawer-close"
+          type="button"
+          onClick={onClose}
+          aria-label="关闭"
+        >
+          <Icon name="x" size="1rem" color="#DFDFDF" />
+        </button>
+      </div>
+      <div className="cf-drawer-body">
+        <DetailRow label="匹配动作">
+          <span className="cf-tag cf-tag--action">
+            <Icon
+              name={step.actionIcon || "circle-dot"}
+              size="0.75rem"
+              color="#cb8efb"
+              strokeWidth={1.5}
+              className="cf-tag-icon"
+            />
+            {step.action}
+          </span>
+        </DetailRow>
+        <DetailRow label="匹配参数">
+          {params.length ? (
+            <div className="cf-drawer-params">
+              {params.map((p, i) => (
+                <ParamTag key={i} value={p} />
+              ))}
+            </div>
+          ) : (
+            <span className="cf-drawer-text cf-drawer-text--muted">—</span>
+          )}
+        </DetailRow>
+        <div className="cf-drawer-row">
+          <div className="cf-drawer-label-row">
+            <span className="cf-drawer-label">关联命令行</span>
+            {step.commandLine ? (
+              <button
+                className="cf-drawer-copy"
+                type="button"
+                onClick={() => {
+                  const text = step.commandLine || "";
+                  if (
+                    typeof navigator !== "undefined" &&
+                    navigator.clipboard
+                  ) {
+                    navigator.clipboard.writeText(text);
+                  }
+                }}
+                aria-label="复制"
+              >
+                <Icon name="copy" size="0.875rem" color="#C9C9C9" />
+              </button>
+            ) : null}
+          </div>
+          <div className="cf-drawer-value">
+            <pre className="cf-drawer-code">{step.commandLine || "—"}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 配置变更流程组件:纵向流程图,步骤卡片依次加载(流光边框),
+// 支持条件分支、点击选中(详情侧边栏)、视图缩放
+// 时间线常量取自 FLOW_TIMING(与左侧 AI 问答步骤条联动共用同一节奏)
+function ChangeFlow(props) {
+  const steps = props.steps || [];
+  const autoPlay = props.autoPlay !== false;
+  const loadingMs =
+    props.loadingMs != null ? props.loadingMs : FLOW_TIMING.loadingMs;
+  const elapsed = useElapsed(autoPlay);
+
+  // 选中态:支持受控(selectedIndex)与非受控(内部状态 + 点击切换)
+  const [internalSelected, setInternalSelected] = useState(null);
+  const selectedIndex =
+    props.selectedIndex != null ? props.selectedIndex : internalSelected;
+
+  // 节点详情侧边栏
+  const [detailNode, setDetailNode] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const closeDetail = () => {
+    setDetailOpen(false);
+    if (props.selectedIndex == null) setInternalSelected(null);
+    if (props.onSelect) props.onSelect(null);
+  };
+  const selectAndOpen = (i, step) => {
+    if (props.selectedIndex == null) setInternalSelected(i);
+    if (props.onSelect) props.onSelect(i);
+    setDetailNode(step);
+    setDetailOpen(true);
+  };
+  const handleSelect = (i) => selectAndOpen(i, steps[i]);
+
+  // 视图缩放
+  const ZOOM_MIN = 0.5;
+  const ZOOM_MAX = 1.5;
+  const ZOOM_STEP = 0.1;
+  const [zoom, setZoom] = useState(1);
+  const zoomIn = () =>
+    setZoom((z) => Math.min(ZOOM_MAX, Math.round((z + ZOOM_STEP) * 10) / 10));
+  const zoomOut = () =>
+    setZoom((z) => Math.max(ZOOM_MIN, Math.round((z - ZOOM_STEP) * 10) / 10));
+
+  const actions = props.actions || DEFAULT_ACTIONS;
+
+  // 顺序出现:上一张卡片「全部加载完成(含状态揭示)」后,箭头淡入,再轮到下一张
+  const APPEAR_DELAY_MS = FLOW_TIMING.appearDelay;
+  const STATUS_REVEAL_MS = FLOW_TIMING.revealMs;
+  const ARROW_GAP_MS = FLOW_TIMING.arrowGapMs;
+  const FADE_OUT_MS = 450;
+  const cycleMs = loadingMs + STATUS_REVEAL_MS + ARROW_GAP_MS;
+  const endDelay = autoPlay
+    ? (APPEAR_DELAY_MS + steps.length * cycleMs) / 1000
+    : 0.7 + steps.length * 0.5;
+  const flowDoneMs =
+    APPEAR_DELAY_MS +
+    Math.max(0, steps.length - 1) * cycleMs +
+    loadingMs +
+    FADE_OUT_MS;
+  const flowLoading = autoPlay && elapsed < flowDoneMs;
+
+  return (
+    <div className={`cf ${props.theme === "light" ? "cf--light" : ""}`}>
+      <header className="cf-topbar cf-anim" style={{ animationDelay: "0.1s" }}>
+        <div className="cf-topbar-left">
+          <div className="cf-topbar-icon">
+            <Icon
+              name={props.headerIcon || "clipboard-list"}
+              size="0.875rem"
+              color="#ffffff"
+            />
+          </div>
+          <span className="cf-topbar-title">
+            {props.title || "网络变更-配置详情"}
+          </span>
+        </div>
+        <div className="cf-topbar-right">
+          {actions.map((a, i) => (
+            <button key={i} className="cf-btn" type="button">
+              <Icon name={a.icon} size="0.875rem" />
+              {a.label}
+            </button>
+          ))}
+        </div>
+      </header>
+
+      <main className="cf-flow" style={{ transform: `scale(${zoom})` }}>
+        <div className="cf-terminal cf-anim" style={{ animationDelay: "0.3s" }}>
+          {props.startLabel || "开始"}
+        </div>
+        <div
+          className={`cf-arrow ${
+            flowLoading ? "cf-arrow--loading" : ""
+          } cf-anim`}
+          style={{ animationDelay: "0.4s" }}
+        />
+        {steps.map((step, i) => {
+          const appearAt = APPEAR_DELAY_MS + i * cycleMs;
+          const doneAt = appearAt + loadingMs;
+          const arrowAt = doneAt + STATUS_REVEAL_MS;
+          const loading = autoPlay && elapsed < doneAt;
+          const fading = autoPlay && !loading && elapsed < doneAt + FADE_OUT_MS;
+          const cardDelay = autoPlay ? appearAt / 1000 : 0.5 + i * 0.5;
+          const arrowDelay = autoPlay ? arrowAt / 1000 : 0.7 + i * 0.5;
+          // 三阶段加载:初始仅标题 → 加载动作标签 → 加载参数标签
+          const actionAt = appearAt + loadingMs * 0.33;
+          const paramsAt = appearAt + loadingMs * 0.66;
+          const showAction =
+            props.showAction != null
+              ? props.showAction
+              : !autoPlay || elapsed >= actionAt;
+          const showParams =
+            props.showParams != null
+              ? props.showParams
+              : !autoPlay || elapsed >= paramsAt;
+          // 分支节点:判断条件 + 多条分支
+          if (step.type === "branch") {
+            return (
+              <Fragment key={i}>
+                <div
+                  className="cf-branch cf-anim"
+                  style={{ animationDelay: `${cardDelay}s` }}
+                >
+                  <FlowCard
+                    step={{
+                      title: step.condition,
+                      action: step.action,
+                      params: step.params,
+                      commandLine: step.commandLine,
+                      no: step.no,
+                    }}
+                    index={i}
+                    loading={loading}
+                    fading={fading}
+                    delay={cardDelay}
+                    selected={false}
+                    onSelect={() =>
+                      selectAndOpen(i, {
+                        title: step.condition,
+                        action: step.action,
+                        params: step.params,
+                        commandLine: step.commandLine,
+                      })
+                    }
+                    showAction={showAction}
+                    showParams={showParams}
+                  />
+                  <div
+                    className="cf-branch-fork cf-anim"
+                    style={{ animationDelay: `${cardDelay + 0.1}s` }}
+                  >
+                    <svg viewBox="0 0 840 50" preserveAspectRatio="none">
+                      <path d="M420,0 V20 Q420,35 405,35 H215 Q200,35 200,50" />
+                      <path d="M420,0 V20 Q420,35 435,35 H625 Q640,35 640,50" />
+                    </svg>
+                    {step.branches.map((b, bi) => (
+                      <span
+                        key={bi}
+                        className={`cf-branch-label ${
+                          bi === 0
+                            ? "cf-branch-label--left"
+                            : "cf-branch-label--right"
+                        }`}
+                      >
+                        {b.label}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="cf-branch-cols">
+                    {step.branches.map((b, bi) => (
+                      <FlowCard
+                        key={bi}
+                        step={b.step}
+                        index={i}
+                        loading={loading}
+                        fading={fading}
+                        delay={cardDelay + 0.4 + bi * 0.2}
+                        selected={false}
+                        onSelect={() => selectAndOpen(i, b.step)}
+                        showAction={showAction}
+                        showParams={showParams}
+                      />
+                    ))}
+                  </div>
+                  <div
+                    className="cf-branch-join cf-anim"
+                    style={{ animationDelay: `${arrowDelay - 0.1}s` }}
+                  >
+                    <svg viewBox="0 0 840 50" preserveAspectRatio="none">
+                      <path d="M200,0 V20 Q200,35 215,35 H405 Q420,35 420,50" />
+                      <path d="M640,0 V20 Q640,35 625,35 H435 Q420,35 420,50" />
+                    </svg>
+                  </div>
+                </div>
+                <div
+                  className={`cf-arrow ${
+                    flowLoading ? "cf-arrow--loading" : ""
+                  } cf-anim`}
+                  style={{ animationDelay: `${arrowDelay}s` }}
+                />
+              </Fragment>
+            );
+          }
+          return (
+            <Fragment key={i}>
+              <FlowCard
+                step={step}
+                index={i}
+                loading={loading}
+                fading={fading}
+                delay={cardDelay}
+                selected={selectedIndex === i}
+                onSelect={handleSelect}
+                showAction={showAction}
+                showParams={showParams}
+              />
+              <div
+                className={`cf-arrow ${
+                  flowLoading ? "cf-arrow--loading" : ""
+                } cf-anim`}
+                style={{ animationDelay: `${arrowDelay}s` }}
+              />
+            </Fragment>
+          );
+        })}
+        <div
+          className="cf-terminal cf-anim"
+          style={{ animationDelay: `${endDelay}s` }}
+        >
+          {props.endLabel || "结束"}
+        </div>
+      </main>
+      <div className="cf-zoom">
+        <button
+          className="cf-zoom-btn"
+          type="button"
+          onClick={zoomIn}
+          disabled={zoom >= ZOOM_MAX}
+          aria-label="放大"
+        >
+          <Icon name="plus" size="0.875rem" />
+        </button>
+        <button
+          className="cf-zoom-btn"
+          type="button"
+          onClick={zoomOut}
+          disabled={zoom <= ZOOM_MIN}
+          aria-label="缩小"
+        >
+          <Icon name="minus" size="0.875rem" />
+        </button>
+      </div>
+
+      <div className={`cf-drawer ${detailOpen ? "cf-drawer--open" : ""}`}>
+        <DetailPanel step={detailNode} onClose={closeDetail} />
+      </div>
+    </div>
+  );
+}
+  Object.assign(__export, { ChangeFlow });
 })();
 
 /* ===== src/components/status-tag/index.jsx ===== */
@@ -8332,16 +11492,18 @@ function SettingsView() {
 
 /* ===== src/views/content-area/index.jsx ===== */
 (function () {
-  const { useApp } = __export;
+  const { useApp, SYNCED_FLOW_STEPS } = __export;
   const SessionCard = __export.SessionCard;
   const OverviewView = __export.OverviewView;
   const AiChat = __export.AiChat;
+  const ContentGen = __export.ContentGen;
+  const ChangeFlow = __export.ChangeFlow;
   const DeviceView = __export.DeviceView;
   const AlarmView = __export.AlarmView;
   const SettingsView = __export.SettingsView;
 // Layer 4: 菜单内容区 — 按当前激活菜单项渲染对应视图
 // 首页:左侧会话卡片(33.75rem × 100%,贴边) + 右侧地图自适应
-// AI:左侧 AI 会话卡片(33.75rem × 100%,贴边) + 右侧留白
+// AI:左侧 AI 会话卡片(33.75rem × 100%,贴边) + 右侧生成画布(发送后出现)
 const VIEW_MAP = {
   devices: DeviceView,
   alarms: AlarmView,
@@ -8349,7 +11511,7 @@ const VIEW_MAP = {
 };
 
 function ContentArea() {
-  const { activeMenu } = useApp();
+  const { activeMenu, aiChatActive, aiFlowRunId } = useApp();
 
   if (activeMenu === "overview") {
     return (
@@ -8363,10 +11525,22 @@ function ContentArea() {
   }
 
   if (activeMenu === "ai") {
+    // 右侧画布:发送后「内容生成中」→ 点击确认后切换为配置变更流程组件
+    // 步骤与左侧步骤条同内容(配置生成/配置审核/结果下发),共用 FLOW_TIMING 时间线联动;
+    // key=aiFlowRunId:再次确认时重新挂载,流程动画与左侧同步重放
+    const canvas =
+      aiFlowRunId > 0 ? (
+        <ChangeFlow key={aiFlowRunId} steps={SYNCED_FLOW_STEPS} />
+      ) : (
+        <ContentGen />
+      );
     return (
       <main className="content-area is-overview">
         <AiChat />
-        <div className="overview-aside" />
+        {/* 右侧画布容器带 dark 类:固定深色(含发送前空态),与 AI 面板一致 */}
+        <div className="overview-aside ai-canvas dark">
+          {aiChatActive ? canvas : null}
+        </div>
       </main>
     );
   }

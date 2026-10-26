@@ -1,0 +1,38 @@
+/* 侧边菜单:收起 3rem / 展开 16rem,宽度过渡实现抽屉式伸缩 */
+.side-menu {
+  flex: 0 0 auto;
+  width: 16rem;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-container-highest);
+  border-right: 1px solid var(--divider);
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+
+.side-menu.is-collapsed {
+  width: 3rem;
+}
+
+/* 底部伸缩按钮:3rem × 3rem,图标 1rem × 1rem,水平垂直居中,距底部 1rem */
+.side-menu-toggle {
+  flex: 0 0 auto;
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-base);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.side-menu-toggle:hover {
+  color: var(--primary);
+  background: var(--surface-variant);
+}

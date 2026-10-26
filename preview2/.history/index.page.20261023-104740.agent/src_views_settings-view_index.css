@@ -1,0 +1,110 @@
+/* 系统设置:H5 表单骨架(标签居左 CSS Grid) + 开关设置行 */
+.settings-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-section);
+  max-width: 48rem;
+}
+
+.settings-card {
+  padding: 1.5rem;
+  background: var(--surface-container-highest);
+  border-radius: var(--radius-container);
+  box-shadow: var(--shadow-card);
+}
+
+.settings-card-title {
+  margin: 0 0 1.25rem;
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+/* 表单区:标签列固定宽度,字段纵向间距 1.5rem */
+.settings-grid {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  row-gap: 1.5rem;
+  column-gap: 1rem;
+  align-items: center;
+}
+
+.form-label {
+  position: relative;
+  font: var(--font-body-m);
+  color: var(--on-surface);
+  text-align: left;
+}
+
+/* 必填星号:悬挂在标签左侧,不占排版空间 */
+.form-label.required::before {
+  content: "*";
+  position: absolute;
+  left: -0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font: var(--font-body-m);
+  color: var(--error);
+}
+
+.form-field {
+  position: relative;
+}
+
+/* 校验文案:覆盖在控件正下方,不占布局空间 */
+.form-error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.25rem;
+  font: var(--font-caption-m);
+  color: var(--error);
+}
+
+.form-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-unit {
+  font: var(--font-body-m);
+  color: var(--on-surface-variant);
+}
+
+/* 开关设置行:Label 与说明在行首,Switch 在行尾 */
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--divider);
+}
+
+.switch-row:last-of-type {
+  border-bottom: none;
+}
+
+.switch-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.switch-label {
+  font: var(--font-body-m);
+  color: var(--on-surface);
+}
+
+.switch-desc {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+/* 底部按钮组靠右:取消在前,主操作在后 */
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}

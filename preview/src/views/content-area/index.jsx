@@ -1,7 +1,10 @@
 import { useApp } from "../../context.jsx";
+import { SYNCED_FLOW_STEPS } from "../../mock/change-flow.js";
 import SessionCard from "../session-card/index.jsx";
 import OverviewView from "../overview-view/index.jsx";
 import AiChat from "../ai-view/index.jsx";
+import ContentGen from "../content-gen/index.jsx";
+import ChangeFlow from "../change-flow/index.jsx";
 import DeviceView from "../device-view/index.jsx";
 import AlarmView from "../alarm-view/index.jsx";
 import SettingsView from "../settings-view/index.jsx";
@@ -9,7 +12,7 @@ import "./index.css";
 
 // Layer 4: 菜单内容区 — 按当前激活菜单项渲染对应视图
 // 首页:左侧会话卡片(33.75rem × 100%,贴边) + 右侧地图自适应
-// AI:左侧 AI 会话卡片(33.75rem × 100%,贴边) + 右侧留白
+// AI:左侧 AI 会话卡片(33.75rem × 100%,贴边) + 右侧生成画布(发送后出现)
 const VIEW_MAP = {
   devices: DeviceView,
   alarms: AlarmView,
@@ -17,7 +20,7 @@ const VIEW_MAP = {
 };
 
 export default function ContentArea() {
-  const { activeMenu } = useApp();
+  const { activeMenu, aiChatActive, aiFlowRunId } = useApp();
 
   if (activeMenu === "overview") {
     return (
@@ -31,10 +34,22 @@ export default function ContentArea() {
   }
 
   if (activeMenu === "ai") {
+    // 右侧画布:发送后「内容生成中」→ 点击确认后切换为配置变更流程组件
+    // 步骤与左侧步骤条同内容(配置生成/配置审核/结果下发),共用 FLOW_TIMING 时间线联动;
+    // key=aiFlowRunId:再次确认时重新挂载,流程动画与左侧同步重放
+    const canvas =
+      aiFlowRunId > 0 ? (
+        <ChangeFlow key={aiFlowRunId} steps={SYNCED_FLOW_STEPS} />
+      ) : (
+        <ContentGen />
+      );
     return (
       <main className="content-area is-overview">
         <AiChat />
-        <div className="overview-aside" />
+        {/* 右侧画布容器带 dark 类:固定深色(含发送前空态),与 AI 面板一致 */}
+        <div className="overview-aside ai-canvas dark">
+          {aiChatActive ? canvas : null}
+        </div>
       </main>
     );
   }

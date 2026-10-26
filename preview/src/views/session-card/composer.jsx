@@ -52,7 +52,8 @@ function TplPanel({ tab, onTab, selectedKey, onPick }) {
 
 // AI 输入框:初始 48px 单行,点击展开为 120px 完整输入区(渐变彩边 + 模板库 + 字数 + 发送)
 // 展开后保持大输入框状态,不因点击外部而收起;defaultExpanded 可指定初始即展开
-export default function Composer({ defaultExpanded = false }) {
+// onSend:发送回调(Enter/点击发送触发),发送后清空输入;busy:回答生成中锁定发送
+export default function Composer({ defaultExpanded = false, busy = false, onSend }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [text, setText] = useState("");
   const [scene, setScene] = useState("config");
@@ -65,14 +66,27 @@ export default function Composer({ defaultExpanded = false }) {
     if (expanded && taRef.current) taRef.current.focus();
   }, [expanded]);
 
-  const canSend = text.trim().length > 0;
+  const canSend = Boolean(onSend) && !busy && text.trim().length > 0;
   const tplLabel = selectedTpl ? selectedTpl.name : "模板库";
 
+  // 发送:回调后清空输入内容与已选模板;携带模板名(若来自模板库)供会话标题使用
+  const doSend = () => {
+    if (!canSend) return;
+    onSend(
+      text.trim(),
+      selectedTpl ? { tplName: selectedTpl.name } : null
+    );
+    setText("");
+    setSelectedTpl(null);
+  };
+
   const pickTpl = (tpl) => {
-    setSelectedTpl(tpl);
-    setText(tpl.prompt);
+    // 点击模板列表项:直接发送(携带模板名作为会话标题),不再先填入输入框
+    if (!onSend || busy) return;
     setTplOpen(false);
-    if (taRef.current) taRef.current.focus();
+    setText("");
+    setSelectedTpl(null);
+    onSend(tpl.prompt, { tplName: tpl.name });
   };
 
   const clearTpl = () => {
@@ -114,6 +128,12 @@ export default function Composer({ defaultExpanded = false }) {
               placeholder={PLACEHOLDER}
               maxLength={MAX_LEN}
               onChange={(e) => setText(e.target.value)}
+              onPressEnter={(e) => {
+                if (!e.shiftKey) {
+                  e.preventDefault();
+                  doSend();
+                }
+              }}
               style={{ height: "100%", resize: "none" }}
             />
           </div>
@@ -196,9 +216,10 @@ export default function Composer({ defaultExpanded = false }) {
               <button
                 type="button"
                 className={canSend ? "send-btn is-active" : "send-btn"}
-                title="发送"
+                title={busy ? "回答生成中…" : "发送"}
+                onClick={doSend}
               >
-                <Icon name="send" size="1rem" />
+                <Icon name={busy ? "loader-circle" : "send"} size="1rem" className={busy ? "is-spin" : ""} />
               </button>
             </div>
           </div>

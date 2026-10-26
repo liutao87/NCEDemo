@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Select } from "antd";
 import { Icon } from "../../../assets/shared/icon.jsx";
+import { useApp } from "../../context.jsx";
 import { ATTENTION_ITEMS, RANGE_OPTIONS } from "../../mock/session.js";
 import Composer from "./composer.jsx";
 import "./index.css";
@@ -13,8 +14,19 @@ const ATTENTION_TABS = [
 ];
 
 export default function SessionCard() {
+  const { setActiveMenu, setPendingQuestion } = useApp();
   const [range, setRange] = useState("week");
   const [tab, setTab] = useState("all");
+
+  // 首页发送(输入框发送或点击模板库直接发送):携带输入文字跳转到 AI 侧边栏,自动开始问答;
+  // meta.tplName(模板库点击时携带)会作为会话标题
+  const handleSend = (text, meta) => {
+    setPendingQuestion({
+      text,
+      title: meta && meta.tplName ? meta.tplName : null,
+    });
+    setActiveMenu("ai");
+  };
 
   const counts = useMemo(
     () => ({
@@ -59,7 +71,7 @@ export default function SessionCard() {
           </div>
           <img
             className="hero-art"
-            src="./assets/uploads/hero-illustration.svg"
+            src="./assets/uploads/work.png"
             alt="网络守护示意"
           />
         </div>
@@ -128,8 +140,8 @@ export default function SessionCard() {
           </div>
         </div>
 
-        {/* 底部:AI 输入框(背景图区域内,固定最底部) */}
-        <Composer />
+        {/* 底部:AI 输入框(背景图区域内,固定最底部;发送后带文字跳转 AI 会话) */}
+        <Composer onSend={handleSend} />
       </div>
     </section>
   );
