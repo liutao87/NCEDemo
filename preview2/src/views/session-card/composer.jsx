@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Input, Popover, Select } from "antd";
+import { Input, Select } from "antd";
 import { Icon } from "../../../assets/shared/icon.jsx";
 import { SCENE_OPTIONS, TEMPLATES } from "../../mock/session.js";
 
@@ -41,7 +41,12 @@ function TplPanel({ tab, onTab, selectedKey, onPick }) {
             className={t.key === selectedKey ? "tpl-item is-active" : "tpl-item"}
             onClick={() => onPick(t)}
           >
-            <Icon name={t.icon} size="0.875rem" />
+            <Icon
+              name={t.icon}
+              size="0.875rem"
+              strokeWidth={2.5}
+              className="tpl-item-icon"
+            />
             <span className="tpl-name">{t.name}</span>
           </button>
         ))}
@@ -61,6 +66,19 @@ export default function Composer({ defaultExpanded = false, busy = false, onSend
   const [tplTab, setTplTab] = useState("all");
   const [selectedTpl, setSelectedTpl] = useState(null);
   const taRef = useRef(null);
+  const wrapRef = useRef(null); // 输入框整体容器:模板库弹层的定位基准与外点关闭判定
+
+  // 模板库弹层打开时,点击容器外部自动关闭
+  useEffect(() => {
+    if (!tplOpen) return undefined;
+    const onDocClick = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        setTplOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [tplOpen]);
 
   useEffect(() => {
     if (expanded && taRef.current) taRef.current.focus();
@@ -98,6 +116,17 @@ export default function Composer({ defaultExpanded = false, busy = false, onSend
     // 初始态:48px 小输入框,点击展开
     return (
       <div className="session-composer">
+        {/* 发送图标彩色渐变描边定义(SVG 渐变,供 CSS stroke 引用) */}
+        <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute" }}>
+          <defs>
+            <linearGradient id="send-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#669fff" />
+              <stop offset="30%" stopColor="#9567ff" />
+              <stop offset="60%" stopColor="#ff666b" />
+              <stop offset="100%" stopColor="#ffad66" />
+            </linearGradient>
+          </defs>
+        </svg>
         <button
           type="button"
           className="composer-frame is-small"
@@ -107,7 +136,7 @@ export default function Composer({ defaultExpanded = false, busy = false, onSend
           <span className="composer-inner">
             <span className="composer-placeholder">{text || PLACEHOLDER}</span>
             <span className="composer-send-mini">
-              <Icon name="send" size="1rem" />
+              <Icon name="send" size="1rem" className="send-grad-icon" />
             </span>
           </span>
         </button>
@@ -117,7 +146,18 @@ export default function Composer({ defaultExpanded = false, busy = false, onSend
 
   // 展开态:120px 大输入框 + 工具栏 + AI 提示(保持展开,不自动收起)
   return (
-    <div className="session-composer">
+    <div className="session-composer" ref={wrapRef}>
+      {/* 发送图标彩色渐变描边定义(SVG 渐变,供 CSS stroke 引用) */}
+      <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute" }}>
+        <defs>
+          <linearGradient id="send-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#669fff" />
+            <stop offset="30%" stopColor="#9567ff" />
+            <stop offset="60%" stopColor="#ff666b" />
+            <stop offset="100%" stopColor="#ffad66" />
+          </linearGradient>
+        </defs>
+      </svg>
       <div className="composer-frame is-big">
         <div className="composer-inner">
           <div className="composer-input">
@@ -155,53 +195,17 @@ export default function Composer({ defaultExpanded = false, busy = false, onSend
                   ),
                 }))}
               />
-              <Popover
-                arrow={false}
-                trigger="click"
-                placement="topLeft"
-                open={tplOpen}
-                onOpenChange={setTplOpen}
-                overlayClassName="tpl-popover"
-                content={
-                  <TplPanel
-                    tab={tplTab}
-                    onTab={setTplTab}
-                    selectedKey={selectedTpl ? selectedTpl.key : ""}
-                    onPick={pickTpl}
-                  />
+              <button
+                type="button"
+                className={
+                  tplOpen ? "tool-btn is-active" : "tool-btn"
                 }
+                aria-label="打开模板库"
+                onClick={() => setTplOpen((o) => !o)}
               >
-                <div
-                  className={selectedTpl ? "tool-btn is-active" : "tool-btn"}
-                  role="button"
-                  tabIndex={0}
-                  aria-label="打开模板库"
-                >
-                  <Icon name="layout-template" size="0.75rem" />
-                  <span className="tool-btn-text">{tplLabel}</span>
-                  {selectedTpl ? (
-                    <span
-                      className="tool-btn-clear"
-                      role="button"
-                      tabIndex={0}
-                      title="清除模板"
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        clearTpl();
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.stopPropagation();
-                          clearTpl();
-                        }
-                      }}
-                    >
-                      <Icon name="x" size="0.75rem" />
-                    </span>
-                  ) : null}
-                </div>
-              </Popover>
+                <Icon name="layout-template" size="0.75rem" />
+                <span className="tool-btn-text">{tplLabel}</span>
+              </button>
               <span className="word-count">
                 {text.length}/{MAX_LEN}
               </span>
@@ -219,7 +223,11 @@ export default function Composer({ defaultExpanded = false, busy = false, onSend
                 title={busy ? "回答生成中…" : "发送"}
                 onClick={doSend}
               >
-                <Icon name={busy ? "loader-circle" : "send"} size="1rem" className={busy ? "is-spin" : ""} />
+                <Icon
+                  name={busy ? "loader-circle" : "send"}
+                  size="1rem"
+                  className={busy ? "is-spin" : "send-grad-icon"}
+                />
               </button>
             </div>
           </div>
@@ -229,6 +237,18 @@ export default function Composer({ defaultExpanded = false, busy = false, onSend
         <span>内容由ai生成，无法确保准确性和完整性，仅供参考。</span>
         <Icon name="circle-question-mark" size="0.75rem" />
       </div>
+
+      {/* 模板库弹层:与输入框同宽、左缘对齐、在输入框正上方展开(自绘定位,不依赖 antd Popover) */}
+      {tplOpen ? (
+        <div className="tpl-popover-custom">
+          <TplPanel
+            tab={tplTab}
+            onTab={setTplTab}
+            selectedKey={selectedTpl ? selectedTpl.key : ""}
+            onPick={pickTpl}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

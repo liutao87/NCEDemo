@@ -95,7 +95,7 @@ export default function AiChat() {
           <div className="ai-brand">
             <img
               className="ai-gem"
-              src="./assets/uploads/aico-gem.svg"
+              src="./assets/uploads/aico-gem.gif"
               alt="Aico 五色石"
             />
             <span className="ai-brand-name">Aico</span>

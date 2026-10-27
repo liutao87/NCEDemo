@@ -4280,6 +4280,7 @@ input.ant-input.ant-input-sm {
 
 /* ---------- 背景图区域(不含底部输入框) ---------- */
 .session-main {
+  position: relative; /* 五色石绝对定位的参照 */
   flex: 1 1 0;
   min-height: 0;
   display: flex;
@@ -4290,6 +4291,17 @@ input.ant-input.ant-input-sm {
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
+}
+
+/* 五色石动图:叠在背景图的发光亮斑上(亮度分析:水平 49.5% / 纵向 8.4%),装饰不拦截交互 */
+.session-gem {
+  position: absolute;
+  left: 49.5%;
+  top: 8.4%;
+  width: 6.5rem; /* 104px,与光斑尺度匹配 */
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
 }
 
 /* 深色主题:浅色背景图上叠深色蒙层,保证白色标题/正文可读 */
@@ -4313,9 +4325,58 @@ input.ant-input.ant-input-sm {
   color: var(--on-surface);
 }
 
-.range-select {
+/* 时间范围下拉(Dropdown 触发器):无边框,仅白色文字 + 下拉图标 */
+.range-dd {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
   font: var(--font-body-s);
-  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.range-dd:hover,
+.range-dd:focus-visible {
+  color: #ffffff;
+}
+
+/* 时间范围下拉弹层菜单:卡片底 + 圆角 + 阴影
+   antd 运行时注入样式需以更高优先级 + !important 覆盖;
+   选中态用 primary-container(深蓝底) + on-primary-container(白字),对比充足 */
+.range-dd-menu.ant-dropdown .ant-dropdown-menu {
+  background: var(--surface-container-high);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  box-shadow: var(--shadow-popover);
+}
+
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+  min-width: 6rem;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: var(--radius-base) !important;
+  font-size: var(--font-size-base) !important; /* 12px,与触发器一致 */
+  line-height: 2rem !important;
+  color: var(--color-text-primary) !important; /* 深色下为白字 */
+}
+
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:hover,
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item-active {
+  background: var(--surface-variant) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.range-dd-menu.ant-dropdown
+  .ant-dropdown-menu
+  .ant-dropdown-menu-item-selected,
+.range-dd-menu.ant-dropdown
+  .ant-dropdown-menu
+  .ant-dropdown-menu-item-selected:hover {
+  background: var(--primary-container) !important; /* 深色 #112857 深蓝底 */
+  color: var(--on-primary-container) !important; /* 深色 #FFFFFF 白字 */
+  font-weight: var(--font-weight-medium) !important;
 }
 
 /* ---------- 区域二:守护概览(左文本 + 右图片) ---------- */
@@ -4592,31 +4653,73 @@ input.ant-input.ant-input-sm {
 
 /* ---------- 底部 AI 输入框(背景图区域内,边距由 session-main 的 32px 内边距提供) ---------- */
 .session-composer {
+  position: relative; /* 模板库弹层(自绘)的定位基准 */
   flex-shrink: 0;
   margin-top: 1rem;
 }
 
-.composer-frame {
+/* 模板库弹层(自绘):与输入框同宽、左缘对齐、输入框正上方展开 */
+.tpl-popover-custom {
+  position: absolute;
+  left: 0;
+  width: 100%; /* 与输入框(含渐变边框)像素级同宽 */
+  bottom: calc(100% + 0.5rem); /* 输入框正上方,留 8px 间距 */
+  z-index: 30;
   box-sizing: border-box;
-  width: 100%;
-  padding: 0.09375rem; /* 1.5px 渐变彩边 */
-  border: none;
-  border-radius: 1.5rem; /* 24px */
-  text-align: left;
-  background: linear-gradient(120deg, #7c3aed, #2563eb, #06b6d4, #8b5cf6, #7c3aed);
-  background-size: 300% 300%;
-  animation: ai-flow 8s ease infinite;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--surface-container-high);
+  box-shadow: var(--shadow-popover);
+  animation: tpl-pop-in 0.22s ease-out;
 }
 
-@keyframes ai-flow {
-  0% {
-    background-position: 0% 50%;
+.dark .tpl-popover-custom {
+  background: var(--surface-container-high);
+}
+
+@keyframes tpl-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
   }
-  50% {
-    background-position: 100% 50%;
+  to {
+    opacity: 1;
+    transform: none;
   }
-  100% {
-    background-position: 0% 50%;
+}
+
+/* 角度渐变边框的旋转角度(需 @property 注册才能平滑插值) */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.composer-frame {
+  position: relative; /* 模板库弹层挂载容器(宽度对齐输入框/定位正上方) */
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1px; /* 粗细 1,位置内部 */
+  border: none;
+  border-radius: 1.5rem; /* 保持圆角 24px */
+  text-align: left;
+  /* 角度渐变(七色环,色标位置按设计稿),随 --border-angle 缓慢旋转 */
+  background: conic-gradient(
+    from var(--border-angle),
+    #669fff 2%,
+    #7b67ff 12%,
+    #9567ff 39%,
+    #ff666b 50%,
+    #ff9566 61%,
+    #ffad66 89%,
+    #669fff 99%
+  );
+  animation: border-spin 6s linear infinite;
+}
+
+@keyframes border-spin {
+  to {
+    --border-angle: 360deg;
   }
 }
 
@@ -4636,7 +4739,7 @@ input.ant-input.ant-input-sm {
   align-items: center;
   height: 3rem; /* 初始 48px */
   padding: 0 0.75rem 0 1.25rem;
-  border-radius: 1.40625rem;
+  border-radius: 1.4375rem; /* 与外框 24px 圆角同心(24px - 1px 边框) */
   background: var(--surface-container-highest);
 }
 
@@ -4661,7 +4764,19 @@ input.ant-input.ant-input-sm {
 .composer-send-mini {
   flex: 0 0 auto;
   display: inline-flex;
-  color: var(--primary);
+  align-items: center;
+  justify-content: center;
+  width: 2rem; /* 32px */
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: rgba(92, 162, 233, 0.15); /* 圆环背景(设计稿指定) */
+  color: #ffffff;
+}
+
+/* 发送图标彩色渐变描边:引用页面内 #send-grad 渐变定义,覆盖 lucide 默认 currentColor 描边 */
+.send-grad-icon :where(path, circle, line, polyline, polygon, rect),
+.send-grad-icon svg :where(path, circle, line, polyline, polygon, rect) {
+  stroke: url(#send-grad);
 }
 
 .composer-input {
@@ -4779,23 +4894,26 @@ input.ant-input.ant-input-sm {
 }
 
 .send-btn {
-  width: 2rem;
+  width: 2rem; /* 32px */
   height: 2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: var(--radius-full);
-  background: var(--surface-variant);
-  color: var(--text-disabled);
-  cursor: not-allowed;
+  background: rgba(92, 162, 233, 0.15); /* 圆环背景(设计稿指定) */
+  color: #ffffff;
+  opacity: 0.55;
+  cursor: default;
 }
 
 .send-btn.is-active {
-  background: linear-gradient(135deg, #7c3aed, #06b6d4);
-  color: #ffffff;
+  opacity: 1;
   cursor: pointer;
-  box-shadow: 0 0 0.5rem rgba(124, 58, 237, 0.4);
+}
+
+.send-btn.is-active:hover {
+  box-shadow: 0 0 0.5rem rgba(92, 162, 233, 0.55);
 }
 
 .composer-hint {
@@ -4873,10 +4991,19 @@ input.ant-input.ant-input-sm {
 }
 
 .tpl-panel {
-  width: 18.75rem;
+  width: 100%; /* 与挂载容器(输入框外框)同宽 */
   height: 22.125rem; /* 354px */
   display: flex;
   flex-direction: column;
+}
+
+/* 模板列表图标:实色品牌色(深色下提亮为亮蓝),描边加粗更具实感 */
+.tpl-item-icon {
+  color: var(--primary);
+}
+
+.dark .tpl-item-icon {
+  color: var(--color-link); /* 深色主题下亮蓝 #5CA2E9 */
 }
 
 .tpl-title {
@@ -5310,7 +5437,10 @@ input.ant-input.ant-input-sm {
 
 
 /* AI 会话:左侧 540px × 100% 面板(导航栏 + 居中欢迎内容 + AI 输入框) */
+/* 聊天背景 #191919(设计稿指定),叠两团高斯模糊光晕:导航区橙色/聊天区紫色 */
 .ai-chat {
+  position: relative;
+  isolation: isolate; /* 光晕 z-index:-1 只沉到本面板背景之上、内容之下 */
   flex: 0 0 33.75rem; /* 540px */
   height: 100%;
   min-height: 0;
@@ -5318,8 +5448,39 @@ input.ant-input.ant-input-sm {
   flex-direction: column;
   overflow: hidden;
   color: var(--on-surface);
-  background: var(--surface-container-lowest);
+  background: #191919; /* 聊天背景色 #191919 100% */
   border-right: var(--border-width-thin) solid var(--divider);
+}
+
+/* 导航背景光晕:#FF9466 100%,高斯模糊(均匀) 161 */
+.ai-chat::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32rem;
+  height: 8rem;
+  background: #ff9466;
+  filter: blur(161px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* 聊天背景光晕:线性渐变 #7A66FF 0% → #7A66FF 100%,高斯模糊(均匀) 195 */
+.ai-chat::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 38%;
+  right: -6rem;
+  width: 26rem;
+  height: 20rem;
+  background: linear-gradient(180deg, #7a66ff 0%, #7a66ff 100%);
+  filter: blur(195px);
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 /* ---------- AI 面板固定深色皮肤(应用浅色/深色下均为深色) ----------
@@ -5550,7 +5711,7 @@ input.ant-input.ant-input-sm {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding: 1rem 2rem;
+  padding: 1rem 2rem 1.5rem; /* 底部留白稍大,回答卡片底圆角与输入框之间有呼吸空间 */
 }
 
 .ai-thread::-webkit-scrollbar {
@@ -5580,13 +5741,13 @@ input.ant-input.ant-input-sm {
   color: var(--on-surface-variant);
 }
 
-/* 用户输入卡片:蓝色背景、右上角小圆角其余三圆角、靠右、宽于回答卡片略窄 */
+/* 用户输入卡片:蓝色半透明背景(设计稿指定)、右上角小圆角其余三圆角、靠右、宽于回答卡片略窄 */
 .ai-msg-user {
   align-self: flex-end;
   max-width: 88%;
   padding: 0.625rem 0.875rem;
   border-radius: 0.75rem 0.25rem 0.75rem 0.75rem; /* 三个大圆角 + 右上小圆角 */
-  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  background: rgba(0, 103, 209, 0.4);
   color: var(--on-primary);
   font: var(--font-body-m);
   line-height: var(--line-height-md);
@@ -5603,13 +5764,13 @@ input.ant-input.ant-input-sm {
   gap: 0.75rem;
   padding: 0.875rem 1rem;
   border-radius: 0.75rem;
-  background: var(--surface-container-highest);
+  background: rgba(42, 42, 42, 1);
   box-shadow: var(--shadow-sm);
   animation: msg-in 0.3s ease-out;
 }
 
 .dark .ai-chat .answer-card {
-  background: var(--color-bg-3);
+  background: rgba(42, 42, 42, 1);
   box-shadow: none;
 }
 
@@ -5643,7 +5804,7 @@ input.ant-input.ant-input-sm {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font: var(--font-body-s);
+  font: var(--font-body-m);
   color: var(--on-surface-variant);
 }
 
@@ -5689,7 +5850,7 @@ input.ant-input.ant-input-sm {
   flex: 1 1 0;
   min-width: 0;
   text-align: left;
-  font: var(--font-body-s);
+  font: var(--font-body-m); /* 主文字 14px */
   font-weight: var(--font-weight-medium);
   color: var(--on-surface);
   white-space: nowrap;
@@ -5730,7 +5891,7 @@ input.ant-input.ant-input-sm {
   padding: 0.5rem 0.625rem;
   border-radius: 0.5rem;
   background: var(--surface-variant);
-  font: var(--font-body-s);
+  font: var(--font-body-m); /* 主文字 14px */
   color: var(--on-surface-variant);
 }
 
@@ -5751,20 +5912,29 @@ input.ant-input.ant-input-sm {
 }
 
 .ac-block-name {
-  font: var(--font-body-s);
+  font: var(--font-body-m); /* 主文字 14px */
   font-weight: var(--font-weight-semibold);
   color: var(--on-surface);
 }
 
+/* 计划主体:小缩进让规划清单卡片更宽 */
 .ac-plan-body {
-  margin-left: 1.25rem;
+  margin-left: 0.375rem;
   display: flex;
   flex-direction: column;
 }
 
-/* 步骤条图标内容居中(数字/对勾处于圆心,各状态一致) */
+/* 步骤条图标:成功色 16px 圆点(完成态白勾/进行中呼吸/等待态半透明),
+   覆盖 antd 默认 24px 数字圆 */
 .ai-chat .ac-steps .ant-steps-item-icon {
-  display: flex;
+  width: 1rem !important;
+  height: 1rem !important;
+  min-width: 1rem !important;
+  margin-inline-end: 0.5rem !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0 !important;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
@@ -5775,6 +5945,52 @@ input.ant-input.ant-input-sm {
   align-items: center;
   justify-content: center;
   line-height: 1;
+  font-size: 0;
+}
+
+.ai-chat .ac-steps .ac-step-icon {
+  position: relative;
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background: var(--success); /* 成功色 */
+}
+
+.ai-chat .ac-steps .ant-steps-item-wait .ac-step-icon {
+  opacity: 0.45;
+}
+
+.ai-chat .ac-steps .ant-steps-item-process .ac-step-icon {
+  animation: ac-dot-breathe 1.2s ease-in-out infinite;
+}
+
+@keyframes ac-dot-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(9, 170, 113, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0.5rem 0.125rem rgba(9, 170, 113, 0.35);
+  }
+}
+
+.ai-chat .ac-steps .ant-steps-item-finish .ac-step-icon::after {
+  content: "✓";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 0.625rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.ai-chat .ac-steps .ant-steps-item-tail {
+  margin-inline-start: 0.5rem;
+  padding-block-start: 0.25rem;
 }
 
 /* 步骤条标题/描述:强制面板亮色令牌
@@ -5784,13 +6000,33 @@ input.ant-input.ant-input-sm {
   color: var(--on-surface) !important;
 }
 
+/* 16px 圆点图标与标题文字对齐:容器改为 flex,标题行盒压缩到 16px 与圆点同心 */
+.ai-chat .ac-steps .ant-steps-item-container {
+  display: flex !important;
+  align-items: flex-start !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item-content {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0 !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item .ant-steps-item-title {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 1rem !important;
+  line-height: 1rem !important; /* 行盒 16px,与图标同高居中对齐 */
+  padding-inline-end: 0 !important;
+}
+
 .ai-chat .ac-steps .ant-steps-item.ant-steps-item-wait .ant-steps-item-title {
   color: var(--on-surface-variant) !important;
 }
 
 .ai-chat .ac-steps .ant-steps-item .ant-steps-item-description {
   color: var(--on-surface) !important;
-  font: var(--font-body-s);
+  font: var(--font-body-m); /* 主文字 14px */
   line-height: var(--line-height-md);
 }
 
@@ -5838,7 +6074,7 @@ input.ant-input.ant-input-sm {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  font: var(--font-body-s);
+  font: var(--font-body-m); /* 主文字 14px */
   font-weight: var(--font-weight-semibold);
   color: var(--on-surface);
 }
@@ -5870,7 +6106,7 @@ input.ant-input.ant-input-sm {
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  font: var(--font-caption-m);
+  font: var(--font-body-m); /* 主文字 14px */
   color: var(--success);
 }
 
@@ -5887,7 +6123,7 @@ input.ant-input.ant-input-sm {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font: var(--font-body-s);
+  font: var(--font-body-m); /* 主文字 14px */
   color: var(--on-surface);
   animation: msg-in 0.3s ease-out both;
 }
@@ -5939,7 +6175,7 @@ input.ant-input.ant-input-sm {
 }
 
 .ac-confirm-text {
-  font: var(--font-body-s);
+  font: var(--font-body-m); /* 主文字 14px */
   font-weight: var(--font-weight-medium);
   color: var(--on-primary-container);
 }
@@ -6051,13 +6287,172 @@ input.ant-input.ant-input-sm {
   }
 }
 
+/* ---------- 结果卡片:结果输出完成后展示(配置详情文档) ---------- */
+.ac-result-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 36rem; /* 设计稿 576px */
+  min-height: 9.5rem; /* 152px */
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.75rem; /* 12px */
+  /* 径向渐变背景:中心 rgb(49,99,244) → 63% 处 25% 透明 → 边缘透明(设计稿) */
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(49, 99, 244) 0%,
+    rgba(49, 99, 244, 0.25) 63%,
+    rgba(49, 99, 244, 0) 100%
+  );
+  border: 1px solid rgba(46, 134, 222, 1);
+}
+
+.rc-doc-icon {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+}
+
+.rc-body {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.75rem; /* 行距 12px(三行内容在 152px 内排布) */
+}
+
+/* 第一行:标题 + 待决策标签 | 下载|∨ */
+.rc-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rc-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+}
+
+.rc-tag {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 1.25rem; /* 20px */
+  padding: 0 0.5rem;
+  border-radius: 0.25rem; /* 4px */
+  background: rgba(238, 105, 111, 0.15);
+  color: rgba(231, 67, 74, 1);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-normal);
+  line-height: 1.25rem;
+  text-align: left;
+}
+
+.rc-head-actions {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.rc-download {
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: rgba(201, 201, 201, 1);
+  font: var(--font-body-s);
+  cursor: pointer;
+}
+
+.rc-download:hover {
+  color: #ffffff;
+}
+
+.rc-v-divider {
+  width: 1px;
+  height: 0.75rem;
+  background: rgba(119, 119, 119, 0.6);
+}
+
+.rc-caret {
+  color: rgba(147, 147, 147, 1);
+}
+
+/* 第二行:时间 + 方案描述(超长省略) */
+.rc-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-normal);
+  line-height: 1.375rem; /* 22px */
+  color: rgba(147, 147, 147, 1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 第三行:确认 / 忽略按钮 */
+.rc-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rc-confirm {
+  width: 5.5rem; /* 88px */
+  height: 2rem; /* 32px */
+  padding: 0.3125rem 1rem; /* 5px 16px */
+  border: none;
+  border-radius: 0.25rem; /* 4px */
+  background: rgba(0, 103, 209, 1);
+  color: #ffffff;
+  font: var(--font-body-m);
+  cursor: pointer;
+}
+
+.rc-confirm:hover {
+  background: rgba(46, 134, 222, 1);
+}
+
+.rc-ignore {
+  width: 5.5rem;
+  height: 2rem;
+  padding: 0.3125rem 1rem;
+  border: 1px solid rgba(119, 119, 119, 1);
+  border-radius: 0.25rem;
+  background: rgba(0, 0, 0, 0);
+  color: rgba(201, 201, 201, 1);
+  font: var(--font-body-m);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.rc-ignore:hover {
+  color: #ffffff;
+  border-color: rgba(201, 201, 201, 1);
+}
+
+/* 点击后的收敛状态 */
+.rc-status {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+.rc-status.is-ok {
+  color: var(--success);
+}
+
 /* ---------- 底部操作条:左耗时 | 右五图标 ---------- */
 .ac-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding-top: 0.5rem;
-  border-top: var(--border-width-thin) solid var(--divider);
   animation: msg-in 0.35s ease-out;
 }
 
@@ -6187,7 +6582,7 @@ input.ant-input.ant-input-sm {
   width: 100%;
   height: 50%; /* 高度为一半 */
   min-height: 16.5rem;
-  border-radius: 1.5rem;
+  border-radius: 1rem;
   background: rgba(25, 25, 25, 0.8);
   backdrop-filter: blur(163px);
   -webkit-backdrop-filter: blur(163px);
@@ -8587,7 +8982,7 @@ const TEMPLATES = [
 /* ===== src/views/session-card/composer.jsx ===== */
 (function () {
   const { useEffect, useRef, useState } = React;
-  const { Input, Popover, Select } = antd;
+  const { Input, Select } = antd;
   const { Icon, SCENE_OPTIONS, TEMPLATES } = __export;
 const { TextArea } = Input;
 
@@ -8627,7 +9022,12 @@ function TplPanel({ tab, onTab, selectedKey, onPick }) {
             className={t.key === selectedKey ? "tpl-item is-active" : "tpl-item"}
             onClick={() => onPick(t)}
           >
-            <Icon name={t.icon} size="0.875rem" />
+            <Icon
+              name={t.icon}
+              size="0.875rem"
+              strokeWidth={2.5}
+              className="tpl-item-icon"
+            />
             <span className="tpl-name">{t.name}</span>
           </button>
         ))}
@@ -8647,6 +9047,19 @@ function Composer({ defaultExpanded = false, busy = false, onSend }) {
   const [tplTab, setTplTab] = useState("all");
   const [selectedTpl, setSelectedTpl] = useState(null);
   const taRef = useRef(null);
+  const wrapRef = useRef(null); // 输入框整体容器:模板库弹层的定位基准与外点关闭判定
+
+  // 模板库弹层打开时,点击容器外部自动关闭
+  useEffect(() => {
+    if (!tplOpen) return undefined;
+    const onDocClick = (e) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        setTplOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [tplOpen]);
 
   useEffect(() => {
     if (expanded && taRef.current) taRef.current.focus();
@@ -8684,6 +9097,17 @@ function Composer({ defaultExpanded = false, busy = false, onSend }) {
     // 初始态:48px 小输入框,点击展开
     return (
       <div className="session-composer">
+        {/* 发送图标彩色渐变描边定义(SVG 渐变,供 CSS stroke 引用) */}
+        <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute" }}>
+          <defs>
+            <linearGradient id="send-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#669fff" />
+              <stop offset="30%" stopColor="#9567ff" />
+              <stop offset="60%" stopColor="#ff666b" />
+              <stop offset="100%" stopColor="#ffad66" />
+            </linearGradient>
+          </defs>
+        </svg>
         <button
           type="button"
           className="composer-frame is-small"
@@ -8693,7 +9117,7 @@ function Composer({ defaultExpanded = false, busy = false, onSend }) {
           <span className="composer-inner">
             <span className="composer-placeholder">{text || PLACEHOLDER}</span>
             <span className="composer-send-mini">
-              <Icon name="send" size="1rem" />
+              <Icon name="send" size="1rem" className="send-grad-icon" />
             </span>
           </span>
         </button>
@@ -8703,7 +9127,18 @@ function Composer({ defaultExpanded = false, busy = false, onSend }) {
 
   // 展开态:120px 大输入框 + 工具栏 + AI 提示(保持展开,不自动收起)
   return (
-    <div className="session-composer">
+    <div className="session-composer" ref={wrapRef}>
+      {/* 发送图标彩色渐变描边定义(SVG 渐变,供 CSS stroke 引用) */}
+      <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute" }}>
+        <defs>
+          <linearGradient id="send-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#669fff" />
+            <stop offset="30%" stopColor="#9567ff" />
+            <stop offset="60%" stopColor="#ff666b" />
+            <stop offset="100%" stopColor="#ffad66" />
+          </linearGradient>
+        </defs>
+      </svg>
       <div className="composer-frame is-big">
         <div className="composer-inner">
           <div className="composer-input">
@@ -8741,53 +9176,17 @@ function Composer({ defaultExpanded = false, busy = false, onSend }) {
                   ),
                 }))}
               />
-              <Popover
-                arrow={false}
-                trigger="click"
-                placement="topLeft"
-                open={tplOpen}
-                onOpenChange={setTplOpen}
-                overlayClassName="tpl-popover"
-                content={
-                  <TplPanel
-                    tab={tplTab}
-                    onTab={setTplTab}
-                    selectedKey={selectedTpl ? selectedTpl.key : ""}
-                    onPick={pickTpl}
-                  />
+              <button
+                type="button"
+                className={
+                  tplOpen ? "tool-btn is-active" : "tool-btn"
                 }
+                aria-label="打开模板库"
+                onClick={() => setTplOpen((o) => !o)}
               >
-                <div
-                  className={selectedTpl ? "tool-btn is-active" : "tool-btn"}
-                  role="button"
-                  tabIndex={0}
-                  aria-label="打开模板库"
-                >
-                  <Icon name="layout-template" size="0.75rem" />
-                  <span className="tool-btn-text">{tplLabel}</span>
-                  {selectedTpl ? (
-                    <span
-                      className="tool-btn-clear"
-                      role="button"
-                      tabIndex={0}
-                      title="清除模板"
-                      onMouseDown={(e) => e.stopPropagation()}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        clearTpl();
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.stopPropagation();
-                          clearTpl();
-                        }
-                      }}
-                    >
-                      <Icon name="x" size="0.75rem" />
-                    </span>
-                  ) : null}
-                </div>
-              </Popover>
+                <Icon name="layout-template" size="0.75rem" />
+                <span className="tool-btn-text">{tplLabel}</span>
+              </button>
               <span className="word-count">
                 {text.length}/{MAX_LEN}
               </span>
@@ -8805,7 +9204,11 @@ function Composer({ defaultExpanded = false, busy = false, onSend }) {
                 title={busy ? "回答生成中…" : "发送"}
                 onClick={doSend}
               >
-                <Icon name={busy ? "loader-circle" : "send"} size="1rem" className={busy ? "is-spin" : ""} />
+                <Icon
+                  name={busy ? "loader-circle" : "send"}
+                  size="1rem"
+                  className={busy ? "is-spin" : "send-grad-icon"}
+                />
               </button>
             </div>
           </div>
@@ -8815,6 +9218,18 @@ function Composer({ defaultExpanded = false, busy = false, onSend }) {
         <span>内容由ai生成，无法确保准确性和完整性，仅供参考。</span>
         <Icon name="circle-question-mark" size="0.75rem" />
       </div>
+
+      {/* 模板库弹层:与输入框同宽、左缘对齐、在输入框正上方展开(自绘定位,不依赖 antd Popover) */}
+      {tplOpen ? (
+        <div className="tpl-popover-custom">
+          <TplPanel
+            tab={tplTab}
+            onTab={setTplTab}
+            selectedKey={selectedTpl ? selectedTpl.key : ""}
+            onPick={pickTpl}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -8824,7 +9239,7 @@ function Composer({ defaultExpanded = false, busy = false, onSend }) {
 /* ===== src/views/session-card/index.jsx ===== */
 (function () {
   const { useMemo, useState } = React;
-  const { Select } = antd;
+  const { Dropdown } = antd;
   const { Icon, useApp, ATTENTION_ITEMS, RANGE_OPTIONS } = __export;
   const Composer = __export.Composer;
 // Layer 4: 会话卡片 — 总览核心区左侧的 AI 助手面板(540px × 100%, 背景图 + 32px 内边距)
@@ -8866,17 +9281,51 @@ function SessionCard() {
   return (
     <section className="session-card">
       <div className="session-main">
-        {/* 区域一:标题 + 时间范围下拉(无边框) */}
+        {/* 五色石动图:定位在背景图的发光位置(像素亮度分析:水平居中,纵向约 8.4%) */}
+        <img
+          className="session-gem"
+          src="./assets/uploads/aico-gem.gif"
+          alt=""
+          aria-hidden="true"
+        />
+        {/* 区域一:标题 + 时间范围下拉(无边框,白字 + 下拉图标) */}
         <header className="session-head">
           <h2 className="session-title">单域网络智能体</h2>
-          <Select
-            className="range-select"
-            variant="borderless"
-            value={range}
-            onChange={setRange}
-            popupMatchSelectWidth={false}
-            options={RANGE_OPTIONS}
-          />
+          <Dropdown
+            trigger={["click"]}
+            overlayClassName="range-dd-menu"
+            popupClassName="range-dd-menu"
+            menu={{
+              items: RANGE_OPTIONS.map((o) => ({
+                key: o.value,
+                label: (
+                  /* 内联字号,确保 12px 不被 antd 运行时样式弹回 14px */
+                  <span
+                    style={{
+                      fontSize: "var(--font-size-base)",
+                      lineHeight: "2rem",
+                    }}
+                  >
+                    {o.label}
+                  </span>
+                ),
+              })),
+              selectedKeys: [range],
+              onClick: ({ key }) => setRange(key),
+              /* 菜单根节点内联样式:优先级最高,深色卡片底必定生效 */
+              style: {
+                background: "var(--surface-container-high)",
+                borderRadius: "0.75rem",
+                padding: "0.25rem",
+                boxShadow: "var(--shadow-popover)",
+              },
+            }}
+          >
+            <button type="button" className="range-dd">
+              {RANGE_OPTIONS.find((o) => o.value === range)?.label}
+              <Icon name="chevron-down" size="0.875rem" />
+            </button>
+          </Dropdown>
         </header>
 
         {/* 区域二:守护概览(左文本 + 右示意图片) */}
@@ -9784,9 +10233,11 @@ const atLeast = (stage, target) =>
   STAGE_SEQ.indexOf(stage) >= STAGE_SEQ.indexOf(target);
 
 // 步骤条数据:确认前运行第 0-1 步,用户点击「确认」后继续第 2-7 步(与右侧流程卡片同内容)
+// 图标统一为成功色 16px 圆点(完成态白勾,进行中呼吸,等待态半透明)
 const STEP_ITEMS = [
   {
     title: "网络资源确定",
+    icon: <span className="ac-step-icon" />,
     description: (
       <div className="ac-chips">
         {AI_STEP_CHIPS.map((chip) => (
@@ -9798,13 +10249,13 @@ const STEP_ITEMS = [
       </div>
     ),
   },
-  { title: "任务编排", description: "解析意图依赖，编排执行链路与执行顺序" },
-  { title: "配置生成", description: "按安全基线模板批量生成设备配置脚本" },
-  { title: "语法校验", description: "CLI 语法与模板变量合法性校验" },
-  { title: "配置审核", description: "安全策略基线核对与人工复核抽检" },
-  { title: "一致性校验", description: "主备双机配置一致性比对" },
-  { title: "变更方案编排", description: "生成变更窗口、执行顺序与回退预案" },
-  { title: "结果下发", description: "下发变更方案并输出执行报告" },
+  { title: "任务编排", icon: <span className="ac-step-icon" />, description: "解析意图依赖，编排执行链路与执行顺序" },
+  { title: "配置生成", icon: <span className="ac-step-icon" />, description: "按安全基线模板批量生成设备配置脚本" },
+  { title: "语法校验", icon: <span className="ac-step-icon" />, description: "CLI 语法与模板变量合法性校验" },
+  { title: "配置审核", icon: <span className="ac-step-icon" />, description: "安全策略基线核对与人工复核抽检" },
+  { title: "一致性校验", icon: <span className="ac-step-icon" />, description: "主备双机配置一致性比对" },
+  { title: "变更方案编排", icon: <span className="ac-step-icon" />, description: "生成变更窗口、执行顺序与回退预案" },
+  { title: "结果下发", icon: <span className="ac-step-icon" />, description: "下发变更方案并输出执行报告" },
 ];
 
 // 打印中文字的渲染:文字保持原色,上方覆盖一层与原文完全重叠的
@@ -9872,6 +10323,81 @@ function PlanItemText({ text, active, onDone }) {
   return <span className="tw-live">{liveContent(shown, active && !done)}</span>;
 }
 
+// 结果卡片:彩色文档图标 + 标题/待决策标签/下载 + 时间描述 + 确认/忽略按钮
+function ResultCard() {
+  const [status, setStatus] = useState(null); // null | confirmed | ignored
+
+  return (
+    <div className="ac-result-card reveal">
+      {/* 彩色文档图标(32×32,蓝色渐变纸面 + 折角 + W 字与纹理线条) */}
+      <svg
+        className="rc-doc-icon"
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <defs>
+          <linearGradient id="rc-doc-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#4f8bff" />
+            <stop offset="100%" stopColor="#1e5fd8" />
+          </linearGradient>
+        </defs>
+        <rect x="5" y="2" width="22" height="28" rx="3" fill="url(#rc-doc-grad)" />
+        <path d="M20 2 L27 9 L20 9 Z" fill="rgba(255, 255, 255, 0.35)" />
+        <text
+          x="16"
+          y="19.5"
+          textAnchor="middle"
+          fontSize="10.5"
+          fontWeight="700"
+          fill="#ffffff"
+          fontFamily="inherit"
+        >
+          W
+        </text>
+        <rect x="9" y="23" width="6" height="1.5" rx="0.75" fill="rgba(255, 255, 255, 0.55)" />
+        <rect x="17" y="23" width="6" height="1.5" rx="0.75" fill="rgba(255, 255, 255, 0.3)" />
+      </svg>
+
+      <div className="rc-body">
+        {/* 第一行:标题 + 待决策标签 | 下载 + 竖线 + 下拉图标 */}
+        <div className="rc-head">
+          <span className="rc-title">配置详情 V1.0</span>
+          <span className="rc-tag">待决策</span>
+          <span className="rc-head-actions">
+            <button type="button" className="rc-download">下载</button>
+            <span className="rc-v-divider" />
+            <Icon name="chevron-down" size="0.875rem" className="rc-caret" />
+          </span>
+        </div>
+
+        {/* 第二行:时间 + 方案描述(超长省略) */}
+        <p className="rc-desc">
+          2026-06-23 13:56:32｜方案描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述…
+        </p>
+
+        {/* 第三行:确认 / 忽略(点击后收敛为状态文案) */}
+        {status === null ? (
+          <div className="rc-btns">
+            <button type="button" className="rc-confirm" onClick={() => setStatus("confirmed")}>
+              确认
+            </button>
+            <button type="button" className="rc-ignore" onClick={() => setStatus("ignored")}>
+              忽略
+            </button>
+          </div>
+        ) : (
+          <div className={status === "confirmed" ? "rc-status is-ok" : "rc-status"}>
+            {status === "confirmed" ? "已确认" : "已忽略"}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // AI 回答卡片流程:
 // 思考(逐字打印→自动折叠) → 任务拆解与规划(技能选择匹配 + 步骤条 + 总任务规划清单)
 // → 确认提示(点击确认才继续) → 步骤续跑并整段折叠 → 最终结果逐字打印 → 底部操作条
@@ -9896,6 +10422,15 @@ function AnswerCard({ onDone, onRestart }) {
 
   const cbRef = useRef({ onDone, onRestart });
   cbRef.current = { onDone, onRestart };
+
+  // 问答流程中内容持续增长(逐字打印/步骤推进/底部操作条):
+  // 随本卡片每次渲染,把所在对话流滚动到底部,避免新增内容被折叠线遮住、
+  // 卡片底部圆角与操作条显示不全
+  const rootRef = useRef(null);
+  useEffect(() => {
+    const el = rootRef.current && rootRef.current.closest(".ai-thread");
+    if (el) el.scrollTop = el.scrollHeight;
+  });
 
   const think = useTypewriter(AI_THINKING_TEXT, {
     runKey,
@@ -10014,7 +10549,7 @@ function AnswerCard({ onDone, onRestart }) {
   // 发送后短暂等待:提示正在接收问题
   if (stage === "wait") {
     return (
-      <div className="answer-card">
+      <div className="answer-card" ref={rootRef}>
         <div className="ac-wait">
           <Icon name="loader-circle" size="1rem" className="is-spin" />
           <span>正在接收问题…</span>
@@ -10026,7 +10561,7 @@ function AnswerCard({ onDone, onRestart }) {
   const thinking = stage === "thinking";
 
   return (
-    <div className="answer-card">
+    <div className="answer-card" ref={rootRef}>
       {/* 一、思考过程(可折叠:思考图标 + 文案 + 折叠图标,打印完成后自动折叠) */}
       <div className="ac-section">
         <button
@@ -10196,7 +10731,10 @@ function AnswerCard({ onDone, onRestart }) {
         </div>
       ) : null}
 
-      {/* 四、底部操作条:左耗时 | 右五图标(刷新/复制/赞/踩/更多) */}
+      {/* 四、结果卡片:结果输出完成后展示(配置详情文档 + 确认/忽略) */}
+      {stage === "done" ? <ResultCard /> : null}
+
+      {/* 五、底部操作条:左耗时 | 右五图标(刷新/复制/赞/踩/更多) */}
       {stage === "done" ? (
         <div className="ac-footer">
           <span className="ac-cost">
@@ -10371,7 +10909,7 @@ function AiChat() {
           <div className="ai-brand">
             <img
               className="ai-gem"
-              src="./assets/uploads/aico-gem.svg"
+              src="./assets/uploads/aico-gem.gif"
               alt="Aico 五色石"
             />
             <span className="ai-brand-name">Aico</span>

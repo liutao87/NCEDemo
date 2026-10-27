@@ -1,0 +1,16 @@
+/* 应用级基础样式 — 页面骨架（头部 + 主体[侧边菜单 + 内容区]） */
+.app-root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface-container-lowest);
+  color: var(--on-surface);
+  font: var(--font-body-m);
+}
+
+.app-body {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+}

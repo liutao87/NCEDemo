@@ -66,26 +66,39 @@ export const NINE_DASH_LINES = [
 // 地图标注点(绿色) — 省份重点地区设备接入位置,hub 为连线枢纽(MAP_HUBS.id)
 export const MAP_MARKERS = [
   { province: "北京", city: "北京", lon: 116.40, lat: 39.90, hub: "qianhai" },
-  { province: "上海", city: "上海", lon: 121.47, lat: 31.23, hub: "jiading" },
+  { province: "上海", city: "上海", lon: 121.47, lat: 31.23, hub: "fuzhou" },
   { province: "广东", city: "广州", lon: 113.26, lat: 23.13, hub: "waigaoqiao" },
   { province: "广东", city: "深圳", lon: 114.06, lat: 22.55, hub: "waigaoqiao" },
   { province: "四川", city: "成都", lon: 104.07, lat: 30.57, hub: "qianhai" },
-  { province: "湖北", city: "武汉", lon: 114.30, lat: 30.59, hub: "jiading" },
+  { province: "湖北", city: "武汉", lon: 114.30, lat: 30.59, hub: "fuzhou" },
   { province: "陕西", city: "西安", lon: 108.94, lat: 34.34, hub: "qianhai" },
-  { province: "浙江", city: "杭州", lon: 120.15, lat: 30.27, hub: "jiading" },
-  { province: "江苏", city: "南京", lon: 118.80, lat: 32.06, hub: "jiading" },
+  { province: "江苏", city: "南京", lon: 118.80, lat: 32.06, hub: "fuzhou" },
   { province: "新疆", city: "乌鲁木齐", lon: 87.62, lat: 43.83, hub: "qianhai" },
   { province: "西藏", city: "拉萨", lon: 91.11, lat: 29.66, hub: "qianhai" },
   { province: "黑龙江", city: "哈尔滨", lon: 126.53, lat: 45.80, hub: "qianhai" },
-  { province: "云南", city: "昆明", lon: 102.71, lat: 25.04, hub: "jiading" },
+  { province: "云南", city: "昆明", lon: 102.71, lat: 25.04, hub: "fuzhou" },
   { province: "河南", city: "郑州", lon: 113.62, lat: 34.75, hub: "qianhai" },
   { province: "辽宁", city: "沈阳", lon: 123.43, lat: 41.80, hub: "qianhai" },
 ];
 
 // 枢纽标注点 — 站点连线汇聚端,label 为地图上的显示名,offsetX 为水平偏移(rem,嘉定/外高桥错开排列)
-// 枢纽标注点 — 站点连线汇聚端,label 为地图上的显示名,offsetX/Y 为偏移(rem,嘉定左上/外高桥右下错开)
+// 枢纽标注点 — 站点连线汇聚端,label 为地图上的显示名(logo 恒定覆盖标注点正中间,无需偏移)
 export const MAP_HUBS = [
-  { id: "qianhai", name: "北京前海", label: "前海", lon: 116.39, lat: 39.94, offsetX: 0, offsetY: 0 },
-  { id: "jiading", name: "嘉定", label: "嘉定", lon: 121.27, lat: 31.38, offsetX: -1.2, offsetY: -0.8 },
-  { id: "waigaoqiao", name: "外高桥", label: "外高桥", lon: 121.58, lat: 31.35, offsetX: 1.2, offsetY: 0.8 },
+  { id: "qianhai", name: "北京前海", label: "前海", lon: 116.39, lat: 39.94 },
+  { id: "fuzhou", name: "福州", label: "福州", lon: 119.30, lat: 26.08 },
+  { id: "waigaoqiao", name: "外高桥", label: "外高桥", lon: 121.58, lat: 31.35 },
+];
+
+// 连线序列号标签 — 部分线条中点上的序号(圆或长方形包裹数字,背景色同连线)
+// from/to:站点按 city 名,枢纽用 "hub:{id}";shape: circle 圆(直径2rem) / rect 长方形(2rem×1rem)
+export const LINK_LABELS = [
+  { from: "hub:qianhai", to: "hub:fuzhou", shape: "circle", num: 3 },
+  { from: "hub:fuzhou", to: "hub:waigaoqiao", shape: "rect", num: 4 },
+  { from: "hub:waigaoqiao", to: "hub:qianhai", shape: "circle", num: 2 },
+  { from: "沈阳", to: "hub:qianhai", shape: "rect", num: 3 },
+  { from: "哈尔滨", to: "hub:qianhai", shape: "circle", num: 4 },
+  { from: "广州", to: "hub:waigaoqiao", shape: "circle", num: 3 },
+  { from: "深圳", to: "hub:waigaoqiao", shape: "rect", num: 4 },
+  { from: "乌鲁木齐", to: "hub:qianhai", shape: "circle", num: 2 },
+  { from: "成都", to: "hub:qianhai", shape: "rect", num: 4 },
 ];

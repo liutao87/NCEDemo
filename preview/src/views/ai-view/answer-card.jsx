@@ -29,9 +29,11 @@ const atLeast = (stage, target) =>
   STAGE_SEQ.indexOf(stage) >= STAGE_SEQ.indexOf(target);
 
 // 步骤条数据:确认前运行第 0-1 步,用户点击「确认」后继续第 2-7 步(与右侧流程卡片同内容)
+// 图标统一为成功色 16px 圆点(完成态白勾,进行中呼吸,等待态半透明)
 const STEP_ITEMS = [
   {
     title: "网络资源确定",
+    icon: <span className="ac-step-icon" />,
     description: (
       <div className="ac-chips">
         {AI_STEP_CHIPS.map((chip) => (
@@ -43,13 +45,13 @@ const STEP_ITEMS = [
       </div>
     ),
   },
-  { title: "任务编排", description: "解析意图依赖，编排执行链路与执行顺序" },
-  { title: "配置生成", description: "按安全基线模板批量生成设备配置脚本" },
-  { title: "语法校验", description: "CLI 语法与模板变量合法性校验" },
-  { title: "配置审核", description: "安全策略基线核对与人工复核抽检" },
-  { title: "一致性校验", description: "主备双机配置一致性比对" },
-  { title: "变更方案编排", description: "生成变更窗口、执行顺序与回退预案" },
-  { title: "结果下发", description: "下发变更方案并输出执行报告" },
+  { title: "任务编排", icon: <span className="ac-step-icon" />, description: "解析意图依赖，编排执行链路与执行顺序" },
+  { title: "配置生成", icon: <span className="ac-step-icon" />, description: "按安全基线模板批量生成设备配置脚本" },
+  { title: "语法校验", icon: <span className="ac-step-icon" />, description: "CLI 语法与模板变量合法性校验" },
+  { title: "配置审核", icon: <span className="ac-step-icon" />, description: "安全策略基线核对与人工复核抽检" },
+  { title: "一致性校验", icon: <span className="ac-step-icon" />, description: "主备双机配置一致性比对" },
+  { title: "变更方案编排", icon: <span className="ac-step-icon" />, description: "生成变更窗口、执行顺序与回退预案" },
+  { title: "结果下发", icon: <span className="ac-step-icon" />, description: "下发变更方案并输出执行报告" },
 ];
 
 // 打印中文字的渲染:文字保持原色,上方覆盖一层与原文完全重叠的
@@ -117,6 +119,81 @@ function PlanItemText({ text, active, onDone }) {
   return <span className="tw-live">{liveContent(shown, active && !done)}</span>;
 }
 
+// 结果卡片:彩色文档图标 + 标题/待决策标签/下载 + 时间描述 + 确认/忽略按钮
+function ResultCard() {
+  const [status, setStatus] = useState(null); // null | confirmed | ignored
+
+  return (
+    <div className="ac-result-card reveal">
+      {/* 彩色文档图标(32×32,蓝色渐变纸面 + 折角 + W 字与纹理线条) */}
+      <svg
+        className="rc-doc-icon"
+        width="32"
+        height="32"
+        viewBox="0 0 32 32"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <defs>
+          <linearGradient id="rc-doc-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#4f8bff" />
+            <stop offset="100%" stopColor="#1e5fd8" />
+          </linearGradient>
+        </defs>
+        <rect x="5" y="2" width="22" height="28" rx="3" fill="url(#rc-doc-grad)" />
+        <path d="M20 2 L27 9 L20 9 Z" fill="rgba(255, 255, 255, 0.35)" />
+        <text
+          x="16"
+          y="19.5"
+          textAnchor="middle"
+          fontSize="10.5"
+          fontWeight="700"
+          fill="#ffffff"
+          fontFamily="inherit"
+        >
+          W
+        </text>
+        <rect x="9" y="23" width="6" height="1.5" rx="0.75" fill="rgba(255, 255, 255, 0.55)" />
+        <rect x="17" y="23" width="6" height="1.5" rx="0.75" fill="rgba(255, 255, 255, 0.3)" />
+      </svg>
+
+      <div className="rc-body">
+        {/* 第一行:标题 + 待决策标签 | 下载 + 竖线 + 下拉图标 */}
+        <div className="rc-head">
+          <span className="rc-title">配置详情 V1.0</span>
+          <span className="rc-tag">待决策</span>
+          <span className="rc-head-actions">
+            <button type="button" className="rc-download">下载</button>
+            <span className="rc-v-divider" />
+            <Icon name="chevron-down" size="0.875rem" className="rc-caret" />
+          </span>
+        </div>
+
+        {/* 第二行:时间 + 方案描述(超长省略) */}
+        <p className="rc-desc">
+          2026-06-23 13:56:32｜方案描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述…
+        </p>
+
+        {/* 第三行:确认 / 忽略(点击后收敛为状态文案) */}
+        {status === null ? (
+          <div className="rc-btns">
+            <button type="button" className="rc-confirm" onClick={() => setStatus("confirmed")}>
+              确认
+            </button>
+            <button type="button" className="rc-ignore" onClick={() => setStatus("ignored")}>
+              忽略
+            </button>
+          </div>
+        ) : (
+          <div className={status === "confirmed" ? "rc-status is-ok" : "rc-status"}>
+            {status === "confirmed" ? "已确认" : "已忽略"}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // AI 回答卡片流程:
 // 思考(逐字打印→自动折叠) → 任务拆解与规划(技能选择匹配 + 步骤条 + 总任务规划清单)
 // → 确认提示(点击确认才继续) → 步骤续跑并整段折叠 → 最终结果逐字打印 → 底部操作条
@@ -141,6 +218,15 @@ export default function AnswerCard({ onDone, onRestart }) {
 
   const cbRef = useRef({ onDone, onRestart });
   cbRef.current = { onDone, onRestart };
+
+  // 问答流程中内容持续增长(逐字打印/步骤推进/底部操作条):
+  // 随本卡片每次渲染,把所在对话流滚动到底部,避免新增内容被折叠线遮住、
+  // 卡片底部圆角与操作条显示不全
+  const rootRef = useRef(null);
+  useEffect(() => {
+    const el = rootRef.current && rootRef.current.closest(".ai-thread");
+    if (el) el.scrollTop = el.scrollHeight;
+  });
 
   const think = useTypewriter(AI_THINKING_TEXT, {
     runKey,
@@ -259,7 +345,7 @@ export default function AnswerCard({ onDone, onRestart }) {
   // 发送后短暂等待:提示正在接收问题
   if (stage === "wait") {
     return (
-      <div className="answer-card">
+      <div className="answer-card" ref={rootRef}>
         <div className="ac-wait">
           <Icon name="loader-circle" size="1rem" className="is-spin" />
           <span>正在接收问题…</span>
@@ -271,7 +357,7 @@ export default function AnswerCard({ onDone, onRestart }) {
   const thinking = stage === "thinking";
 
   return (
-    <div className="answer-card">
+    <div className="answer-card" ref={rootRef}>
       {/* 一、思考过程(可折叠:思考图标 + 文案 + 折叠图标,打印完成后自动折叠) */}
       <div className="ac-section">
         <button
@@ -441,7 +527,10 @@ export default function AnswerCard({ onDone, onRestart }) {
         </div>
       ) : null}
 
-      {/* 四、底部操作条:左耗时 | 右五图标(刷新/复制/赞/踩/更多) */}
+      {/* 四、结果卡片:结果输出完成后展示(配置详情文档 + 确认/忽略) */}
+      {stage === "done" ? <ResultCard /> : null}
+
+      {/* 五、底部操作条:左耗时 | 右五图标(刷新/复制/赞/踩/更多) */}
       {stage === "done" ? (
         <div className="ac-footer">
           <span className="ac-cost">

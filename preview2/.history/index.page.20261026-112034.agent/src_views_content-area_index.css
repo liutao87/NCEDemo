@@ -1,0 +1,25 @@
+/* 菜单内容区:占据剩余宽度,独立滚动 */
+.content-area {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.5rem;
+  background: var(--surface-container-lowest);
+}
+
+/* 首页态:左侧会话卡片贴边占满,右侧地图区域自适应 */
+.content-area.is-overview {
+  display: flex;
+  padding: 0;
+  overflow: hidden;
+}
+
+.overview-aside {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  padding: 1.5rem;
+  overflow: hidden;
+}

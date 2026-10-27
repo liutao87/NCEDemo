@@ -13,6 +13,7 @@
 
 /* ---------- 背景图区域(不含底部输入框) ---------- */
 .session-main {
+  position: relative; /* 五色石绝对定位的参照 */
   flex: 1 1 0;
   min-height: 0;
   display: flex;
@@ -23,6 +24,17 @@
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
+}
+
+/* 五色石动图:叠在背景图的发光亮斑上(亮度分析:水平 49.5% / 纵向 8.4%),装饰不拦截交互 */
+.session-gem {
+  position: absolute;
+  left: 49.5%;
+  top: 8.4%;
+  width: 6.5rem; /* 104px,与光斑尺度匹配 */
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
 }
 
 /* 深色主题:浅色背景图上叠深色蒙层,保证白色标题/正文可读 */
@@ -46,9 +58,58 @@
   color: var(--on-surface);
 }
 
-.range-select {
+/* 时间范围下拉(Dropdown 触发器):无边框,仅白色文字 + 下拉图标 */
+.range-dd {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
   font: var(--font-body-s);
-  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.range-dd:hover,
+.range-dd:focus-visible {
+  color: #ffffff;
+}
+
+/* 时间范围下拉弹层菜单:卡片底 + 圆角 + 阴影
+   antd 运行时注入样式需以更高优先级 + !important 覆盖;
+   选中态用 primary-container(深蓝底) + on-primary-container(白字),对比充足 */
+.range-dd-menu.ant-dropdown .ant-dropdown-menu {
+  background: var(--surface-container-high);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  box-shadow: var(--shadow-popover);
+}
+
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+  min-width: 6rem;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: var(--radius-base) !important;
+  font-size: var(--font-size-base) !important; /* 12px,与触发器一致 */
+  line-height: 2rem !important;
+  color: var(--color-text-primary) !important; /* 深色下为白字 */
+}
+
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:hover,
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item-active {
+  background: var(--surface-variant) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.range-dd-menu.ant-dropdown
+  .ant-dropdown-menu
+  .ant-dropdown-menu-item-selected,
+.range-dd-menu.ant-dropdown
+  .ant-dropdown-menu
+  .ant-dropdown-menu-item-selected:hover {
+  background: var(--primary-container) !important; /* 深色 #112857 深蓝底 */
+  color: var(--on-primary-container) !important; /* 深色 #FFFFFF 白字 */
+  font-weight: var(--font-weight-medium) !important;
 }
 
 /* ---------- 区域二:守护概览(左文本 + 右图片) ---------- */
@@ -325,31 +386,73 @@
 
 /* ---------- 底部 AI 输入框(背景图区域内,边距由 session-main 的 32px 内边距提供) ---------- */
 .session-composer {
+  position: relative; /* 模板库弹层(自绘)的定位基准 */
   flex-shrink: 0;
   margin-top: 1rem;
 }
 
-.composer-frame {
+/* 模板库弹层(自绘):与输入框同宽、左缘对齐、输入框正上方展开 */
+.tpl-popover-custom {
+  position: absolute;
+  left: 0;
+  width: 100%; /* 与输入框(含渐变边框)像素级同宽 */
+  bottom: calc(100% + 0.5rem); /* 输入框正上方,留 8px 间距 */
+  z-index: 30;
   box-sizing: border-box;
-  width: 100%;
-  padding: 0.09375rem; /* 1.5px 渐变彩边 */
-  border: none;
-  border-radius: 1.5rem; /* 24px */
-  text-align: left;
-  background: linear-gradient(120deg, #7c3aed, #2563eb, #06b6d4, #8b5cf6, #7c3aed);
-  background-size: 300% 300%;
-  animation: ai-flow 8s ease infinite;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--surface-container-high);
+  box-shadow: var(--shadow-popover);
+  animation: tpl-pop-in 0.22s ease-out;
 }
 
-@keyframes ai-flow {
-  0% {
-    background-position: 0% 50%;
+.dark .tpl-popover-custom {
+  background: var(--surface-container-high);
+}
+
+@keyframes tpl-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
   }
-  50% {
-    background-position: 100% 50%;
+  to {
+    opacity: 1;
+    transform: none;
   }
-  100% {
-    background-position: 0% 50%;
+}
+
+/* 角度渐变边框的旋转角度(需 @property 注册才能平滑插值) */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.composer-frame {
+  position: relative; /* 模板库弹层挂载容器(宽度对齐输入框/定位正上方) */
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1px; /* 粗细 1,位置内部 */
+  border: none;
+  border-radius: 1.5rem; /* 保持圆角 24px */
+  text-align: left;
+  /* 角度渐变(七色环,色标位置按设计稿),随 --border-angle 缓慢旋转 */
+  background: conic-gradient(
+    from var(--border-angle),
+    #669fff 2%,
+    #7b67ff 12%,
+    #9567ff 39%,
+    #ff666b 50%,
+    #ff9566 61%,
+    #ffad66 89%,
+    #669fff 99%
+  );
+  animation: border-spin 6s linear infinite;
+}
+
+@keyframes border-spin {
+  to {
+    --border-angle: 360deg;
   }
 }
 
@@ -369,7 +472,7 @@
   align-items: center;
   height: 3rem; /* 初始 48px */
   padding: 0 0.75rem 0 1.25rem;
-  border-radius: 1.40625rem;
+  border-radius: 1.4375rem; /* 与外框 24px 圆角同心(24px - 1px 边框) */
   background: var(--surface-container-highest);
 }
 
@@ -394,7 +497,19 @@
 .composer-send-mini {
   flex: 0 0 auto;
   display: inline-flex;
-  color: var(--primary);
+  align-items: center;
+  justify-content: center;
+  width: 2rem; /* 32px */
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: rgba(92, 162, 233, 0.15); /* 圆环背景(设计稿指定) */
+  color: #ffffff;
+}
+
+/* 发送图标彩色渐变描边:引用页面内 #send-grad 渐变定义,覆盖 lucide 默认 currentColor 描边 */
+.send-grad-icon :where(path, circle, line, polyline, polygon, rect),
+.send-grad-icon svg :where(path, circle, line, polyline, polygon, rect) {
+  stroke: url(#send-grad);
 }
 
 .composer-input {
@@ -512,23 +627,26 @@
 }
 
 .send-btn {
-  width: 2rem;
+  width: 2rem; /* 32px */
   height: 2rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: var(--radius-full);
-  background: var(--surface-variant);
-  color: var(--text-disabled);
-  cursor: not-allowed;
+  background: rgba(92, 162, 233, 0.15); /* 圆环背景(设计稿指定) */
+  color: #ffffff;
+  opacity: 0.55;
+  cursor: default;
 }
 
 .send-btn.is-active {
-  background: linear-gradient(135deg, #7c3aed, #06b6d4);
-  color: #ffffff;
+  opacity: 1;
   cursor: pointer;
-  box-shadow: 0 0 0.5rem rgba(124, 58, 237, 0.4);
+}
+
+.send-btn.is-active:hover {
+  box-shadow: 0 0 0.5rem rgba(92, 162, 233, 0.55);
 }
 
 .composer-hint {
@@ -606,10 +724,19 @@
 }
 
 .tpl-panel {
-  width: 18.75rem;
+  width: 100%; /* 与挂载容器(输入框外框)同宽 */
   height: 22.125rem; /* 354px */
   display: flex;
   flex-direction: column;
+}
+
+/* 模板列表图标:实色品牌色(深色下提亮为亮蓝),描边加粗更具实感 */
+.tpl-item-icon {
+  color: var(--primary);
+}
+
+.dark .tpl-item-icon {
+  color: var(--color-link); /* 深色主题下亮蓝 #5CA2E9 */
 }
 
 .tpl-title {

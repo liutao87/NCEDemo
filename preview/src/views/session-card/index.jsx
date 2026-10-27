@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Select } from "antd";
+import { Dropdown } from "antd";
 import { Icon } from "../../../assets/shared/icon.jsx";
 import { useApp } from "../../context.jsx";
 import { ATTENTION_ITEMS, RANGE_OPTIONS } from "../../mock/session.js";
@@ -45,17 +45,51 @@ export default function SessionCard() {
   return (
     <section className="session-card">
       <div className="session-main">
-        {/* 区域一:标题 + 时间范围下拉(无边框) */}
+        {/* 五色石动图:定位在背景图的发光位置(像素亮度分析:水平居中,纵向约 8.4%) */}
+        <img
+          className="session-gem"
+          src="./assets/uploads/aico-gem.gif"
+          alt=""
+          aria-hidden="true"
+        />
+        {/* 区域一:标题 + 时间范围下拉(无边框,白字 + 下拉图标) */}
         <header className="session-head">
           <h2 className="session-title">单域网络智能体</h2>
-          <Select
-            className="range-select"
-            variant="borderless"
-            value={range}
-            onChange={setRange}
-            popupMatchSelectWidth={false}
-            options={RANGE_OPTIONS}
-          />
+          <Dropdown
+            trigger={["click"]}
+            overlayClassName="range-dd-menu"
+            popupClassName="range-dd-menu"
+            menu={{
+              items: RANGE_OPTIONS.map((o) => ({
+                key: o.value,
+                label: (
+                  /* 内联字号,确保 12px 不被 antd 运行时样式弹回 14px */
+                  <span
+                    style={{
+                      fontSize: "var(--font-size-base)",
+                      lineHeight: "2rem",
+                    }}
+                  >
+                    {o.label}
+                  </span>
+                ),
+              })),
+              selectedKeys: [range],
+              onClick: ({ key }) => setRange(key),
+              /* 菜单根节点内联样式:优先级最高,深色卡片底必定生效 */
+              style: {
+                background: "var(--surface-container-high)",
+                borderRadius: "0.75rem",
+                padding: "0.25rem",
+                boxShadow: "var(--shadow-popover)",
+              },
+            }}
+          >
+            <button type="button" className="range-dd">
+              {RANGE_OPTIONS.find((o) => o.value === range)?.label}
+              <Icon name="chevron-down" size="0.875rem" />
+            </button>
+          </Dropdown>
         </header>
 
         {/* 区域二:守护概览(左文本 + 右示意图片) */}
