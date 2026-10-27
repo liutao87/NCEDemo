@@ -13,34 +13,27 @@
 
 /* ---------- 背景图区域(不含底部输入框) ---------- */
 .session-main {
-  position: relative; /* 五色石绝对定位的参照 */
+  position: relative; /* 五色石绝对定位的锚点 */
   flex: 1 1 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
   padding: 2rem; /* 上下左右 32px */
-  background-color: var(--surface-container-high);
   background-image: url("./assets/uploads/bg-1.png");
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
 }
 
-/* 五色石动图:叠在背景图的发光亮斑上(亮度分析:水平 49.5% / 纵向 8.4%),装饰不拦截交互 */
+/* 五色石:置于背景图圆圈中心(用户指定定位) */
 .session-gem {
   position: absolute;
-  left: 49.5%;
-  top: 8.4%;
-  width: 6.5rem; /* 104px,与光斑尺度匹配 */
+  left: 50%;
+  top: 5rem;
+  width: 3rem;
   transform: translate(-50%, -50%);
   pointer-events: none;
   user-select: none;
-}
-
-/* 深色主题:浅色背景图上叠深色蒙层,保证白色标题/正文可读 */
-.dark .session-card .session-main {
-  background-image: linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.62)),
-    url("./assets/uploads/bg-1.png");
 }
 
 /* ---------- 区域一:标题 + 时间范围下拉 ---------- */
