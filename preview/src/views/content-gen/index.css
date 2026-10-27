@@ -72,12 +72,10 @@
   color: rgb(147, 147, 147);
 }
 
-/* ---------- 内容生成区:深底毛玻璃 ---------- */
+/* ---------- 内容生成区:紫色渐变底 ---------- */
 .gen-stage {
-  background: rgba(25, 25, 25, 0.8);
+  background: linear-gradient(180deg, rgba(152, 116, 233, 1) 0%, rgba(93, 58, 173, 0) 100%);
   border-radius: 1rem;
-  backdrop-filter: blur(163px);
-  -webkit-backdrop-filter: blur(163px);
 }
 
 .gen-frame {
@@ -86,6 +84,9 @@
   height: 50%; /* 高度为一半 */
   min-height: 16.5rem;
   border-radius: 1.5rem;
+  background: rgba(25, 25, 25, 0.8);
+  backdrop-filter: blur(163px);
+  -webkit-backdrop-filter: blur(163px);
 }
 
 .gen-border {
