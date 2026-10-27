@@ -1,4 +1,4 @@
-/* 内容生成画布:标题 + 彩色虚线流转矩形(持续动效) */
+/* 内容生成画布:顶部工具栏 + 标题「意图确认」+ 内容生成区(彩色虚线流转动效) */
 
 .content-gen {
   flex: 1 1 0;
@@ -8,46 +8,83 @@
   flex-direction: column;
 }
 
-/* ---------- 顶部标题 ---------- */
-.gen-head {
+/* ---------- 顶部工具栏:高 3.5rem,space-between,底部边框线 ---------- */
+.gen-toolbar {
   flex-shrink: 0;
+  height: 3.5rem;
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  border-bottom: 1px solid rgb(from #F3F3F3 r g b / 0.15);
 }
 
-.gen-title {
-  margin: 0;
+.gen-canvas-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font: var(--font-headline-m);
-  font-weight: var(--font-weight-semibold);
+  gap: 0.375rem;
+  border: none;
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--font-body-m);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.gen-canvas-btn:hover {
+  color: var(--primary);
+}
+
+.gen-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.gen-expand-btn:hover {
+  background: var(--surface-variant);
   color: var(--on-surface);
 }
 
-.gen-title svg {
-  color: var(--primary);
-  align-self: center;
-}
-
-.gen-sub {
-  font: var(--font-body-s);
-  color: var(--on-surface-variant);
-}
-
-/* ---------- 虚线流转矩形:高度为可用区一半,垂直居中 ---------- */
-.gen-stage {
+/* ---------- 画布容器:上间距 0.75rem,左右 1rem,上下布局 ---------- */
+.gen-body {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
-  align-items: center; /* 垂直居中 */
+  flex-direction: column;
+  padding: 0.75rem 1rem 0;
+}
+
+/* 标题「意图确认」 */
+.gen-intent-title {
+  flex-shrink: 0;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  color: rgb(147, 147, 147);
+}
+
+/* ---------- 内容生成区:深底毛玻璃 ---------- */
+.gen-stage {
+  background: rgba(25, 25, 25, 0.8);
+  border-radius: 1rem;
+  backdrop-filter: blur(163px);
+  -webkit-backdrop-filter: blur(163px);
 }
 
 .gen-frame {
   position: relative;
   width: 100%;
   height: 50%; /* 高度为一半 */
+  min-height: 16.5rem;
   border-radius: 1.5rem;
 }
 
@@ -176,7 +213,7 @@
   color: var(--on-surface-variant);
 }
 
-/* ---------- 深色主题:增强虚线发光与光晕,保证暗背景下的动效可见性 ---------- */
+/* ---------- 深色主题:增强虚线发光与光晕 ---------- */
 .dark .content-gen .gen-border {
   filter: drop-shadow(0 0 0.5rem rgba(37, 99, 235, 0.55));
 }

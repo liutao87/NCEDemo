@@ -6102,7 +6102,7 @@ input.ant-input.ant-input-sm {
 }
 
 
-/* 内容生成画布:标题 + 彩色虚线流转矩形(持续动效) */
+/* 内容生成画布:顶部工具栏 + 标题「意图确认」+ 内容生成区(彩色虚线流转动效) */
 
 .content-gen {
   flex: 1 1 0;
@@ -6112,46 +6112,83 @@ input.ant-input.ant-input-sm {
   flex-direction: column;
 }
 
-/* ---------- 顶部标题 ---------- */
-.gen-head {
+/* ---------- 顶部工具栏:高 3.5rem,space-between,底部边框线 ---------- */
+.gen-toolbar {
   flex-shrink: 0;
+  height: 3.5rem;
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  border-bottom: 1px solid rgb(from #F3F3F3 r g b / 0.15);
 }
 
-.gen-title {
-  margin: 0;
+.gen-canvas-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  font: var(--font-headline-m);
-  font-weight: var(--font-weight-semibold);
+  gap: 0.375rem;
+  border: none;
+  background: transparent;
+  color: var(--on-surface);
+  font: var(--font-body-m);
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.gen-canvas-btn:hover {
+  color: var(--primary);
+}
+
+.gen-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.gen-expand-btn:hover {
+  background: var(--surface-variant);
   color: var(--on-surface);
 }
 
-.gen-title svg {
-  color: var(--primary);
-  align-self: center;
-}
-
-.gen-sub {
-  font: var(--font-body-s);
-  color: var(--on-surface-variant);
-}
-
-/* ---------- 虚线流转矩形:高度为可用区一半,垂直居中 ---------- */
-.gen-stage {
+/* ---------- 画布容器:上间距 0.75rem,左右 1rem,上下布局 ---------- */
+.gen-body {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
-  align-items: center; /* 垂直居中 */
+  flex-direction: column;
+  padding: 0.75rem 1rem 0;
+}
+
+/* 标题「意图确认」 */
+.gen-intent-title {
+  flex-shrink: 0;
+  padding: 0.5rem 0;
+  font-size: 0.875rem;
+  line-height: 1.375rem;
+  color: rgb(147, 147, 147);
+}
+
+/* ---------- 内容生成区:深底毛玻璃 ---------- */
+.gen-stage {
+  background: rgba(25, 25, 25, 0.8);
+  border-radius: 1rem;
+  backdrop-filter: blur(163px);
+  -webkit-backdrop-filter: blur(163px);
 }
 
 .gen-frame {
   position: relative;
   width: 100%;
   height: 50%; /* 高度为一半 */
+  min-height: 16.5rem;
   border-radius: 1.5rem;
 }
 
@@ -6280,7 +6317,7 @@ input.ant-input.ant-input-sm {
   color: var(--on-surface-variant);
 }
 
-/* ---------- 深色主题:增强虚线发光与光晕,保证暗背景下的动效可见性 ---------- */
+/* ---------- 深色主题:增强虚线发光与光晕 ---------- */
 .dark .content-gen .gen-border {
   filter: drop-shadow(0 0 0.5rem rgba(37, 99, 235, 0.55));
 }
@@ -7700,11 +7737,13 @@ function useApp() {
     "file-text": [["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],
     "globe": [["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"}],["path",{"d":"M2 12h20"}]],
     "house": [["path",{"d":"M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"}],["path",{"d":"M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"}]],
+    "layout-dashboard": [["rect",{"width":"7","height":"9","x":"3","y":"3","rx":"1"}],["rect",{"width":"7","height":"5","x":"14","y":"3","rx":"1"}],["rect",{"width":"7","height":"9","x":"14","y":"12","rx":"1"}],["rect",{"width":"7","height":"5","x":"3","y":"16","rx":"1"}]],
     "layout-template": [["rect",{"width":"18","height":"7","x":"3","y":"3","rx":"1"}],["rect",{"width":"9","height":"7","x":"3","y":"14","rx":"1"}],["rect",{"width":"5","height":"7","x":"16","y":"14","rx":"1"}]],
     "link": [["path",{"d":"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"}],["path",{"d":"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"}]],
     "loader-circle": [["path",{"d":"M21 12a9 9 0 1 1-6.219-8.56"}]],
     "locate-fixed": [["line",{"x1":"2","x2":"5","y1":"12","y2":"12"}],["line",{"x1":"19","x2":"22","y1":"12","y2":"12"}],["line",{"x1":"12","x2":"12","y1":"2","y2":"5"}],["line",{"x1":"12","x2":"12","y1":"19","y2":"22"}],["circle",{"cx":"12","cy":"12","r":"7"}],["circle",{"cx":"12","cy":"12","r":"3"}]],
     "lock": [["rect",{"width":"18","height":"11","x":"3","y":"11","rx":"2","ry":"2"}],["path",{"d":"M7 11V7a5 5 0 0 1 10 0v4"}]],
+    "maximize-2": [["path",{"d":"M15 3h6v6"}],["path",{"d":"m21 3-7 7"}],["path",{"d":"m3 21 7-7"}],["path",{"d":"M9 21H3v-6"}]],
     "menu": [["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],
     "mic": [["path",{"d":"M12 19v3"}],["path",{"d":"M19 10v2a7 7 0 0 1-14 0v-2"}],["rect",{"x":"9","y":"2","width":"6","height":"13","rx":"3"}]],
     "minus": [["path",{"d":"M5 12h14"}]],
@@ -10378,48 +10417,60 @@ function AiChat() {
 (function () {
   const { Icon } = __export;
 // Layer 4: 内容生成画布 — AI 会话发送后右侧主内容区
-// 顶部标题「网络资源确定」,下方为彩色虚线流转矩形(持续动效),中心文案「内容生成中」
+// 顶部工具栏(全景画布 + 放大/缩小) + 标题「意图确认」+ 内容生成区(深底毛玻璃 + 彩色虚线动效)
 function ContentGen() {
   return (
     <div className="content-gen">
-      <header className="gen-head">
-        <h3 className="gen-title">
-          <Icon name="network" size="1.125rem" />
-          网络资源确定
-        </h3>
-        <span className="gen-sub">Aico 正在为您生成内容</span>
-      </header>
+      {/* 顶部工具栏:高 3.5rem,space-between,底部边框线 */}
+      <div className="gen-toolbar">
+        <button type="button" className="gen-canvas-btn">
+          <Icon name="layout-dashboard" size="1rem" />
+          <span>全景画布</span>
+        </button>
+        <button
+          type="button"
+          className="gen-expand-btn"
+          title="放大/缩小"
+          aria-label="放大/缩小"
+        >
+          <Icon name="maximize-2" size="1rem" />
+        </button>
+      </div>
 
-      {/* 矩形高度为可用区一半,垂直居中 */}
-      <div className="gen-stage">
-        <div className="gen-frame">
-          {/* 双层彩色虚线矩形:反向流动,叠加发光 */}
-          <svg className="gen-border" aria-hidden="true">
-            <defs>
-              <linearGradient id="genGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#06b6d4" />
-                <stop offset="35%" stopColor="#2563eb" />
-                <stop offset="70%" stopColor="#7c3aed" />
-                <stop offset="100%" stopColor="#ec4899" />
-              </linearGradient>
-            </defs>
-            <rect className="gen-rect gen-rect-fast" x="3" y="3" rx="1.25rem" />
-            <rect className="gen-rect gen-rect-slow" x="3" y="3" rx="1.25rem" />
-          </svg>
+      {/* 画布容器:上间距 0.75rem,左右 1rem,上下布局 */}
+      <div className="gen-body">
+        <div className="gen-intent-title">意图确认</div>
 
-          <div className="gen-center">
-            <span className="gen-orb">
-              <Icon name="sparkles" size="1.5rem" />
-            </span>
-            <div className="gen-text">
-              内容生成中
-              <span className="gen-dots">
-                <i />
-                <i />
-                <i />
+        {/* 内容生成区:深底毛玻璃,彩色虚线流转矩形(持续动效) */}
+        <div className="gen-stage">
+          <div className="gen-frame">
+            <svg className="gen-border" aria-hidden="true">
+              <defs>
+                <linearGradient id="genGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#06b6d4" />
+                  <stop offset="35%" stopColor="#2563eb" />
+                  <stop offset="70%" stopColor="#7c3aed" />
+                  <stop offset="100%" stopColor="#ec4899" />
+                </linearGradient>
+              </defs>
+              <rect className="gen-rect gen-rect-fast" x="3" y="3" rx="1.25rem" />
+              <rect className="gen-rect gen-rect-slow" x="3" y="3" rx="1.25rem" />
+            </svg>
+
+            <div className="gen-center">
+              <span className="gen-orb">
+                <Icon name="sparkles" size="1.5rem" />
               </span>
+              <div className="gen-text">
+                内容生成中
+                <span className="gen-dots">
+                  <i />
+                  <i />
+                  <i />
+                </span>
+              </div>
+              <div className="gen-hint">正在确定网络资源范围并匹配设备清单</div>
             </div>
-            <div className="gen-hint">正在确定网络资源范围并匹配设备清单</div>
           </div>
         </div>
       </div>
