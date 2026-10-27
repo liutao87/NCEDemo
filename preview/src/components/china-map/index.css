@@ -80,15 +80,41 @@
   color: var(--on-surface);
 }
 
-/* 枢纽叠加层:logo 圆 + 名称,绝对定位对准 canvas 投影点 */
+/* 枢纽叠加层:logo 圆(不含文本)中心对准 canvas 投影点,文字悬挂于 logo 下方 */
 .map-hub {
   position: absolute;
-  transform: translate(-50%, -50%); /* logo 圆心对准投影点 */
+  /* left/top 由 JS 内联设为标注点坐标,锚点=点 */
   display: flex;
   flex-direction: column;
   align-items: center;
   pointer-events: none;
   z-index: 1;
+}
+
+.map-hub-logo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%); /* logo 圆心对准锚点(标注点中心) */
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--map-link); /* #08A471 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-hub-label {
+  position: absolute;
+  left: 0;
+  top: 1.75rem;
+  transform: translateX(-50%); /* 水平居中于锚点 */
+  font: var(--font-caption-m);
+  color: #FFFFFF;
+  white-space: nowrap;
+  /* 浅色地图上保证白字可读 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 4px rgba(0, 0, 0, 0.35);
 }
 
 .map-hub-logo {
@@ -99,13 +125,4 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.map-hub-label {
-  margin-top: 0.75rem;
-  font: var(--font-caption-m);
-  color: #FFFFFF;
-  white-space: nowrap;
-  /* 浅色地图上保证白字可读 */
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 4px rgba(0, 0, 0, 0.35);
 }

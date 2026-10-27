@@ -355,6 +355,7 @@
 .attention-card-title {
   min-width: 0;
   font: var(--font-body-m);
+  font-size: 1rem;
   font-weight: var(--font-weight-medium);
   color: var(--on-surface);
   white-space: nowrap;
@@ -364,18 +365,28 @@
 
 /* 下行:位置图标 + 描述,间距 0.25rem */
 .attention-bottom {
+  margin-top: 0.75rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* 图标与文本首行顶部对齐 */
   gap: 0.25rem;
-  color: var(--on-surface-variant);
+  color: rgb(201, 201, 201);
+  font-size: 0.875rem;
+}
+
+.attention-bottom > svg,
+.attention-bottom > span:first-child {
+  flex-shrink: 0;
+  margin-top: 0.125rem; /* 图标微调对齐首行文字基线 */
 }
 
 .attention-card-desc {
   min-width: 0;
-  font: var(--font-caption-m);
-  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  color: rgb(201, 201, 201);
   line-height: var(--line-height-md);
-  word-break: break-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ---------- 底部 AI 输入框(背景图区域内,边距由 session-main 的 32px 内边距提供) ---------- */
@@ -799,7 +810,7 @@
 }
 
 .tpl-item:hover {
-  background: var(--primary-container);
+  background: #19426d;
 }
 
 .tpl-item.is-active {

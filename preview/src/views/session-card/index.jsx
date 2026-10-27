@@ -170,7 +170,7 @@ export default function SessionCard() {
                 </div>
                 <div className="attention-bottom">
                   <Icon name="map-pin" size="0.875rem" />
-                  <div className="attention-card-desc">{item.desc}</div>
+                  <div className="attention-card-desc" title={item.desc}>{item.desc}</div>
                 </div>
               </div>
             ))}

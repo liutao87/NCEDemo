@@ -1,0 +1,137 @@
+/* 中国地图:canvas 绘制,填满父容器 */
+/* 地图专属配色:浅色基础值,暗色经 .dark 后代覆盖(单轨换肤,canvas 侧按变量读取) */
+.china-map {
+  --map-fill: #F0F0F0;      /* 省份区域填充(地图背景色) */
+  --map-line: #D9D9D9;      /* 省界线(细,浅色) */
+  --map-text: #595959;      /* 省份文本(大/中省) */
+  --map-text-sub: #8C8C8C;  /* 省份文本(小省/港澳) */
+  --map-link: #08A471;      /* 标注点/连线/logo(浅/暗同色) */
+  --map-stripe: #202020;    /* 背景斜条纹(浅/暗同色) */
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dark .china-map {
+  --map-fill: #363636;
+  --map-line: #808080;
+  --map-text: #969696;
+  --map-text-sub: #6E6E6E;
+}
+
+.china-map-canvas {
+  display: block;
+  cursor: grab; /* 可拖拽 */
+}
+
+/* 右下角视图控制:放大/缩小连体(分割线隔开) + 居中独立(竖排,位于南海附图上方) */
+.map-controls {
+  position: absolute;
+  right: 1rem;
+  bottom: 5rem; /* 附图(64px) + 底边距(10px) + 间隙 */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+/* 放大+缩小组合:连在一起,中间分割线,毛玻璃 */
+.map-zoom-group {
+  border-radius: var(--radius-md);
+  background: rgba(243, 243, 243, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.map-zoom-group .map-ctl-btn {
+  border-radius: 0;
+  background: transparent; /* 毛玻璃由组合容器提供 */
+}
+
+.map-zoom-group .map-ctl-btn + .map-ctl-btn {
+  border-top: 1px solid rgba(243, 243, 243, 0.2); /* 分割线 */
+}
+
+.map-ctl-btn {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(243, 243, 243, 0.1);
+  color: var(--on-surface);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.map-ctl-btn.is-single {
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.map-ctl-btn:hover {
+  background: rgba(243, 243, 243, 0.22);
+  color: var(--on-surface);
+}
+
+/* 枢纽叠加层:logo 圆(不含文本)中心对准 canvas 投影点,文字悬挂于 logo 下方 */
+.map-hub {
+  position: absolute;
+  /* left/top 由 JS 内联设为标注点坐标,锚点=点 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.map-hub-logo {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%); /* logo 圆心对准锚点(标注点中心) */
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--map-link); /* #08A471 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-hub-label {
+  position: absolute;
+  left: 0;
+  top: 2rem; /* logo 半径(1.5rem) + 间距(0.5rem) */
+  transform: translateX(-50%); /* 水平居中于锚点 */
+  font: var(--font-caption-m);
+  color: #FFFFFF;
+  white-space: nowrap;
+  /* 浅色地图上保证白字可读 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 4px rgba(0, 0, 0, 0.35);
+}
+
+.map-hub-logo {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--map-link); /* #06A46F */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-hub-label {
+  margin-top: 0.75rem;
+  font: var(--font-caption-m);
+  color: #FFFFFF;
+  white-space: nowrap;
+  /* 浅色地图上保证白字可读 */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 0 4px rgba(0, 0, 0, 0.35);
+}

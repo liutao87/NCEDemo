@@ -292,7 +292,7 @@ export default function ChinaMap() {
         ctx.fill();
       });
 
-      // 6. 枢纽位置输出给 DOM 叠加层:logo 圆心恒定覆盖标注点正中间
+      // 6. 枢纽位置输出给 DOM 叠加层:logo 中心对准标注点中心(圆心=点)
       setHubPos(
         MAP_HUBS.map((hb) => {
           const [x, y] = project(hb.lon, hb.lat);

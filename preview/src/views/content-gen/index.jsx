@@ -38,23 +38,12 @@ export default function ContentGen() {
                   <stop offset="100%" stopColor="#ec4899" />
                 </linearGradient>
               </defs>
-              <rect className="gen-rect gen-rect-fast" x="3" y="3" rx="1.25rem" />
-              <rect className="gen-rect gen-rect-slow" x="3" y="3" rx="1.25rem" />
+              <rect className="gen-rect gen-rect-fast" x="3" y="3" rx="1rem" />
+              <rect className="gen-rect gen-rect-slow" x="3" y="3" rx="1rem" />
             </svg>
 
             <div className="gen-center">
-              <span className="gen-orb">
-                <Icon name="sparkles" size="1.5rem" />
-              </span>
-              <div className="gen-text">
-                内容生成中
-                <span className="gen-dots">
-                  <i />
-                  <i />
-                  <i />
-                </span>
-              </div>
-              <div className="gen-hint">正在确定网络资源范围并匹配设备清单</div>
+              <div className="gen-text">内容生成中...</div>
             </div>
           </div>
         </div>

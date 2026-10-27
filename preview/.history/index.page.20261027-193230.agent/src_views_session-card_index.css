@@ -1,0 +1,821 @@
+/* 会话卡片:总览核心区左侧面板(540px × 100%)
+   结构:session-main(背景图区域,32px 内边距) + session-composer(输入框,无背景图) */
+.session-card {
+  flex: 0 0 33.75rem; /* 540px */
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--on-surface);
+  background: var(--surface-container-lowest);
+}
+
+/* ---------- 背景图区域(不含底部输入框) ---------- */
+.session-main {
+  position: relative; /* 五色石绝对定位的锚点 */
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem; /* 上下左右 32px */
+  background-image: url("./assets/uploads/bg-1.png");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+
+/* 五色石:置于背景图圆圈中心(用户指定定位) */
+.session-gem {
+  position: absolute;
+  left: 50%;
+  top: 5rem;
+  width: 3rem;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ---------- 区域一:标题 + 时间范围下拉 ---------- */
+.session-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.session-title {
+  margin: 0;
+  font: var(--font-headline-m);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+/* 时间范围下拉(Dropdown 触发器):无边框,仅白色文字 + 下拉图标 */
+.range-dd {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.92);
+  font: var(--font-body-s);
+  cursor: pointer;
+}
+
+.range-dd:hover,
+.range-dd:focus-visible {
+  color: #ffffff;
+}
+
+/* 时间范围下拉弹层菜单:卡片底 + 圆角 + 阴影
+   antd 运行时注入样式需以更高优先级 + !important 覆盖;
+   选中态用 primary-container(深蓝底) + on-primary-container(白字),对比充足 */
+.range-dd-menu.ant-dropdown .ant-dropdown-menu {
+  background: var(--surface-container-high);
+  border-radius: 0.75rem;
+  padding: 0.25rem;
+  box-shadow: var(--shadow-popover);
+}
+
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item {
+  min-width: 6rem;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: var(--radius-base) !important;
+  font-size: var(--font-size-base) !important; /* 12px,与触发器一致 */
+  line-height: 2rem !important;
+  color: var(--color-text-primary) !important; /* 深色下为白字 */
+}
+
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item:hover,
+.range-dd-menu.ant-dropdown .ant-dropdown-menu .ant-dropdown-menu-item-active {
+  background: var(--surface-variant) !important;
+  color: var(--color-text-primary) !important;
+}
+
+.range-dd-menu.ant-dropdown
+  .ant-dropdown-menu
+  .ant-dropdown-menu-item-selected,
+.range-dd-menu.ant-dropdown
+  .ant-dropdown-menu
+  .ant-dropdown-menu-item-selected:hover {
+  background: var(--primary-container) !important; /* 深色 #112857 深蓝底 */
+  color: var(--on-primary-container) !important; /* 深色 #FFFFFF 白字 */
+  font-weight: var(--font-weight-medium) !important;
+}
+
+/* ---------- 区域二:守护概览(左文本 + 右图片) ---------- */
+.session-hero {
+  flex-shrink: 0;
+  margin-top: 3.9375rem; /* 标题下 63px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.session-hero-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.hero-title {
+  font: var(--font-headline-m);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.hero-num {
+  font-style: normal;
+  font-weight: var(--font-weight-bold);
+  color: var(--success);
+}
+
+.hero-line {
+  margin: 0.78125rem 0 0; /* 标题下 12.5px */
+  font: var(--font-body-m);
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+}
+
+.hero-line + .hero-line {
+  margin-top: 0.25rem; /* 行间 4px */
+}
+
+.hero-strong {
+  font-weight: var(--font-weight-bold);
+  color: var(--on-surface);
+}
+
+.hero-art {
+  flex: 0 0 auto;
+  width: 5.9375rem; /* 95px */
+  height: 5.3125rem; /* 85px */
+  margin-right: 0.8125rem; /* 额外 13px,与区域外缘合计 45px */
+  object-fit: contain; /* 任意比例图片均不拉伸变形 */
+}
+
+/* ---------- 区域三:左右指标小卡片 ---------- */
+.session-metrics {
+  flex-shrink: 0;
+  margin-top: 1.6875rem; /* 27px */
+  display: flex;
+  gap: 0.5rem; /* 8px */
+}
+
+.metric-card {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 1rem; /* 16px */
+  border-radius: 0.75rem; /* 12px */
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.metric-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; /* 图标距标题 8px */
+}
+
+.metric-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.metric-icon.is-fault {
+  color: var(--error);
+}
+
+.metric-icon.is-network {
+  color: var(--info);
+}
+
+.metric-title {
+  min-width: 0;
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-value {
+  margin-top: 0.75rem; /* 12px */
+  font-size: var(--font-size-3xl); /* 24px */
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-xs);
+  color: var(--on-surface);
+}
+
+.metric-label {
+  margin-top: 0.25rem;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+}
+
+/* ---------- 区域四:待您关注 ---------- */
+.session-attention {
+  margin-top: 1.5rem; /* 24px */
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.attention-head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.attention-title {
+  margin: 0;
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.attention-more {
+  font: var(--font-body-s);
+  color: var(--interactive-link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.attention-more:hover {
+  color: var(--interactive-link-hover);
+}
+
+/* 胶囊形 tab:平分宽度,整体与单项均为椭圆 */
+.pill-tabs {
+  flex-shrink: 0;
+  margin-top: 1.25rem; /* 20px */
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: var(--radius-full);
+  background: rgba(38, 38, 38, 1);
+}
+
+.pill-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1875rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  font: var(--font-body-m);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.pill-tab:hover {
+  color: var(--on-surface);
+}
+
+.pill-tab.is-active {
+  background: rgba(53, 53, 53, 1);
+  color: var(--on-surface);
+  font-weight: var(--font-weight-medium);
+}
+
+.pill-count {
+  font-weight: var(--font-weight-semibold);
+}
+
+/* 数据列表:超出显示细小滚动条 */
+.attention-list {
+  margin-top: 0.9375rem; /* 15px */
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding-right: 0.25rem;
+}
+
+.attention-list::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.attention-list::-webkit-scrollbar-thumb {
+  background: rgba(25, 25, 25, 0.18);
+  border-radius: var(--radius-full);
+}
+
+.dark .session-card .attention-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.attention-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 上下间距 */
+  padding: 1rem; /* 16px */
+  border-radius: 0.75rem; /* 12px */
+  background: rgba(36, 36, 36, 1);
+}
+
+.attention-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem; /* 26px */
+  height: 1.625rem;
+}
+
+.attention-icon.is-fault {
+  color: var(--error);
+}
+
+.attention-icon.is-network {
+  color: var(--info);
+}
+
+/* 上行:logo 图 + 标题,间距 0.5rem */
+.attention-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.attention-card-title {
+  min-width: 0;
+  font: var(--font-body-m);
+  font-size: 1rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 下行:位置图标 + 描述,间距 0.25rem */
+.attention-bottom {
+  margin-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: rgb(201, 201, 201);
+  font-size: 0.875rem;
+}
+
+.attention-card-desc {
+  min-width: 0;
+  font-size: 0.875rem;
+  color: rgb(201, 201, 201);
+  line-height: var(--line-height-md);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 底部 AI 输入框(背景图区域内,边距由 session-main 的 32px 内边距提供) ---------- */
+.session-composer {
+  position: relative; /* 模板库弹层(自绘)的定位基准 */
+  flex-shrink: 0;
+  margin-top: 1rem;
+}
+
+/* 模板库弹层(自绘):与输入框同宽、左缘对齐、输入框正上方展开 */
+.tpl-popover-custom {
+  position: absolute;
+  left: 0;
+  width: 100%; /* 与输入框(含渐变边框)像素级同宽 */
+  bottom: calc(100% + 0.5rem); /* 输入框正上方,留 8px 间距 */
+  z-index: 30;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(42, 42, 42, 1);
+  box-shadow: var(--shadow-popover);
+  animation: tpl-pop-in 0.22s ease-out;
+}
+
+@keyframes tpl-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 角度渐变边框的旋转角度(需 @property 注册才能平滑插值) */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.composer-frame {
+  position: relative; /* 模板库弹层挂载容器(宽度对齐输入框/定位正上方) */
+  box-sizing: border-box;
+  width: 100%;
+  padding: 1px; /* 粗细 1,位置内部 */
+  border: none;
+  border-radius: 1.5rem; /* 保持圆角 24px */
+  text-align: left;
+  /* 角度渐变(七色环,色标位置按设计稿),随 --border-angle 缓慢旋转 */
+  background: conic-gradient(
+    from var(--border-angle),
+    #669fff 2%,
+    #7b67ff 12%,
+    #9567ff 39%,
+    #ff666b 50%,
+    #ff9566 61%,
+    #ffad66 89%,
+    #669fff 99%
+  );
+  animation: border-spin 6s linear infinite;
+}
+
+@keyframes border-spin {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.composer-frame.is-small {
+  display: block;
+  cursor: text;
+}
+
+.composer-frame.is-small:focus-visible {
+  outline: var(--focus-ring) solid var(--outline-width-focus);
+  outline-offset: var(--outline-offset-gap);
+}
+
+.composer-inner {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  height: 3rem; /* 初始 48px */
+  padding: 0 0.75rem 0 1.25rem;
+  border-radius: 1.4375rem; /* 与外框 24px 圆角同心(24px - 1px 边框) */
+  background: var(--surface-container-highest);
+}
+
+.composer-frame.is-big .composer-inner {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  height: 7.5rem; /* 展开后 120px */
+  padding: 0.75rem 0.625rem 0.5rem 1rem;
+}
+
+.composer-placeholder {
+  flex: 1 1 0;
+  min-width: 0;
+  font: var(--font-body-m);
+  color: var(--text-placeholder);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.composer-send-mini {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem; /* 32px */
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: rgba(92, 162, 233, 0.15); /* 圆环背景(设计稿指定) */
+  color: #ffffff;
+}
+
+/* 发送图标彩色渐变描边:引用页面内 #send-grad 渐变定义,覆盖 lucide 默认 currentColor 描边 */
+.send-grad-icon :where(path, circle, line, polyline, polygon, rect),
+.send-grad-icon svg :where(path, circle, line, polyline, polygon, rect) {
+  stroke: url(#send-grad);
+}
+
+.composer-input {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.composer-input textarea {
+  height: 100% !important;
+  padding: 0;
+  resize: none;
+  font: var(--font-body-m);
+  color: var(--on-surface);
+}
+
+.composer-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.composer-tools-left {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-width: 0;
+}
+
+.composer-tools-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.scene-select {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+.scene-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 1.75rem;
+  padding: 0 1.125rem;
+  border-radius: var(--radius-full);
+  background: var(--surface-variant);
+  color: var(--on-surface-variant);
+  font: var(--font-body-s);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.tool-btn:hover {
+  color: var(--on-surface);
+}
+
+.tool-btn.is-active {
+  background: var(--primary-container);
+  color: var(--primary);
+}
+
+.tool-btn-text {
+  max-width: 14rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tool-btn-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.125rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+}
+
+.tool-btn-clear:hover {
+  color: var(--error);
+}
+
+.word-count {
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+}
+
+.icon-tool {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.icon-tool:hover {
+  background: var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.send-btn {
+  width: 2rem; /* 32px */
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: rgba(92, 162, 233, 0.15); /* 圆环背景(设计稿指定) */
+  color: #ffffff;
+  opacity: 0.55;
+  cursor: default;
+}
+
+.send-btn.is-active {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.send-btn.is-active:hover {
+  box-shadow: 0 0 0.5rem rgba(92, 162, 233, 0.55);
+}
+
+.composer-hint {
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+}
+
+/* ---------- 深色输入框:场景下拉与模板库按钮统一胶囊圆角 + 白色系描边 ----------
+   覆盖 AI 面板(永久深色)与首页(深色应用下),两个输入框样式一致 */
+.ai-chat .composer-tools-left .tool-btn,
+.dark .session-card .composer-tools-left .tool-btn {
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.ai-chat .composer-tools-left .tool-btn:hover,
+.dark .session-card .composer-tools-left .tool-btn:hover {
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* 场景下拉 Select(borderless 变体):补胶囊圆角 + 白色描边,与模板库按钮对齐 */
+.ai-chat .scene-select .ant-select-selector,
+.dark .session-card .scene-select .ant-select-selector {
+  height: 1.75rem !important;
+  min-height: 1.75rem !important;
+  padding: 0 0.875rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: var(--radius-full) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.ai-chat .scene-select .ant-select-selector:hover,
+.dark .session-card .scene-select .ant-select-selector:hover {
+  border-color: rgba(255, 255, 255, 0.45) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
+.ai-chat .scene-select .ant-select-selection-item,
+.dark .session-card .scene-select .ant-select-selection-item {
+  color: rgba(255, 255, 255, 0.85) !important;
+  line-height: 1.5rem;
+}
+
+.ai-chat .scene-select .ant-select-arrow,
+.dark .session-card .scene-select .ant-select-arrow {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ---------- 模板库浮层弹窗(354px 高,明暗主题适配) ---------- */
+.ant-popover.tpl-popover .ant-popover-inner {
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--surface-container-high);
+  box-shadow: var(--shadow-popover);
+  color: var(--on-surface);
+}
+
+.dark .ant-popover.tpl-popover .ant-popover-inner {
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+}
+
+.tpl-popover .ant-popover-inner-content {
+  padding: 0;
+}
+
+.tpl-panel {
+  width: 100%; /* 与挂载容器(输入框外框)同宽 */
+  height: 22.125rem; /* 354px */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 模板列表图标:实色品牌色(深色下提亮为亮蓝),描边加粗更具实感 */
+.tpl-item-icon {
+  color: var(--primary);
+}
+
+.dark .tpl-item-icon {
+  color: var(--color-link); /* 深色主题下亮蓝 #5CA2E9 */
+}
+
+.tpl-title {
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.tpl-tabs {
+  margin-top: 0.625rem;
+  display: flex;
+  gap: 1rem;
+  padding-bottom: 0.375rem;
+  border-bottom: var(--border-width-thin) solid var(--divider);
+}
+
+.tpl-tab {
+  padding: 0.25rem 0;
+  border: none;
+  background: transparent;
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.tpl-tab.is-active {
+  color: var(--primary);
+  font-weight: var(--font-weight-medium);
+  box-shadow: inset 0 -0.125rem 0 0 var(--primary);
+}
+
+.tpl-list {
+  margin-top: 0.625rem;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem; /* 10px */
+  padding-right: 0.125rem;
+}
+
+.tpl-list::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.tpl-list::-webkit-scrollbar-thumb {
+  background: rgba(25, 25, 25, 0.18);
+  border-radius: var(--radius-full);
+}
+
+.dark .tpl-panel .tpl-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.tpl-item {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.5rem; /* 40px */
+  padding: 0 0.75rem;
+  border: none;
+  border-radius: 0.5rem; /* 8px */
+  background: rgba(57, 57, 57, 1);
+  color: var(--on-surface);
+  font: var(--font-body-m);
+  cursor: pointer;
+  text-align: left;
+}
+
+.tpl-item:hover {
+  background: #19426d;
+}
+
+.tpl-item.is-active {
+  background: var(--primary-container);
+  color: var(--primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.tpl-name {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
