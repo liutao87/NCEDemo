@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button, Steps } from "antd";
+import { Steps } from "antd";
 import { Icon } from "../../../assets/shared/icon.jsx";
 import { useApp } from "../../context.jsx";
 import {
@@ -418,7 +418,9 @@ export default function AnswerCard({ onDone, onRestart }) {
     return (
       <div className="answer-card" ref={rootRef}>
         <div className="ac-wait">
-          <Icon name="loader-circle" size="1rem" className="is-spin" />
+          <span className="ac-lead-icon is-thinking">
+            <Icon name="sparkles" size="1rem" />
+          </span>
           <span>正在接收问题…</span>
         </div>
       </div>
@@ -512,8 +514,8 @@ export default function AnswerCard({ onDone, onRestart }) {
           onClick={() => setThinkOpen((o) => !o)}
           title={thinkOpen ? "折叠思考过程" : "展开思考过程"}
         >
-          <span className={thinking ? "ac-lead-icon is-live" : "ac-lead-icon"}>
-            <Icon name="brain" size="0.875rem" />
+          <span className={thinking ? "ac-lead-icon is-thinking" : "ac-lead-icon is-thinking-done"}>
+            <Icon name={thinking ? "sparkles" : "check"} size="0.875rem" />
           </span>
           <span className="ac-section-title">
             {thinking ? "思考中" : "已完成思考"}
@@ -532,18 +534,9 @@ export default function AnswerCard({ onDone, onRestart }) {
         ) : null}
       </div>
 
-      {/* 二、任务拆解与规划 */}
+      {/* 二、任务拆解与规划(技能选中匹配 + 四步步骤条) */}
       {atLeast(stage, "skill") ? (
         <div className="ac-block reveal">
-          <div className="ac-block-label">
-            <span className="ac-lead-icon is-ok">
-              <Icon name="list-checks" size="0.875rem" />
-            </span>
-            <span className="ac-block-name">
-              <TwText text="任务拆解与规划" />
-            </span>
-          </div>
-
           {/* 技能选中匹配【意图分解】(可折叠) */}
           <div className="ac-section">
             <button
@@ -552,22 +545,11 @@ export default function AnswerCard({ onDone, onRestart }) {
               onClick={() => setPlanOpen((o) => !o)}
               title={planOpen ? "折叠执行详情" : "展开执行详情"}
             >
-              <span className="ac-lead-icon">
-                <Icon name="blocks" size="0.875rem" />
+              <span className={atLeast(stage, "result") ? "ac-lead-icon is-thinking-done" : "ac-lead-icon is-thinking"}>
+                <Icon name={atLeast(stage, "result") ? "check" : "sparkles"} size="0.875rem" />
               </span>
               <span className="ac-section-title">
                 <TwText text="技能选中匹配【意图分解】" />
-              </span>
-              <span className="ac-head-state">
-                {skillDone ? (
-                  <Icon name="check" size="0.875rem" className="ac-done" />
-                ) : (
-                  <Icon
-                    name="loader-circle"
-                    size="0.875rem"
-                    className="is-spin"
-                  />
-                )}
               </span>
               <span className="ac-head-toggle">
                 <Icon
@@ -603,12 +585,20 @@ export default function AnswerCard({ onDone, onRestart }) {
                       />
                     </div>
                     <div className="ac-confirm-btns">
-                      <Button type="primary" size="small" onClick={handleConfirm}>
+                      <button
+                        type="button"
+                        className="rc-confirm"
+                        onClick={handleConfirm}
+                      >
                         确认
-                      </Button>
-                      <Button size="small" onClick={handleCancel}>
+                      </button>
+                      <button
+                        type="button"
+                        className="rc-ignore"
+                        onClick={handleCancel}
+                      >
                         取消
-                      </Button>
+                      </button>
                     </div>
                   </div>
                 ) : null}

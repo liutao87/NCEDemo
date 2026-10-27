@@ -65,7 +65,7 @@ export const LEAF_STEPS = [
   {
     title: "查询设备信息",
     action: "查询设备信息",
-    params: ["Str.serverIp", "Str.serverIp", "Str.mask", "Str.gateway"],
+    params: ["Str.serverIp", "Str.mask"],
     commandLine: "display device information",
     no: 1,
   },
@@ -117,22 +117,22 @@ export const LEAF_STEPS = [
   {
     title: "成员端口加入聚合",
     action: "配置成员端口",
-    params: ["Str.vpnInstanceName"],
+    params: ["Str.vpnName"],
     commandLine: "eth-trunk 200\ntrunkport interface 10GE 1/0/1",
     no: 6,
   },
   {
     title: "MPP区Spine配置",
     action: "MPP区Spine配置",
-    params: ["Str.vpnInstanceName"],
+    params: ["Str.vpnName"],
     commandLine: "display mpp spine status",
     no: 7,
   },
   {
     title: "扩容POD设备SDN",
     action: "扩容POD设备",
-    params: ["Str.gatewayConnIp"],
-    commandLine: "sdn pod-expand --gateway Str.gatewayConnIp",
+    params: ["Str.gateway"],
+    commandLine: "sdn pod-expand --gateway Str.gateway",
     no: 8,
   },
 ];
