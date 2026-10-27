@@ -454,14 +454,19 @@
   }
 }
 
-/* 思考过程内容(浅色内嵌区) */
+/* 思考过程内容:12px rgb(147,147,147)(设计稿指定) */
 .ac-think-body {
   margin: 0.25rem 0 0.25rem 1.25rem;
   padding: 0.5rem 0.625rem;
   border-radius: 0.5rem;
   background: var(--surface-variant);
-  font: var(--font-body-m); /* 主文字 14px */
-  color: var(--on-surface-variant);
+  font: var(--font-body-s);
+  color: rgb(147, 147, 147);
+}
+
+/* 多段思考过程块(无标题,位于技能选中匹配体内):完成后整块消失 */
+.ac-subthink-body {
+  margin: 0.25rem 0 0.625rem 1.25rem;
 }
 
 .dark .ai-chat .ac-think-body {
@@ -473,7 +478,8 @@
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.25rem 0 0.125rem;
+  margin-bottom: 0.875rem; /* 与下方技能行拉开层级间距(加大) */
+  padding: 0.25rem 0 0;
 }
 
 .ac-block-label .ac-lead-icon.is-ok {
@@ -486,9 +492,10 @@
   color: var(--on-surface);
 }
 
-/* 计划主体:小缩进让规划清单卡片更宽 */
+/* 计划主体:小缩进让规划清单卡片更宽;顶部留出与技能行的间距 */
 .ac-plan-body {
   margin-left: 0.375rem;
+  margin-top: 0.875rem; /* 技能选中匹配 与 步骤条首项 的间距(加大) */
   display: flex;
   flex-direction: column;
 }
@@ -557,9 +564,42 @@
   line-height: 1;
 }
 
+/* 连接线:完全隐藏 antd 自带 tail,改用容器 ::after 自绘时间轴线,
+   精确从本项图标中心(顶部 8px/水平 8px)连到下一项图标中心(底部向下延伸 8px) */
 .ai-chat .ac-steps .ant-steps-item-tail {
-  margin-inline-start: 0.5rem;
-  padding-block-start: 0.25rem;
+  display: none !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item-container {
+  position: relative;
+}
+
+.ai-chat .ac-steps .ant-steps-item-container::after {
+  content: "";
+  position: absolute;
+  left: calc(0.5rem - 0.5px);
+  top: 1.75rem; /* 图标圆心 8px + 下方 20px 间隙 */
+  bottom: 0.75rem; /* 距容器底部 12px = 下一图标圆心前 20px 停止,上下间隙对称 */
+  width: 1px;
+  background: rgba(174, 174, 174, 0.4);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 已完成:连接线点亮为成功绿 */
+.ai-chat .ac-steps .ant-steps-item-finish .ant-steps-item-container::after {
+  background: var(--success);
+}
+
+/* 最后一项不再向下连线 */
+.ai-chat .ac-steps .ant-steps-item:last-child .ant-steps-item-container::after {
+  display: none;
+}
+
+/* 图标盖在连接线之上 */
+.ai-chat .ac-steps .ant-steps-item-icon {
+  position: relative;
+  z-index: 1;
 }
 
 /* 步骤条标题/描述:强制面板亮色令牌
@@ -594,9 +634,16 @@
 }
 
 .ai-chat .ac-steps .ant-steps-item .ant-steps-item-description {
-  color: var(--on-surface) !important;
-  font: var(--font-body-m); /* 主文字 14px */
-  line-height: var(--line-height-md);
+  color: rgb(201, 201, 201) !important; /* 内层细节详情文字 */
+  font: var(--font-body-m);
+  line-height: var(--line-height-lg); /* 1.8,行距加大 */
+  max-width: 100%;
+  margin-top: 0.5rem !important; /* 标题与描述间距 */
+  padding-bottom: 1rem; /* 与下一步骤的呼吸空间 */
+}
+
+.ai-chat .ac-steps .ant-steps-item:last-child .ant-steps-item-description {
+  padding-bottom: 0.25rem;
 }
 
 /* 步骤一描述:标签文件胶囊 */
@@ -621,8 +668,8 @@
 
 /* ---------- 总任务规划清单小卡片 ---------- */
 .plan-card {
-  margin-top: 0.75rem;
-  padding: 0.75rem 0.875rem;
+  margin-top: 0.25rem; /* 进一步减小与"任务编排已完成"的间距 */
+  padding: 0.875rem 1rem;
   border-radius: 0.75rem;
   background: var(--surface-variant);
   animation: msg-in 0.35s ease-out, gen-glow 1.8s ease-out 0.1s;
@@ -671,30 +718,43 @@
 }
 
 .plan-card-hint {
-  margin-top: 0.5rem;
+  margin-top: 0.625rem;
   display: flex;
   align-items: center;
   gap: 0.375rem;
-  font: var(--font-body-m); /* 主文字 14px */
+  font: var(--font-body-m);
+  line-height: var(--line-height-lg);
   color: var(--success);
 }
 
 .plan-list {
-  margin: 0.625rem 0 0;
+  margin: 0.75rem 0 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
 }
 
+/* 清单项:圆圈序号 + 14px rgb(201,201,201),项间 1px 细线分隔 */
 .plan-list li {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font: var(--font-body-m); /* 主文字 14px */
-  color: var(--on-surface);
+  padding: 0.625rem 0; /* 10px 上下 */
+  line-height: var(--line-height-lg);
+  font: var(--font-body-m);
+  color: rgb(201, 201, 201);
+  border-bottom: 1px solid rgba(174, 174, 174, 0.35);
   animation: msg-in 0.3s ease-out both;
+}
+
+.plan-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0.125rem;
+}
+
+.plan-list li:first-child {
+  padding-top: 0.25rem;
 }
 
 /* 未轮到逐条打印的清单项:占位隐藏,保持列表高度稳定 */
@@ -710,16 +770,23 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-full);
-  background: var(--primary);
-  color: var(--on-primary);
+  background: rgba(174, 174, 174, 0.15);
+  color: rgba(174, 174, 174, 1);
   font: var(--font-caption-s);
 }
 
-/* ---------- 确认提示(确认后才继续) ---------- */
+/* ---------- 确认提示(位于步骤条最下方,确认后才继续) ----------
+   蓝色系背景与输入框边框渐变一致(#669FFF→#7B67FF 蓝紫系) */
 .ac-confirm {
-  padding: 0.75rem 0.875rem;
+  margin-top: 0.875rem;
+  padding: 0.875rem 1rem;
   border-radius: 0.75rem;
-  background: var(--primary-container);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 159, 255, 0.18),
+    rgba(123, 103, 255, 0.18)
+  );
+  border: 1px solid rgba(102, 159, 255, 0.3);
   animation: msg-in 0.35s ease-out;
 }
 
@@ -746,11 +813,12 @@
 .ac-confirm-text {
   font: var(--font-body-m); /* 主文字 14px */
   font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-lg);
   color: var(--on-primary-container);
 }
 
 .ac-confirm-btns {
-  margin-top: 0.625rem;
+  margin-top: 0.75rem;
   display: flex;
   gap: 0.5rem;
 }
@@ -953,16 +1021,14 @@
   color: rgba(147, 147, 147, 1);
 }
 
-/* 第二行:时间 + 方案描述(超长省略) */
+/* 第二行:时间 + 方案描述(正常换行,不截断) */
 .rc-desc {
   margin: 0;
   font-size: 0.875rem;
   font-weight: var(--font-weight-normal);
   line-height: 1.375rem; /* 22px */
   color: rgba(147, 147, 147, 1);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-all;
 }
 
 /* 第三行:确认 / 忽略按钮 */
@@ -1016,7 +1082,206 @@
   color: var(--success);
 }
 
-/* ---------- 底部操作条:左耗时 | 右五图标 ---------- */
+/* ---------- 步骤一:网络资源确定 描述 ---------- */
+.ac-netres {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ac-netres-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ac-netres-file {
+  flex: 0 0 auto;
+  margin-top: 0.375rem;
+  color: rgb(201, 201, 201);
+}
+
+.ac-netres-text {
+  font: var(--font-body-m);
+  color: rgb(201, 201, 201);
+  line-height: var(--line-height-lg); /* 1.8 */
+  word-break: break-all;
+}
+
+.ac-netres-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.125rem;
+}
+
+.ac-netres-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem; /* 图标与文字间距加大,对齐 */
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  border-radius: 0.25rem;
+  background: rgba(174, 174, 174, 0.15);
+  color: rgb(201, 201, 201);
+  font: var(--font-body-s);
+  cursor: pointer;
+}
+
+/* 关联拓扑/设备列表图标:实色品牌色(不随文字灰色) */
+.ac-netres-tag svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.dark .ac-netres-tag svg {
+  color: var(--color-link);
+}
+
+.ac-netres-tag:hover {
+  background: rgba(174, 174, 174, 0.28);
+  color: #ffffff;
+}
+
+/* ---------- 步骤二:任务编排 ---------- */
+.ac-orchestrate {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.ac-orch-line {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font: var(--font-body-m);
+  line-height: var(--line-height-lg);
+  color: var(--success);
+}
+
+/* "任务编排已完成"行的勾图标:与文字对齐 */
+.ac-orch-check {
+  flex: 0 0 auto;
+  color: var(--success);
+  line-height: 1;
+}
+
+/* ---------- 步骤三:规划步骤生成(与右侧同步的小步骤) ---------- */
+.ac-small-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* 小步骤组间距(12级) */
+}
+
+.ac-small-step {
+  animation: msg-in 0.3s ease-out;
+}
+
+.ac-small-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-md); /* 1.625 */
+  color: rgb(255, 255, 255);
+}
+
+.ac-small-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem; /* 圆点行间距收小 */
+  font: var(--font-body-m);
+  line-height: var(--line-height-md);
+  color: rgb(201, 201, 201);
+}
+
+/* 小圆点:统一白色实心(无 dim 变体) */
+.ac-small-dot {
+  flex: 0 0 auto;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: var(--radius-full);
+  background: #ffffff;
+}
+
+/* ---------- 步骤四:推导动作参数(表格区域) ---------- */
+.ac-table {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 表头:三列,背景 rgba(174,174,174,0.15),白色 12px */
+.ac-table-head {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr minmax(7rem, auto);
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.ac-table-hcell {
+  border-radius: 4px;
+  background: rgba(174, 174, 174, 0.15);
+  padding: 0.375rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: #ffffff;
+  text-align: left;
+}
+
+/* 数据行:同样三列栅格,行间 1px 细线,上下间距加大 */
+.ac-table-row {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr minmax(7rem, auto);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0; /* 12px 上下 */
+  border-bottom: 1px solid rgba(174, 174, 174, 1);
+  animation: msg-in 0.3s ease-out both;
+}
+
+.ac-table-row:last-child {
+  border-bottom: none;
+}
+
+.ac-table-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* 匹配动作/匹配参数 矩形胶囊:圆角 4px、灰底、12px #AEAEAE */
+.ac-table-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 1.5rem; /* 24px */
+  padding: 0.125rem 0.5rem; /* 2px 8px */
+  border-radius: 4px;
+  background: rgba(174, 174, 174, 0.15);
+  color: rgba(174, 174, 174, 1);
+  font-size: 0.75rem; /* 12px */
+  font-weight: var(--font-weight-normal);
+  line-height: 1.25rem;
+  text-align: left;
+}
+
+/* 对应步骤列:纯文本,白色 */
+.ac-table-cell.is-step {
+  font-size: 0.75rem;
+  color: #ffffff;
+  line-height: 1.25rem;
+  word-break: break-all;
+}
+
+/* ---------- 底部操作条:左耗时(12px #939393) | 右五图标(白色 20px,间距 20px) ---------- */
+
+/* 回答卡片内所有 SVG 图标:统一 block + line-height:1,消除基线偏移,
+   确保与文字在 flex 容器中严格垂直居中(思考标题/区块标题/技能行/耗时行等全部生效) */
+.answer-card svg {
+  display: block;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .ac-footer {
   display: flex;
   align-items: center;
@@ -1029,32 +1294,39 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  font: var(--font-caption-m);
-  color: var(--on-surface-variant);
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.25rem;
+  color: rgba(147, 147, 147, 1);
+}
+
+/* 耗时行的 timer 图标:与文字严格垂直居中 */
+.ac-cost svg {
+  flex-shrink: 0;
+  display: block;
+  line-height: 1;
 }
 
 .ac-actions {
   display: flex;
   align-items: center;
-  gap: 0.125rem;
+  gap: 1.25rem; /* 间距 20px */
 }
 
 .ac-action {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: var(--radius-full);
   background: transparent;
-  color: var(--on-surface-variant);
+  color: #ffffff; /* 图标白色 20px(1.25rem) */
   cursor: pointer;
 }
 
 .ac-action:hover {
   background: var(--surface-variant);
-  color: var(--on-surface);
 }
 
 .ac-action.is-on {

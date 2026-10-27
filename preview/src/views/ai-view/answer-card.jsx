@@ -4,11 +4,23 @@ import { Icon } from "../../../assets/shared/icon.jsx";
 import { useApp } from "../../context.jsx";
 import {
   AI_THINKING_TEXT,
-  AI_FINAL_RESULT,
+  AI_NETRES_DESC,
+  AI_NETRES_TAGS,
   AI_TASK_PLAN,
-  AI_STEP_CHIPS,
+  AI_FINAL_RESULT,
 } from "../../mock/ai-chat.js";
-import { FLOW_TIMING } from "../../mock/change-flow.js";
+import { LEAF_STEPS, FLOW_TIMING } from "../../mock/change-flow.js";
+
+// 每个匹配动作对应的不同实色图标 + 颜色(彩色,每个不一样)
+const ACTION_ICON_STYLES = [
+  { icon: "search", color: "#5ca2e9" },
+  { icon: "plus", color: "#a78bfa" },
+  { icon: "link", color: "#55ccd9" },
+  { icon: "git-branch", color: "#f69e39" },
+  { icon: "settings", color: "#8ecf5c" },
+  { icon: "network", color: "#ed448a" },
+  { icon: "send", color: "#f4840c" },
+];
 import { useTypewriter } from "./use-typewriter.js";
 
 // 阶段顺序表:用于判断某个区块是否已进入展示时机
@@ -17,46 +29,38 @@ const STAGE_SEQ = [
   "thinking",
   "thinkDone",
   "skill",
-  "steps",
+  "steps1",
   "orchestrate",
   "plancard",
   "confirm",
-  "runMore",
+  "runSync",
   "result",
   "done",
 ];
 const atLeast = (stage, target) =>
   STAGE_SEQ.indexOf(stage) >= STAGE_SEQ.indexOf(target);
 
-// 步骤条数据:确认前运行第 0-1 步,用户点击「确认」后继续第 2-7 步(与右侧流程卡片同内容)
-// 图标统一为成功色 16px 圆点(完成态白勾,进行中呼吸,等待态半透明)
-const STEP_ITEMS = [
-  {
-    title: "网络资源确定",
-    icon: <span className="ac-step-icon" />,
-    description: (
-      <div className="ac-chips">
-        {AI_STEP_CHIPS.map((chip) => (
-          <span key={chip.label} className="ac-chip">
-            <Icon name={chip.icon} size="0.75rem" />
-            <span>{chip.label}</span>
-          </span>
-        ))}
-      </div>
-    ),
-  },
-  { title: "任务编排", icon: <span className="ac-step-icon" />, description: "解析意图依赖，编排执行链路与执行顺序" },
-  { title: "配置生成", icon: <span className="ac-step-icon" />, description: "按安全基线模板批量生成设备配置脚本" },
-  { title: "语法校验", icon: <span className="ac-step-icon" />, description: "CLI 语法与模板变量合法性校验" },
-  { title: "配置审核", icon: <span className="ac-step-icon" />, description: "安全策略基线核对与人工复核抽检" },
-  { title: "一致性校验", icon: <span className="ac-step-icon" />, description: "主备双机配置一致性比对" },
-  { title: "变更方案编排", icon: <span className="ac-step-icon" />, description: "生成变更窗口、执行顺序与回退预案" },
-  { title: "结果下发", icon: <span className="ac-step-icon" />, description: "下发变更方案并输出执行报告" },
-];
+// 与右侧流程组件同步的小步骤数据(由 LEAF_STEPS 派生,数量一致)
+const SMALL_STEPS = LEAF_STEPS.map((s, i) => ({
+  no: i + 1,
+  title: s.type === "branch" ? s.condition : s.title,
+  subs:
+    s.type === "branch"
+      ? ["条件分支", "判断设备版本并路由"]
+      : i === 0
+        ? ["固定步骤", "获取设备的厂商、型号等信息"]
+        : ["固定步骤", s.action],
+}));
+
+// 推导动作参数表格数据(与右侧流程步骤同数量)
+const ACTION_ROWS = LEAF_STEPS.map((s, i) => ({
+  action: s.action,
+  step: `${i + 1}.${s.type === "branch" ? s.condition : s.title}`,
+  param: (s.params && s.params[0]) || "—",
+}));
 
 // 打印中文字的渲染:文字保持原色,上方覆盖一层与原文完全重叠的
-// 小矩形渐变蒙层(青→蓝→紫→粉),仅末端约 11em 露出彩色光带,
-// 光带随打印推进不断向前滑动(见 .tw-veil 样式)
+// 小矩形渐变蒙层(青→蓝→紫→粉),仅末端约 11em 露出彩色光带
 function liveContent(text, typing) {
   if (!typing || !text) return text;
   return (
@@ -70,7 +74,7 @@ function liveContent(text, typing) {
   );
 }
 
-// 打印文本渲染:按行拆分;打印中的末行覆盖渐变蒙层 + 蓝色光标闪烁
+// 打印文本渲染:按行拆分;打印中的末行覆盖渐变蒙层 + 光标闪烁
 function TwBlock({ shown, typing }) {
   const lines = shown.split("\n");
   return (
@@ -108,15 +112,84 @@ function TwText({ text, speed = 1, onDone }) {
   return <span className="tw-live">{liveContent(shown, !done)}</span>;
 }
 
-// 规划清单条目打印:active 为真才开始打印,完成后解锁下一条
-function PlanItemText({ text, active, onDone }) {
-  const { shown, done } = useTypewriter(text, { speed: 1, enabled: active });
+// ---------- 步骤一:网络资源确定 描述 ----------
+function NetResDesc() {
+  return (
+    <div className="ac-netres">
+      <div className="ac-netres-line">
+        <Icon name="file-text" size="0.75rem" className="ac-netres-file" />
+        <span className="ac-netres-text">{AI_NETRES_DESC}</span>
+      </div>
+      <div className="ac-netres-tags">
+        {AI_NETRES_TAGS.map((t) => (
+          <span key={t.label} className="ac-netres-tag">
+            <Icon name={t.icon} size="0.75rem" />
+            <span>{t.label}</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
-  useEffect(() => {
-    if (done && active && onDone) onDone();
-  }, [done, active]);
+// ---------- 步骤三:规划步骤生成(与右侧流程同步加载的小步骤) ----------
+function SmallStepsList({ shown }) {
+  return (
+    <div className="ac-small-steps">
+      {SMALL_STEPS.slice(0, shown).map((s) => (
+        <div key={s.no} className="ac-small-step">
+          <div className="ac-small-title">
+            {s.no}.{s.title}
+          </div>
+          {s.subs.map((sub, i) => (
+            <div key={i} className="ac-small-sub">
+              <span className={i === 0 ? "ac-small-dot" : "ac-small-dot is-dim"} />
+              <span>{sub}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
 
-  return <span className="tw-live">{liveContent(shown, active && !done)}</span>;
+// ---------- 步骤四:推导动作参数(表格区域) ----------
+function ActionTable() {
+  return (
+    <div className="ac-table">
+      <div className="ac-table-head">
+        <span className="ac-table-hcell is-action">匹配动作</span>
+        <span className="ac-table-hcell is-step">对应步骤</span>
+        <span className="ac-table-hcell is-param">匹配参数</span>
+      </div>
+      {ACTION_ROWS.map((r, i) => {
+        const iconStyle = ACTION_ICON_STYLES[i % ACTION_ICON_STYLES.length];
+        return (
+          <div
+            key={i}
+            className="ac-table-row"
+            style={{ animationDelay: `${i * 150}ms` }}
+          >
+            <span className="ac-table-cell is-action">
+              <span className="ac-table-chip">
+                <Icon
+                  name={iconStyle.icon}
+                  size="0.75rem"
+                  color={iconStyle.color}
+                  strokeWidth={2.5}
+                />
+                {r.action}
+              </span>
+            </span>
+            <span className="ac-table-cell is-step">{r.step}</span>
+            <span className="ac-table-cell is-param">
+              <span className="ac-table-chip is-bare">{r.param}</span>
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 // 结果卡片:彩色文档图标 + 标题/待决策标签/下载 + 时间描述 + 确认/忽略按钮
@@ -125,7 +198,6 @@ function ResultCard() {
 
   return (
     <div className="ac-result-card reveal">
-      {/* 彩色文档图标(32×32,蓝色渐变纸面 + 折角 + W 字与纹理线条) */}
       <svg
         className="rc-doc-icon"
         width="32"
@@ -158,7 +230,6 @@ function ResultCard() {
       </svg>
 
       <div className="rc-body">
-        {/* 第一行:标题 + 待决策标签 | 下载 + 竖线 + 下拉图标 */}
         <div className="rc-head">
           <span className="rc-title">配置详情 V1.0</span>
           <span className="rc-tag">待决策</span>
@@ -169,12 +240,10 @@ function ResultCard() {
           </span>
         </div>
 
-        {/* 第二行:时间 + 方案描述(超长省略) */}
         <p className="rc-desc">
-          2026-06-23 13:56:32｜方案描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述描述…
+          2026-06-23 13:56:32｜方案描述描述描述描述描述描述描述描述描述描述描述描述描述…
         </p>
 
-        {/* 第三行:确认 / 忽略(点击后收敛为状态文案) */}
         {status === null ? (
           <div className="rc-btns">
             <button type="button" className="rc-confirm" onClick={() => setStatus("confirmed")}>
@@ -195,8 +264,9 @@ function ResultCard() {
 }
 
 // AI 回答卡片流程:
-// 思考(逐字打印→自动折叠) → 任务拆解与规划(技能选择匹配 + 步骤条 + 总任务规划清单)
-// → 确认提示(点击确认才继续) → 步骤续跑并整段折叠 → 最终结果逐字打印 → 底部操作条
+// 思考(逐字打印→自动折叠) → 任务拆解与规划(技能选中匹配 + 子思考 + 四步步骤条:
+// 网络资源确定 → 任务编排(规划清单+确认) → 规划步骤生成(与右侧同步) → 推导动作参数(表格))
+// → 整段折叠 → 最终结果逐字打印 → 结果卡片 → 底部操作条
 export default function AnswerCard({ onDone, onRestart }) {
   const { launchAiFlow } = useApp();
   const [stage, setStage] = useState("wait");
@@ -208,20 +278,16 @@ export default function AnswerCard({ onDone, onRestart }) {
   const [stepIndex, setStepIndex] = useState(-1);
   const [showPlanCard, setShowPlanCard] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [smallShown, setSmallShown] = useState(0);
+  const [showTable, setShowTable] = useState(false);
   const [cancelShake, setCancelShake] = useState(false);
   const [copied, setCopied] = useState(false);
   const [vote, setVote] = useState(0);
-  // 规划清单条目逐条打印的进度(前 typedPlanCount 条可打印)
-  const [typedPlanCount, setTypedPlanCount] = useState(1);
-  // 确认问题打印完成后才显示按钮
-  const [confirmTyped, setConfirmTyped] = useState(false);
 
   const cbRef = useRef({ onDone, onRestart });
   cbRef.current = { onDone, onRestart };
 
-  // 问答流程中内容持续增长(逐字打印/步骤推进/底部操作条):
-  // 随本卡片每次渲染,把所在对话流滚动到底部,避免新增内容被折叠线遮住、
-  // 卡片底部圆角与操作条显示不全
+  // 问答流程中内容持续增长:随本卡片每次渲染,把所在对话流滚动到底部
   const rootRef = useRef(null);
   useEffect(() => {
     const el = rootRef.current && rootRef.current.closest(".ai-thread");
@@ -248,7 +314,7 @@ export default function AnswerCard({ onDone, onRestart }) {
       later(() => setStage("thinking"), 400);
     } else if (stage === "thinking" && think.done) {
       later(() => {
-        setThinkOpen(false); // 思考完成自动折叠思考文案
+        setThinkOpen(false); // 思考完成自动折叠
         setStage("thinkDone");
       }, 700);
     } else if (stage === "thinkDone") {
@@ -257,9 +323,9 @@ export default function AnswerCard({ onDone, onRestart }) {
       later(() => {
         setSkillDone(true);
         setStepIndex(0);
-        setStage("steps");
+        setStage("steps1"); // 技能匹配完成,步骤条直接出现
       }, 900);
-    } else if (stage === "steps") {
+    } else if (stage === "steps1") {
       later(() => {
         setStepIndex(1);
         setStage("orchestrate");
@@ -272,27 +338,31 @@ export default function AnswerCard({ onDone, onRestart }) {
     } else if (stage === "plancard") {
       later(() => {
         setShowConfirm(true);
-        setStage("confirm"); // 停在这里,等待用户确认
-      }, 1000);
-    } else if (stage === "runMore") {
-      // 与右侧 ChangeFlow 流程组件共用同一条时间线(FLOW_TIMING):
-      // 右侧卡片 i 完成时刻 = appearDelay + i*cycle + loadingMs,
-      // 每张卡片完成时左侧步骤条同步前进一步,两边同时到达完成/结束
+        setStage("confirm"); // 等清单完整展示后再出现确认选项
+      }, 1500);
+    } else if (stage === "runSync") {
+      // 与右侧 ChangeFlow 共用同一条时间线(FLOW_TIMING):
+      // 右侧卡片 i 完成时刻 = appearDelay + i*cycle + loadingMs,逐个同步展示小步骤
       const cycle =
         FLOW_TIMING.loadingMs + FLOW_TIMING.revealMs + FLOW_TIMING.arrowGapMs;
       const cardDoneAt = (i) =>
         FLOW_TIMING.appearDelay + i * cycle + FLOW_TIMING.loadingMs;
-      const totalCards = STEP_ITEMS.length - 2; // 确认后执行的步骤:配置生成/配置审核/结果下发
-      later(() => setStepIndex(2), 400); // 开始执行「配置生成」(右侧卡片即将出现)
-      for (let i = 0; i < totalCards; i++) {
-        later(() => setStepIndex(2 + i + 1), cardDoneAt(i)); // 卡片 i 完成 → 下一步
+      const total = SMALL_STEPS.length;
+      for (let i = 0; i < total; i++) {
+        later(() => setSmallShown(i + 1), cardDoneAt(i));
       }
+      const lastDone = cardDoneAt(total - 1);
+      later(() => {
+        setStepIndex(3); // 进入第四步:推导动作参数
+        setShowTable(true);
+      }, lastDone + 600);
+      later(() => setStepIndex(4), lastDone + 600 + total * 150 + 400);
       later(
         () => {
-          setPlanOpen(false); // 与右侧「结束」端子同时,整段折叠进入结果打印
+          setPlanOpen(false); // 全部完成,任务拆解与规划整段折叠
           setStage("result");
         },
-        FLOW_TIMING.appearDelay + totalCards * cycle + 200
+        lastDone + 600 + total * 150 + 1000
       );
     } else if (stage === "result" && result.done) {
       setStage("done");
@@ -304,8 +374,9 @@ export default function AnswerCard({ onDone, onRestart }) {
 
   const handleConfirm = () => {
     setShowConfirm(false);
-    setStage("runMore");
-    // 右侧画布由「内容生成中」切换为配置变更流程组件
+    setStage("runSync");
+    setStepIndex(2);
+    // 右侧画布由「内容生成中」切换为配置变更流程组件(与左侧小步骤同步加载)
     launchAiFlow();
   };
 
@@ -323,10 +394,10 @@ export default function AnswerCard({ onDone, onRestart }) {
     setStepIndex(-1);
     setShowPlanCard(false);
     setShowConfirm(false);
+    setSmallShown(0);
+    setShowTable(false);
     setCopied(false);
     setVote(0);
-    setTypedPlanCount(1);
-    setConfirmTyped(false);
     setRunKey((k) => k + 1);
     setStage("wait");
     if (cbRef.current.onRestart) cbRef.current.onRestart();
@@ -356,9 +427,84 @@ export default function AnswerCard({ onDone, onRestart }) {
 
   const thinking = stage === "thinking";
 
+  // 步骤条四步(确认前仅展示前两步,确认后第三/四步逐步加载)
+  const stepItems = [
+    {
+      title: "网络资源确定",
+      icon: <span className="ac-step-icon" />,
+      description: <NetResDesc />,
+    },
+    {
+      title: "任务编排",
+      icon: <span className="ac-step-icon" />,
+      description: atLeast(stage, "orchestrate") ? (
+        <div className="ac-orchestrate">
+          <div className="ac-orch-line">
+            <Icon name="check" size="0.875rem" className="ac-orch-check" />
+            <TwText text="任务编排已完成，清单与规划已生成" speed={2} />
+          </div>
+          {showPlanCard ? (
+            <div className="plan-card">
+              <div className="plan-card-head">
+                <span className="plan-card-title">
+                  <Icon name="clipboard-list" size="0.875rem" />
+                  <TwText text="总任务规划清单" />
+                </span>
+                <button
+                  type="button"
+                  className="plan-fold"
+                  title={planCardOpen ? "折叠清单" : "展开清单"}
+                  onClick={() => setPlanCardOpen((o) => !o)}
+                >
+                  <Icon
+                    name={planCardOpen ? "chevron-up" : "chevron-down"}
+                    size="0.875rem"
+                  />
+                </button>
+              </div>
+              {planCardOpen ? (
+                <ol className="plan-list">
+                  {AI_TASK_PLAN.map((item, i) => (
+                    <li
+                      key={item}
+                      style={{ animationDelay: `${100 * i}ms` }}
+                    >
+                      <span className="plan-idx">{i + 1}</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      ) : null,
+    },
+    // 以下两步确认后才出现,逐步加载
+    {
+      title: "规划步骤生成",
+      icon: <span className="ac-step-icon" />,
+      description: atLeast(stage, "runSync") ? (
+        <SmallStepsList shown={smallShown} />
+      ) : null,
+    },
+    {
+      title: "推导动作参数",
+      icon: <span className="ac-step-icon" />,
+      description: showTable ? <ActionTable /> : null,
+    },
+  ];
+  // 步骤条动态增长:确认前仅前两步 → 确认后加入第三步(小步骤与右侧同步加载)
+  // → 第三步全部展示完成后才加入第四步(推导动作参数)
+  const visibleItems = showTable
+    ? stepItems
+    : atLeast(stage, "runSync")
+      ? stepItems.slice(0, 3)
+      : stepItems.slice(0, 2);
+
   return (
     <div className="answer-card" ref={rootRef}>
-      {/* 一、思考过程(可折叠:思考图标 + 文案 + 折叠图标,打印完成后自动折叠) */}
+      {/* 一、思考过程(可折叠,12px #939393,打印完成后自动折叠) */}
       <div className="ac-section">
         <button
           type="button"
@@ -391,14 +537,14 @@ export default function AnswerCard({ onDone, onRestart }) {
         <div className="ac-block reveal">
           <div className="ac-block-label">
             <span className="ac-lead-icon is-ok">
-              <Icon name="workflow" size="0.875rem" />
+              <Icon name="list-checks" size="0.875rem" />
             </span>
             <span className="ac-block-name">
               <TwText text="任务拆解与规划" />
             </span>
           </div>
 
-          {/* 第一个小步骤:技能选择匹配【意图分解】(图标 + 逐字打印文案 + 折叠按钮) */}
+          {/* 技能选中匹配【意图分解】(可折叠) */}
           <div className="ac-section">
             <button
               type="button"
@@ -407,10 +553,10 @@ export default function AnswerCard({ onDone, onRestart }) {
               title={planOpen ? "折叠执行详情" : "展开执行详情"}
             >
               <span className="ac-lead-icon">
-                <Icon name="puzzle" size="0.875rem" />
+                <Icon name="blocks" size="0.875rem" />
               </span>
               <span className="ac-section-title">
-                <TwText text="技能选择匹配【意图分解】" />
+                <TwText text="技能选中匹配【意图分解】" />
               </span>
               <span className="ac-head-state">
                 {skillDone ? (
@@ -432,64 +578,38 @@ export default function AnswerCard({ onDone, onRestart }) {
             </button>
             {planOpen ? (
               <div className="ac-plan-body">
-                {atLeast(stage, "steps") ? (
+                {/* 四步步骤条:确认前仅前两步,确认后三/四步逐步加载 */}
+                {atLeast(stage, "steps1") ? (
                   <Steps
                     className="ac-steps"
                     direction="vertical"
                     size="small"
                     current={stepIndex}
-                    items={STEP_ITEMS}
+                    items={visibleItems}
                   />
                 ) : null}
 
-                {/* 总任务规划清单小卡片(标题 + 折叠按钮 + 提示文案 + 逐条打印的清单内容) */}
-                {showPlanCard ? (
-                  <div className="plan-card">
-                    <div className="plan-card-head">
-                      <span className="plan-card-title">
-                        <Icon name="clipboard-list" size="0.875rem" />
-                        <TwText text="总任务规划清单" />
-                      </span>
-                      <button
-                        type="button"
-                        className="plan-fold"
-                        title={planCardOpen ? "折叠清单" : "展开清单"}
-                        onClick={() => setPlanCardOpen((o) => !o)}
-                      >
-                        <Icon
-                          name={planCardOpen ? "chevron-up" : "chevron-down"}
-                          size="0.875rem"
-                        />
-                      </button>
-                    </div>
-                    <div className="plan-card-hint">
-                      <Icon name="circle-check-big" size="0.875rem" />
+                {/* 确认提示:位于步骤条最下方,点击「确认」后流程才继续 */}
+                {showConfirm ? (
+                  <div
+                    className={
+                      cancelShake ? "ac-confirm is-shake" : "ac-confirm"
+                    }
+                  >
+                    <div className="ac-confirm-text">
                       <TwText
-                        text="任务编排已完成，清单与规划已生成"
-                        speed={2}
+                        text="请确认是否按照总任务规划清单执行？"
+                        speed={1}
                       />
                     </div>
-                    {planCardOpen ? (
-                      <ol className="plan-list">
-                        {AI_TASK_PLAN.map((item, i) => (
-                          <li
-                            key={item}
-                            className={i < typedPlanCount ? "" : "is-hidden"}
-                          >
-                            <span className="plan-idx">{i + 1}</span>
-                            <span>
-                              <PlanItemText
-                                text={item}
-                                active={i < typedPlanCount}
-                                onDone={() =>
-                                  setTypedPlanCount((c) => Math.max(c, i + 2))
-                                }
-                              />
-                            </span>
-                          </li>
-                        ))}
-                      </ol>
-                    ) : null}
+                    <div className="ac-confirm-btns">
+                      <Button type="primary" size="small" onClick={handleConfirm}>
+                        确认
+                      </Button>
+                      <Button size="small" onClick={handleCancel}>
+                        取消
+                      </Button>
+                    </div>
                   </div>
                 ) : null}
               </div>
@@ -498,29 +618,7 @@ export default function AnswerCard({ onDone, onRestart }) {
         </div>
       ) : null}
 
-      {/* 确认提示:问题逐字打印,打印完成后出现按钮;点击「确认」后流程才继续 */}
-      {showConfirm ? (
-        <div className={cancelShake ? "ac-confirm is-shake" : "ac-confirm"}>
-          <div className="ac-confirm-text">
-            <TwText
-              text="请确认是否按照总任务规划清单执行？"
-              onDone={() => setConfirmTyped(true)}
-            />
-          </div>
-          {confirmTyped ? (
-            <div className="ac-confirm-btns">
-              <Button type="primary" size="small" onClick={handleConfirm}>
-                确认
-              </Button>
-              <Button size="small" onClick={handleCancel}>
-                取消
-              </Button>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {/* 三、最终生成结果(逐字打印 + 蓝色光效) */}
+      {/* 三、最终生成结果(逐字打印 + 彩色蒙层光带) */}
       {atLeast(stage, "result") ? (
         <div className="ac-result">
           <TwBlock shown={result.shown} typing={stage === "result"} />
@@ -530,7 +628,7 @@ export default function AnswerCard({ onDone, onRestart }) {
       {/* 四、结果卡片:结果输出完成后展示(配置详情文档 + 确认/忽略) */}
       {stage === "done" ? <ResultCard /> : null}
 
-      {/* 五、底部操作条:左耗时 | 右五图标(刷新/复制/赞/踩/更多) */}
+      {/* 五、底部操作条:左耗时(12px #939393) | 右五图标(白色 20px,间距 20px) */}
       {stage === "done" ? (
         <div className="ac-footer">
           <span className="ac-cost">
@@ -544,7 +642,7 @@ export default function AnswerCard({ onDone, onRestart }) {
               title="重新生成"
               onClick={handleRefresh}
             >
-              <Icon name="refresh-cw" size="0.875rem" />
+              <Icon name="refresh-cw" size="1.25rem" />
             </button>
             <button
               type="button"
@@ -552,7 +650,7 @@ export default function AnswerCard({ onDone, onRestart }) {
               title={copied ? "已复制" : "复制结果"}
               onClick={handleCopy}
             >
-              <Icon name={copied ? "check" : "copy"} size="0.875rem" />
+              <Icon name={copied ? "check" : "copy"} size="1.25rem" />
             </button>
             <button
               type="button"
@@ -560,7 +658,7 @@ export default function AnswerCard({ onDone, onRestart }) {
               title="点赞"
               onClick={() => setVote((v) => (v === 1 ? 0 : 1))}
             >
-              <Icon name="thumbs-up" size="0.875rem" />
+              <Icon name="thumbs-up" size="1.25rem" />
             </button>
             <button
               type="button"
@@ -568,10 +666,10 @@ export default function AnswerCard({ onDone, onRestart }) {
               title="踩"
               onClick={() => setVote((v) => (v === 2 ? 0 : 2))}
             >
-              <Icon name="thumbs-down" size="0.875rem" />
+              <Icon name="thumbs-down" size="1.25rem" />
             </button>
             <button type="button" className="ac-action" title="更多">
-              <Icon name="ellipsis" size="0.875rem" />
+              <Icon name="ellipsis" size="1.25rem" />
             </button>
           </div>
         </div>
