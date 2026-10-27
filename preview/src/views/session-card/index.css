@@ -332,8 +332,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.625rem; /* 26px */
-  height: 1.625rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: #2171f3;
 }
 
 .attention-icon.is-fault {
@@ -367,7 +369,7 @@
 .attention-bottom {
   margin-top: 0.75rem;
   display: flex;
-  align-items: flex-start; /* 图标与文本首行顶部对齐 */
+  align-items: center;
   gap: 0.25rem;
   color: rgb(201, 201, 201);
   font-size: 0.875rem;
@@ -376,7 +378,6 @@
 .attention-bottom > svg,
 .attention-bottom > span:first-child {
   flex-shrink: 0;
-  margin-top: 0.125rem; /* 图标微调对齐首行文字基线 */
 }
 
 .attention-card-desc {

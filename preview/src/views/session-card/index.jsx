@@ -164,7 +164,7 @@ export default function SessionCard() {
               <div key={item.key} className="attention-card">
                 <div className="attention-top">
                   <span className={`attention-icon ${item.iconTone}`}>
-                    <Icon name={item.icon} size="1.625rem" />
+                    <Icon name="bot" size="1rem" color="#FFFFFF" />
                   </span>
                   <div className="attention-card-title">{item.title}</div>
                 </div>

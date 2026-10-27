@@ -267,7 +267,7 @@ export default function ChinaMap() {
           ctx.roundRect(-w / 2, -h / 2, w, h, 0.125 * remPx);
           ctx.fillStyle = cLink;
           ctx.fill();
-          ctx.rotate(-Math.PI / 2); // 数字方向:垂直于长方形长边
+          ctx.rotate(-Math.PI / 2); // 数字旋转 -90°(垂直于长方形长边),仍水平垂直居中
           ctx.fillStyle = "#FFFFFF";
           ctx.fillText(String(lb.num), 0, 0);
           ctx.restore();

@@ -1,0 +1,228 @@
+/* 首页右侧:地图直接铺满(无 padding) + 顶部"数据总览"浮层卡片 */
+.overview-view {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  position: relative; /* 卡片浮层定位基准 */
+}
+
+.map-body {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ---------- 数据总览浮层卡片(绝对定位悬浮于地图上方) ---------- */
+.data-overview-card {
+  position: absolute;
+  top: 1.5rem;
+  left: 2rem;
+  right: 2rem; /* 左右外间距 2rem,宽度占满剩余 */
+  z-index: 2;
+  background: rgba(119, 119, 119, 0.25);
+  backdrop-filter: blur(12px); /* 毛玻璃 */
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  padding: 1rem 1.5rem 1.5rem; /* 上 1rem,左右 1.5rem,下 1.5rem */
+  pointer-events: none; /* 不阻挡地图拖拽/缩放 */
+}
+
+.doc-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.875rem;
+  color: #FFFFFF;
+}
+
+/* 信息内容:标题下 0.25rem,左右均分 + 中间分割线,垂直居中 */
+.doc-body {
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+}
+
+.doc-half {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* 子块:第一块内容撑开,第二块占满剩余宽度 */
+.doc-stat {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.doc-stat-fill {
+  flex: 1 1 0;
+}
+
+/* 分割线:1px 宽,3rem 高,两边 1.5rem 间距 */
+.doc-divider {
+  flex: 0 0 auto;
+  width: 1px;
+  height: 3rem;
+  margin: 0 1.5rem;
+  background: rgba(243, 243, 243, 0.1);
+}
+
+/* ---------- 单个指标块(上下布局) ---------- */
+.stat-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-num {
+  display: flex;
+  align-items: baseline; /* 大小数字底部对齐 */
+}
+
+.stat-num-main {
+  font-size: 2rem;
+  line-height: 2.5rem;
+  color: #FFFFFF;
+}
+
+.stat-num-sub {
+  font-size: 0.875rem;
+  line-height: 1.625rem;
+  color: rgb(201, 201, 201);
+}
+
+.stat-desc {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: rgb(147, 147, 147);
+}
+
+.stat-desc-text {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- A2:DC 配置变更推荐次数 ---------- */
+.dc-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dc-title {
+  font-size: 0.75rem;
+  line-height: 0.75rem;
+  color: rgb(147, 147, 147);
+}
+
+/* 三组并排,间距 1.5rem */
+.dc-items {
+  margin: 0.25rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.dc-item {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dc-num {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  color: #FFFFFF;
+}
+
+/* 带背景小圆 + 文本,间隙 0.25rem */
+.dc-label {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dc-dot {
+  flex: 0 0 auto;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.dc-text {
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: rgb(201, 201, 201);
+}
+
+/* 底部分段进度条:在 dc-items(父容器)之下,无上间距,三段按比例占满,段间 0.25rem 间距 */
+.dc-bar {
+  display: flex;
+  gap: 0.25rem;
+  height: 0.25rem;
+  border-radius: 9999px;
+  background: rgba(243, 243, 243, 0.1);
+  overflow: hidden;
+}
+
+.dc-bar-seg {
+  display: block;
+  height: 100%;
+  flex: 1 0 0; /* grow 按数据比例由 inline style 覆盖 */
+}
+
+/* ---------- B2:指标块 + 圆环图(左右布局,间距 1.5rem) ---------- */
+.b2-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.b2-stat {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.ring-wrap {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ring-svg {
+  flex: 0 0 auto;
+  width: 4rem;
+  height: 4rem;
+}
+
+.ring-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ring-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: rgb(201, 201, 201);
+}
+
+.ring-dot {
+  flex: 0 0 auto;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
