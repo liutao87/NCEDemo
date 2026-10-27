@@ -5225,6 +5225,59 @@ input.ant-input.ant-input-sm {
   cursor: grab; /* 可拖拽 */
 }
 
+/* 右下角视图控制:放大/缩小连体(分割线隔开) + 居中独立(竖排,位于南海附图上方) */
+.map-controls {
+  position: absolute;
+  right: 1rem;
+  bottom: 5rem; /* 附图(64px) + 底边距(10px) + 间隙 */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  z-index: 2;
+}
+
+/* 放大+缩小组合:连在一起,中间分割线,毛玻璃 */
+.map-zoom-group {
+  border-radius: var(--radius-md);
+  background: rgba(243, 243, 243, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.map-zoom-group .map-ctl-btn {
+  border-radius: 0;
+  background: transparent; /* 毛玻璃由组合容器提供 */
+}
+
+.map-zoom-group .map-ctl-btn + .map-ctl-btn {
+  border-top: 1px solid rgba(243, 243, 243, 0.2); /* 分割线 */
+}
+
+.map-ctl-btn {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(243, 243, 243, 0.1);
+  color: var(--on-surface);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.map-ctl-btn.is-single {
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.map-ctl-btn:hover {
+  background: rgba(243, 243, 243, 0.22);
+  color: var(--on-surface);
+}
+
 /* 枢纽叠加层:logo 圆 + 名称,绝对定位对准 canvas 投影点 */
 .map-hub {
   position: absolute;
@@ -7650,6 +7703,7 @@ function useApp() {
     "layout-template": [["rect",{"width":"18","height":"7","x":"3","y":"3","rx":"1"}],["rect",{"width":"9","height":"7","x":"3","y":"14","rx":"1"}],["rect",{"width":"5","height":"7","x":"16","y":"14","rx":"1"}]],
     "link": [["path",{"d":"M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"}],["path",{"d":"M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"}]],
     "loader-circle": [["path",{"d":"M21 12a9 9 0 1 1-6.219-8.56"}]],
+    "locate-fixed": [["line",{"x1":"2","x2":"5","y1":"12","y2":"12"}],["line",{"x1":"19","x2":"22","y1":"12","y2":"12"}],["line",{"x1":"12","x2":"12","y1":"2","y2":"5"}],["line",{"x1":"12","x2":"12","y1":"19","y2":"22"}],["circle",{"cx":"12","cy":"12","r":"7"}],["circle",{"cx":"12","cy":"12","r":"3"}]],
     "lock": [["rect",{"width":"18","height":"11","x":"3","y":"11","rx":"2","ry":"2"}],["path",{"d":"M7 11V7a5 5 0 0 1 10 0v4"}]],
     "menu": [["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],
     "mic": [["path",{"d":"M12 19v3"}],["path",{"d":"M19 10v2a7 7 0 0 1-14 0v-2"}],["rect",{"x":"9","y":"2","width":"6","height":"13","rx":"3"}]],
@@ -8946,36 +9000,49 @@ const NINE_DASH_LINES = [
 // 地图标注点(绿色) — 省份重点地区设备接入位置,hub 为连线枢纽(MAP_HUBS.id)
 const MAP_MARKERS = [
   { province: "北京", city: "北京", lon: 116.40, lat: 39.90, hub: "qianhai" },
-  { province: "上海", city: "上海", lon: 121.47, lat: 31.23, hub: "jiading" },
+  { province: "上海", city: "上海", lon: 121.47, lat: 31.23, hub: "fuzhou" },
   { province: "广东", city: "广州", lon: 113.26, lat: 23.13, hub: "waigaoqiao" },
   { province: "广东", city: "深圳", lon: 114.06, lat: 22.55, hub: "waigaoqiao" },
   { province: "四川", city: "成都", lon: 104.07, lat: 30.57, hub: "qianhai" },
-  { province: "湖北", city: "武汉", lon: 114.30, lat: 30.59, hub: "jiading" },
+  { province: "湖北", city: "武汉", lon: 114.30, lat: 30.59, hub: "fuzhou" },
   { province: "陕西", city: "西安", lon: 108.94, lat: 34.34, hub: "qianhai" },
-  { province: "浙江", city: "杭州", lon: 120.15, lat: 30.27, hub: "jiading" },
-  { province: "江苏", city: "南京", lon: 118.80, lat: 32.06, hub: "jiading" },
+  { province: "江苏", city: "南京", lon: 118.80, lat: 32.06, hub: "fuzhou" },
   { province: "新疆", city: "乌鲁木齐", lon: 87.62, lat: 43.83, hub: "qianhai" },
   { province: "西藏", city: "拉萨", lon: 91.11, lat: 29.66, hub: "qianhai" },
   { province: "黑龙江", city: "哈尔滨", lon: 126.53, lat: 45.80, hub: "qianhai" },
-  { province: "云南", city: "昆明", lon: 102.71, lat: 25.04, hub: "jiading" },
+  { province: "云南", city: "昆明", lon: 102.71, lat: 25.04, hub: "fuzhou" },
   { province: "河南", city: "郑州", lon: 113.62, lat: 34.75, hub: "qianhai" },
   { province: "辽宁", city: "沈阳", lon: 123.43, lat: 41.80, hub: "qianhai" },
 ];
 
 // 枢纽标注点 — 站点连线汇聚端,label 为地图上的显示名,offsetX 为水平偏移(rem,嘉定/外高桥错开排列)
-// 枢纽标注点 — 站点连线汇聚端,label 为地图上的显示名,offsetX/Y 为偏移(rem,嘉定左上/外高桥右下错开)
+// 枢纽标注点 — 站点连线汇聚端,label 为地图上的显示名(logo 恒定覆盖标注点正中间,无需偏移)
 const MAP_HUBS = [
-  { id: "qianhai", name: "北京前海", label: "前海", lon: 116.39, lat: 39.94, offsetX: 0, offsetY: 0 },
-  { id: "jiading", name: "嘉定", label: "嘉定", lon: 121.27, lat: 31.38, offsetX: -1.2, offsetY: -0.8 },
-  { id: "waigaoqiao", name: "外高桥", label: "外高桥", lon: 121.58, lat: 31.35, offsetX: 1.2, offsetY: 0.8 },
+  { id: "qianhai", name: "北京前海", label: "前海", lon: 116.39, lat: 39.94 },
+  { id: "fuzhou", name: "福州", label: "福州", lon: 119.30, lat: 26.08 },
+  { id: "waigaoqiao", name: "外高桥", label: "外高桥", lon: 121.58, lat: 31.35 },
 ];
-  Object.assign(__export, { CHINA_PROVINCES, CHINA_BORDER, NINE_DASH_LINES, MAP_MARKERS, MAP_HUBS });
+
+// 连线序列号标签 — 部分线条中点上的序号(圆或长方形包裹数字,背景色同连线)
+// from/to:站点按 city 名,枢纽用 "hub:{id}";shape: circle 圆(直径2rem) / rect 长方形(2rem×1rem)
+const LINK_LABELS = [
+  { from: "hub:qianhai", to: "hub:fuzhou", shape: "circle", num: 3 },
+  { from: "hub:fuzhou", to: "hub:waigaoqiao", shape: "rect", num: 4 },
+  { from: "hub:waigaoqiao", to: "hub:qianhai", shape: "circle", num: 2 },
+  { from: "沈阳", to: "hub:qianhai", shape: "rect", num: 3 },
+  { from: "哈尔滨", to: "hub:qianhai", shape: "circle", num: 4 },
+  { from: "广州", to: "hub:waigaoqiao", shape: "circle", num: 3 },
+  { from: "深圳", to: "hub:waigaoqiao", shape: "rect", num: 4 },
+  { from: "乌鲁木齐", to: "hub:qianhai", shape: "circle", num: 2 },
+  { from: "成都", to: "hub:qianhai", shape: "rect", num: 4 },
+];
+  Object.assign(__export, { CHINA_PROVINCES, CHINA_BORDER, NINE_DASH_LINES, MAP_MARKERS, MAP_HUBS, LINK_LABELS });
 })();
 
 /* ===== src/components/china-map/index.jsx ===== */
 (function () {
   const { useEffect, useRef, useState } = React;
-  const { Icon, useApp, CHINA_PROVINCES, NINE_DASH_LINES, MAP_MARKERS, MAP_HUBS } = __export;
+  const { Icon, useApp, CHINA_PROVINCES, NINE_DASH_LINES, MAP_MARKERS, MAP_HUBS, LINK_LABELS } = __export;
 // Layer 3: 中国地图 — canvas 绘制(阿里 DataV 高德行政区划数据)
 // 双层边界:省界线(细,浅色) + 国界/海岸线(粗,深色,CHINA_BORDER)
 // 其余:省份文本 + 绿色标注点 + 连线 + 枢纽 logo(DOM 叠加) + 南海附图,明暗配色自动跟随
@@ -9072,6 +9139,7 @@ function ChinaMap() {
   const canvasRef = useRef(null);
   // 视图状态:交互缩放/平移(ref 存放,重绘时读取,不触发 React 渲染)
   const viewRef = useRef({ zoom: 1, panX: 0, panY: 0 });
+  const redrawRef = useRef(null); // 重绘函数引用(控制按钮触发)
   const [hubPos, setHubPos] = useState([]);
 
   useEffect(() => {
@@ -9178,8 +9246,8 @@ function ChinaMap() {
       // 4.5 枢纽骨干互联(前海 ↔ 嘉定 ↔ 外高桥 三角骨干环,线加粗与站点接入线区分)
       ctx.lineWidth = 1.5;
       const hubPairs = [
-        ["qianhai", "jiading"],
-        ["jiading", "waigaoqiao"],
+        ["qianhai", "fuzhou"],
+        ["fuzhou", "waigaoqiao"],
         ["waigaoqiao", "qianhai"],
       ];
       hubPairs.forEach(([idA, idB]) => {
@@ -9194,6 +9262,58 @@ function ChinaMap() {
         ctx.stroke();
       });
       ctx.lineWidth = 1;
+
+      // 4.7 连线序列号标签:部分线条中点,圆(直径2rem)或长方形(2rem×1rem)包裹数字
+      //     背景色同连线色,数字白色
+      const resolveRef = (ref) => {
+        if (ref.startsWith("hub:")) {
+          const hub = MAP_HUBS.find((h) => h.id === ref.slice(4));
+          return hub ? [hub.lon, hub.lat] : null;
+        }
+        const m = MAP_MARKERS.find((mk) => mk.city === ref);
+        return m ? [m.lon, m.lat] : null;
+      };
+      LINK_LABELS.forEach((lb) => {
+        const p1 = resolveRef(lb.from);
+        const p2 = resolveRef(lb.to);
+        if (!p1 || !p2) return;
+        const [x1, y1] = project(p1[0], p1[1]);
+        const [x2, y2] = project(p2[0], p2[1]);
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        const w = 2 * remPx;
+        ctx.font = `500 ${0.875 * remPx}px "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        if (lb.shape === "circle") {
+          // 圆:无方向,数字水平居中
+          ctx.beginPath();
+          ctx.arc(mx, my, w / 2, 0, Math.PI * 2);
+          ctx.fillStyle = cLink;
+          ctx.fill();
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillText(String(lb.num), mx, my);
+        } else {
+          // 长方形:长边沿线条方向旋转,数字旋转 -90°(垂直于长边),垂直水平居中
+          let angle = Math.atan2(y2 - y1, x2 - x1);
+          if (angle > Math.PI / 2) angle -= Math.PI;
+          if (angle < -Math.PI / 2) angle += Math.PI;
+          const h = 1 * remPx;
+          ctx.save();
+          ctx.translate(mx, my);
+          ctx.rotate(angle);
+          ctx.beginPath();
+          ctx.roundRect(-w / 2, -h / 2, w, h, 0.125 * remPx);
+          ctx.fillStyle = cLink;
+          ctx.fill();
+          ctx.rotate(-Math.PI / 2); // 数字方向:垂直于长方形长边
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillText(String(lb.num), 0, 0);
+          ctx.restore();
+        }
+      });
+
+      // 5. 站点标注点(绿色实心圆)
       MAP_MARKERS.forEach((m) => {
         const [x, y] = project(m.lon, m.lat);
         ctx.beginPath();
@@ -9211,60 +9331,13 @@ function ChinaMap() {
         ctx.fill();
       });
 
-      // 6. 枢纽位置输出给 DOM 叠加层
-      // 前海:无偏移;嘉定/外高桥:对角偏移 + 最小分离(缩小时推开保证间隙),
-      // 放大(≥1.8x 起过渡,2.4x 到位)后切换为两点中点上方左右并排
-      const logoD = 3 * remPx; // logo 直径
-      const gapMin = 0.3 * remPx; // 期望间隙
-      const dMin = logoD + gapMin;
-      const pos = MAP_HUBS.map((hb) => {
-        const [x, y] = project(hb.lon, hb.lat);
-        return { hb, x, y };
-      });
-      const jd = pos.find((p) => p.hb.id === "jiading");
-      const wg = pos.find((p) => p.hb.id === "waigaoqiao");
-
-      // 模式A:对角偏移(嘉定左上/外高桥右下) + 最小分离推开
-      let A1 = { x: jd.x + jd.hb.offsetX * remPx, y: jd.y + jd.hb.offsetY * remPx };
-      let A2 = { x: wg.x + wg.hb.offsetX * remPx, y: wg.y + wg.hb.offsetY * remPx };
-      let ddx = A2.x - A1.x;
-      let ddy = A2.y - A1.y;
-      let dist = Math.hypot(ddx, ddy) || 0.001;
-      if (dist < dMin) {
-        const midX = (A1.x + A2.x) / 2;
-        const midY = (A1.y + A2.y) / 2;
-        const nx = ddx / dist;
-        const ny = ddy / dist;
-        A1 = { x: midX - (nx * dMin) / 2, y: midY - (ny * dMin) / 2 };
-        A2 = { x: midX + (nx * dMin) / 2, y: midY + (ny * dMin) / 2 };
-      }
-
-      // 模式B:logo 严格悬浮于标注点正中心上方(圆下缘贴住点,水平与点居中对齐)
-      const lift = logoD / 2;
-      const B1 = { x: jd.x, y: jd.y - lift };
-      const B2 = { x: wg.x, y: wg.y - lift };
-
-      // zoom 阈值平滑插值(1.8x 起过渡,2.4x 完全到位)
-      const z1 = 1.8;
-      const z2 = 2.4;
-      let tv = (zoom - z1) / (z2 - z1);
-      tv = Math.min(Math.max(tv, 0), 1);
-      tv = tv * tv * (3 - 2 * tv); // smoothstep
-      const lerp = (a, b, k) => a + (b - a) * k;
-
-      const hubPosOf = (p, a, b) => ({
-        id: p.hb.id,
-        label: p.hb.label,
-        x: lerp(a.x, b.x, tv),
-        y: lerp(a.y, b.y, tv),
-      });
-      setHubPos([
-        ...pos
-          .filter((p) => p.hb.id !== "jiading" && p.hb.id !== "waigaoqiao")
-          .map((p) => ({ id: p.hb.id, label: p.hb.label, x: p.x, y: p.y })),
-        hubPosOf(jd, A1, B1),
-        hubPosOf(wg, A2, B2),
-      ]);
+      // 6. 枢纽位置输出给 DOM 叠加层:logo 圆心恒定覆盖标注点正中间
+      setHubPos(
+        MAP_HUBS.map((hb) => {
+          const [x, y] = project(hb.lon, hb.lat);
+          return { id: hb.id, label: hb.label, x, y };
+        }),
+      );
 
       // 7. 南海诸岛附图(右下角,真实九段线 + 台湾/海南轮廓)
       const sw = 88;
@@ -9279,6 +9352,7 @@ function ChinaMap() {
       }, hainanP ? hainanP.points : null, taiwanP ? taiwanP.points : null);
     };
 
+    redrawRef.current = draw;
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(wrap);
@@ -9346,9 +9420,37 @@ function ChinaMap() {
     };
   }, [isDark]);
 
+  // 控制按钮:以画布中心为锚缩放(中心地理位置保持不动);居中重置视图
+  const zoomBy = (factor) => {
+    const v = viewRef.current;
+    const z2 = Math.min(Math.max(v.zoom * factor, 0.5), 8);
+    const k = z2 / v.zoom;
+    viewRef.current = { zoom: z2, panX: v.panX * k, panY: v.panY * k };
+    if (redrawRef.current) redrawRef.current();
+  };
+
+  const resetView = () => {
+    viewRef.current = { zoom: 1, panX: 0, panY: 0 };
+    if (redrawRef.current) redrawRef.current();
+  };
+
   return (
     <div ref={wrapRef} className="china-map">
       <canvas ref={canvasRef} className="china-map-canvas" />
+      {/* 右下角视图控制:放大/缩小(连体,分割线隔开) + 居中 */}
+      <div className="map-controls">
+        <div className="map-zoom-group">
+          <button type="button" className="map-ctl-btn" title="放大" aria-label="放大" onClick={() => zoomBy(1.3)}>
+            <Icon name="plus" size="1rem" />
+          </button>
+          <button type="button" className="map-ctl-btn" title="缩小" aria-label="缩小" onClick={() => zoomBy(1 / 1.3)}>
+            <Icon name="minus" size="1rem" />
+          </button>
+        </div>
+        <button type="button" className="map-ctl-btn is-single" title="居中" aria-label="居中" onClick={resetView}>
+          <Icon name="locate-fixed" size="1rem" />
+        </button>
+      </div>
       {hubPos.map((hb) => (
         <div key={hb.id} className="map-hub" style={{ left: `${hb.x}px`, top: `${hb.y}px` }}>
           <div className="map-hub-logo" title={hb.label}>

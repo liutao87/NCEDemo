@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "../../../assets/shared/icon.jsx";
 import { useApp } from "../../context.jsx";
-import { CHINA_PROVINCES, NINE_DASH_LINES, MAP_MARKERS, MAP_HUBS } from "../../mock/china-map.js";
+import { CHINA_PROVINCES, NINE_DASH_LINES, MAP_MARKERS, MAP_HUBS, LINK_LABELS } from "../../mock/china-map.js";
 import "./index.css";
 
 // Layer 3: 中国地图 — canvas 绘制(阿里 DataV 高德行政区划数据)
@@ -100,6 +100,7 @@ export default function ChinaMap() {
   const canvasRef = useRef(null);
   // 视图状态:交互缩放/平移(ref 存放,重绘时读取,不触发 React 渲染)
   const viewRef = useRef({ zoom: 1, panX: 0, panY: 0 });
+  const redrawRef = useRef(null); // 重绘函数引用(控制按钮触发)
   const [hubPos, setHubPos] = useState([]);
 
   useEffect(() => {
@@ -206,8 +207,8 @@ export default function ChinaMap() {
       // 4.5 枢纽骨干互联(前海 ↔ 嘉定 ↔ 外高桥 三角骨干环,线加粗与站点接入线区分)
       ctx.lineWidth = 1.5;
       const hubPairs = [
-        ["qianhai", "jiading"],
-        ["jiading", "waigaoqiao"],
+        ["qianhai", "fuzhou"],
+        ["fuzhou", "waigaoqiao"],
         ["waigaoqiao", "qianhai"],
       ];
       hubPairs.forEach(([idA, idB]) => {
@@ -222,6 +223,58 @@ export default function ChinaMap() {
         ctx.stroke();
       });
       ctx.lineWidth = 1;
+
+      // 4.7 连线序列号标签:部分线条中点,圆(直径2rem)或长方形(2rem×1rem)包裹数字
+      //     背景色同连线色,数字白色
+      const resolveRef = (ref) => {
+        if (ref.startsWith("hub:")) {
+          const hub = MAP_HUBS.find((h) => h.id === ref.slice(4));
+          return hub ? [hub.lon, hub.lat] : null;
+        }
+        const m = MAP_MARKERS.find((mk) => mk.city === ref);
+        return m ? [m.lon, m.lat] : null;
+      };
+      LINK_LABELS.forEach((lb) => {
+        const p1 = resolveRef(lb.from);
+        const p2 = resolveRef(lb.to);
+        if (!p1 || !p2) return;
+        const [x1, y1] = project(p1[0], p1[1]);
+        const [x2, y2] = project(p2[0], p2[1]);
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        const w = 2 * remPx;
+        ctx.font = `500 ${0.875 * remPx}px "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        if (lb.shape === "circle") {
+          // 圆:无方向,数字水平居中
+          ctx.beginPath();
+          ctx.arc(mx, my, w / 2, 0, Math.PI * 2);
+          ctx.fillStyle = cLink;
+          ctx.fill();
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillText(String(lb.num), mx, my);
+        } else {
+          // 长方形:长边沿线条方向旋转,数字旋转 -90°(垂直于长边),垂直水平居中
+          let angle = Math.atan2(y2 - y1, x2 - x1);
+          if (angle > Math.PI / 2) angle -= Math.PI;
+          if (angle < -Math.PI / 2) angle += Math.PI;
+          const h = 1 * remPx;
+          ctx.save();
+          ctx.translate(mx, my);
+          ctx.rotate(angle);
+          ctx.beginPath();
+          ctx.roundRect(-w / 2, -h / 2, w, h, 0.125 * remPx);
+          ctx.fillStyle = cLink;
+          ctx.fill();
+          ctx.rotate(-Math.PI / 2); // 数字方向:垂直于长方形长边
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillText(String(lb.num), 0, 0);
+          ctx.restore();
+        }
+      });
+
+      // 5. 站点标注点(绿色实心圆)
       MAP_MARKERS.forEach((m) => {
         const [x, y] = project(m.lon, m.lat);
         ctx.beginPath();
@@ -239,60 +292,13 @@ export default function ChinaMap() {
         ctx.fill();
       });
 
-      // 6. 枢纽位置输出给 DOM 叠加层
-      // 前海:无偏移;嘉定/外高桥:对角偏移 + 最小分离(缩小时推开保证间隙),
-      // 放大(≥1.8x 起过渡,2.4x 到位)后切换为两点中点上方左右并排
-      const logoD = 3 * remPx; // logo 直径
-      const gapMin = 0.3 * remPx; // 期望间隙
-      const dMin = logoD + gapMin;
-      const pos = MAP_HUBS.map((hb) => {
-        const [x, y] = project(hb.lon, hb.lat);
-        return { hb, x, y };
-      });
-      const jd = pos.find((p) => p.hb.id === "jiading");
-      const wg = pos.find((p) => p.hb.id === "waigaoqiao");
-
-      // 模式A:对角偏移(嘉定左上/外高桥右下) + 最小分离推开
-      let A1 = { x: jd.x + jd.hb.offsetX * remPx, y: jd.y + jd.hb.offsetY * remPx };
-      let A2 = { x: wg.x + wg.hb.offsetX * remPx, y: wg.y + wg.hb.offsetY * remPx };
-      let ddx = A2.x - A1.x;
-      let ddy = A2.y - A1.y;
-      let dist = Math.hypot(ddx, ddy) || 0.001;
-      if (dist < dMin) {
-        const midX = (A1.x + A2.x) / 2;
-        const midY = (A1.y + A2.y) / 2;
-        const nx = ddx / dist;
-        const ny = ddy / dist;
-        A1 = { x: midX - (nx * dMin) / 2, y: midY - (ny * dMin) / 2 };
-        A2 = { x: midX + (nx * dMin) / 2, y: midY + (ny * dMin) / 2 };
-      }
-
-      // 模式B:logo 严格悬浮于标注点正中心上方(圆下缘贴住点,水平与点居中对齐)
-      const lift = logoD / 2;
-      const B1 = { x: jd.x, y: jd.y - lift };
-      const B2 = { x: wg.x, y: wg.y - lift };
-
-      // zoom 阈值平滑插值(1.8x 起过渡,2.4x 完全到位)
-      const z1 = 1.8;
-      const z2 = 2.4;
-      let tv = (zoom - z1) / (z2 - z1);
-      tv = Math.min(Math.max(tv, 0), 1);
-      tv = tv * tv * (3 - 2 * tv); // smoothstep
-      const lerp = (a, b, k) => a + (b - a) * k;
-
-      const hubPosOf = (p, a, b) => ({
-        id: p.hb.id,
-        label: p.hb.label,
-        x: lerp(a.x, b.x, tv),
-        y: lerp(a.y, b.y, tv),
-      });
-      setHubPos([
-        ...pos
-          .filter((p) => p.hb.id !== "jiading" && p.hb.id !== "waigaoqiao")
-          .map((p) => ({ id: p.hb.id, label: p.hb.label, x: p.x, y: p.y })),
-        hubPosOf(jd, A1, B1),
-        hubPosOf(wg, A2, B2),
-      ]);
+      // 6. 枢纽位置输出给 DOM 叠加层:logo 圆心恒定覆盖标注点正中间
+      setHubPos(
+        MAP_HUBS.map((hb) => {
+          const [x, y] = project(hb.lon, hb.lat);
+          return { id: hb.id, label: hb.label, x, y };
+        }),
+      );
 
       // 7. 南海诸岛附图(右下角,真实九段线 + 台湾/海南轮廓)
       const sw = 88;
@@ -307,6 +313,7 @@ export default function ChinaMap() {
       }, hainanP ? hainanP.points : null, taiwanP ? taiwanP.points : null);
     };
 
+    redrawRef.current = draw;
     draw();
     const ro = new ResizeObserver(draw);
     ro.observe(wrap);
@@ -374,9 +381,37 @@ export default function ChinaMap() {
     };
   }, [isDark]);
 
+  // 控制按钮:以画布中心为锚缩放(中心地理位置保持不动);居中重置视图
+  const zoomBy = (factor) => {
+    const v = viewRef.current;
+    const z2 = Math.min(Math.max(v.zoom * factor, 0.5), 8);
+    const k = z2 / v.zoom;
+    viewRef.current = { zoom: z2, panX: v.panX * k, panY: v.panY * k };
+    if (redrawRef.current) redrawRef.current();
+  };
+
+  const resetView = () => {
+    viewRef.current = { zoom: 1, panX: 0, panY: 0 };
+    if (redrawRef.current) redrawRef.current();
+  };
+
   return (
     <div ref={wrapRef} className="china-map">
       <canvas ref={canvasRef} className="china-map-canvas" />
+      {/* 右下角视图控制:放大/缩小(连体,分割线隔开) + 居中 */}
+      <div className="map-controls">
+        <div className="map-zoom-group">
+          <button type="button" className="map-ctl-btn" title="放大" aria-label="放大" onClick={() => zoomBy(1.3)}>
+            <Icon name="plus" size="1rem" />
+          </button>
+          <button type="button" className="map-ctl-btn" title="缩小" aria-label="缩小" onClick={() => zoomBy(1 / 1.3)}>
+            <Icon name="minus" size="1rem" />
+          </button>
+        </div>
+        <button type="button" className="map-ctl-btn is-single" title="居中" aria-label="居中" onClick={resetView}>
+          <Icon name="locate-fixed" size="1rem" />
+        </button>
+      </div>
       {hubPos.map((hb) => (
         <div key={hb.id} className="map-hub" style={{ left: `${hb.x}px`, top: `${hb.y}px` }}>
           <div className="map-hub-logo" title={hb.label}>
