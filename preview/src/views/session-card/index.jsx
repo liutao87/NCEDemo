@@ -162,11 +162,14 @@ export default function SessionCard() {
           <div className="attention-list">
             {list.map((item) => (
               <div key={item.key} className="attention-card">
-                <span className={`attention-icon ${item.iconTone}`}>
-                  <Icon name={item.icon} size="1.625rem" />
-                </span>
-                <div className="attention-body">
+                <div className="attention-top">
+                  <span className={`attention-icon ${item.iconTone}`}>
+                    <Icon name={item.icon} size="1.625rem" />
+                  </span>
                   <div className="attention-card-title">{item.title}</div>
+                </div>
+                <div className="attention-bottom">
+                  <Icon name="map-pin" size="0.875rem" />
                   <div className="attention-card-desc">{item.desc}</div>
                 </div>
               </div>

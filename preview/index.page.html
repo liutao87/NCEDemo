@@ -4402,7 +4402,8 @@ input.ant-input.ant-input-sm {
 
 .hero-line {
   margin: 0.78125rem 0 0; /* 标题下 12.5px */
-  font: var(--font-body-s);
+  font: var(--font-body-m);
+  font-size: 0.875rem;
   color: var(--on-surface-variant);
 }
 
@@ -4436,11 +4437,7 @@ input.ant-input.ant-input-sm {
   min-width: 0;
   padding: 1rem; /* 16px */
   border-radius: 0.75rem; /* 12px */
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.dark .session-card .metric-card {
-  background: rgba(28, 28, 30, 0.72);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .metric-head {
@@ -4528,11 +4525,7 @@ input.ant-input.ant-input-sm {
   gap: 0.25rem;
   padding: 0.25rem;
   border-radius: var(--radius-full);
-  background: rgba(255, 255, 255, 0.5);
-}
-
-.dark .session-card .pill-tabs {
-  background: rgba(20, 20, 20, 0.45);
+  background: rgba(38, 38, 38, 1);
 }
 
 .pill-tab {
@@ -4547,7 +4540,8 @@ input.ant-input.ant-input-sm {
   border-radius: var(--radius-full);
   background: transparent;
   color: var(--on-surface-variant);
-  font: var(--font-body-s);
+  font: var(--font-body-m);
+  font-size: 0.875rem;
   cursor: pointer;
   transition: background 0.2s ease, color 0.2s ease;
 }
@@ -4557,10 +4551,9 @@ input.ant-input.ant-input-sm {
 }
 
 .pill-tab.is-active {
-  background: var(--surface-container-highest);
+  background: rgba(53, 53, 53, 1);
   color: var(--on-surface);
   font-weight: var(--font-weight-medium);
-  box-shadow: var(--shadow-sm);
 }
 
 .pill-count {
@@ -4594,15 +4587,11 @@ input.ant-input.ant-input-sm {
 
 .attention-card {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem; /* 图标距文本 12px */
+  flex-direction: column;
+  gap: 0.5rem; /* 上下间距 */
   padding: 1rem; /* 16px */
   border-radius: 0.75rem; /* 12px */
-  background: rgba(255, 255, 255, 0.9);
-}
-
-.dark .session-card .attention-card {
-  background: rgba(30, 30, 32, 0.88);
+  background: rgba(36, 36, 36, 1);
 }
 
 .attention-icon {
@@ -4622,12 +4611,16 @@ input.ant-input.ant-input-sm {
   color: var(--info);
 }
 
-.attention-body {
-  flex: 1 1 0;
+/* 上行:logo 图 + 标题,间距 0.5rem */
+.attention-top {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   min-width: 0;
 }
 
 .attention-card-title {
+  min-width: 0;
   font: var(--font-body-m);
   font-weight: var(--font-weight-medium);
   color: var(--on-surface);
@@ -4636,8 +4629,16 @@ input.ant-input.ant-input-sm {
   text-overflow: ellipsis;
 }
 
+/* 下行:位置图标 + 描述,间距 0.25rem */
+.attention-bottom {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--on-surface-variant);
+}
+
 .attention-card-desc {
-  margin-top: 0.25rem; /* 4px */
+  min-width: 0;
   font: var(--font-caption-m);
   color: var(--on-surface-variant);
   line-height: var(--line-height-md);
@@ -4661,13 +4662,9 @@ input.ant-input.ant-input-sm {
   box-sizing: border-box;
   padding: 0.75rem;
   border-radius: 0.75rem;
-  background: var(--surface-container-high);
+  background: rgba(42, 42, 42, 1);
   box-shadow: var(--shadow-popover);
   animation: tpl-pop-in 0.22s ease-out;
-}
-
-.dark .tpl-popover-custom {
-  background: var(--surface-container-high);
 }
 
 @keyframes tpl-pop-in {
@@ -5061,7 +5058,7 @@ input.ant-input.ant-input-sm {
   padding: 0 0.75rem;
   border: none;
   border-radius: 0.5rem; /* 8px */
-  background: var(--surface-variant);
+  background: rgba(57, 57, 57, 1);
   color: var(--on-surface);
   font: var(--font-body-m);
   cursor: pointer;
@@ -5690,6 +5687,13 @@ input.ant-input.ant-input-sm {
 /* ---------- 底部 AI 输入框(复用 Composer,左右/底部留白 32px) ---------- */
 .ai-chat .session-composer {
   padding: 0 2rem 2rem;
+}
+
+/* 模板列表弹层:左右对齐输入框(composer-frame 在 padding 2rem 内) */
+.ai-chat .session-composer .tpl-popover-custom {
+  left: 2rem;
+  right: 2rem;
+  width: auto;
 }
 
 /* ==================================================================
@@ -8132,6 +8136,7 @@ function useApp() {
     "loader-circle": [["path",{"d":"M21 12a9 9 0 1 1-6.219-8.56"}]],
     "locate-fixed": [["line",{"x1":"2","x2":"5","y1":"12","y2":"12"}],["line",{"x1":"19","x2":"22","y1":"12","y2":"12"}],["line",{"x1":"12","x2":"12","y1":"2","y2":"5"}],["line",{"x1":"12","x2":"12","y1":"19","y2":"22"}],["circle",{"cx":"12","cy":"12","r":"7"}],["circle",{"cx":"12","cy":"12","r":"3"}]],
     "lock": [["rect",{"width":"18","height":"11","x":"3","y":"11","rx":"2","ry":"2"}],["path",{"d":"M7 11V7a5 5 0 0 1 10 0v4"}]],
+    "map-pin": [["path",{"d":"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"}],["circle",{"cx":"12","cy":"10","r":"3"}]],
     "maximize-2": [["path",{"d":"M15 3h6v6"}],["path",{"d":"m21 3-7 7"}],["path",{"d":"m3 21 7-7"}],["path",{"d":"M9 21H3v-6"}]],
     "menu": [["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],
     "mic": [["path",{"d":"M12 19v3"}],["path",{"d":"M19 10v2a7 7 0 0 1-14 0v-2"}],["rect",{"x":"9","y":"2","width":"6","height":"13","rx":"3"}]],
@@ -9391,11 +9396,14 @@ function SessionCard() {
           <div className="attention-list">
             {list.map((item) => (
               <div key={item.key} className="attention-card">
-                <span className={`attention-icon ${item.iconTone}`}>
-                  <Icon name={item.icon} size="1.625rem" />
-                </span>
-                <div className="attention-body">
+                <div className="attention-top">
+                  <span className={`attention-icon ${item.iconTone}`}>
+                    <Icon name={item.icon} size="1.625rem" />
+                  </span>
                   <div className="attention-card-title">{item.title}</div>
+                </div>
+                <div className="attention-bottom">
+                  <Icon name="map-pin" size="0.875rem" />
                   <div className="attention-card-desc">{item.desc}</div>
                 </div>
               </div>
