@@ -4294,6 +4294,7 @@ input.ant-input.ant-input-sm {
   display: flex;
   flex-direction: column;
   padding: 2rem; /* 上下左右 32px */
+  background-color: #191919;
   background-image: url("./assets/uploads/bg-1.png");
   background-size: 100%;
   background-position: center top;
@@ -6892,9 +6893,11 @@ input.ant-input.ant-input-sm {
   position: absolute;
   inset: 0;
   width: 100%;
-  height: calc(100% - 4px);
+  height: calc(100% + 2px);
+  top: -2px;
+  opacity: 0.6;
   pointer-events: none;
-  z-index: 2;
+  z-index: 5;
   overflow: visible;
 }
 
@@ -6907,11 +6910,8 @@ input.ant-input.ant-input-sm {
   right: 2px;
   bottom: 2px;
   border-radius: calc(1rem - 2px);
-  background: rgba(25, 25, 25, 0.8);
-  backdrop-filter: blur(163px);
-  -webkit-backdrop-filter: blur(163px);
+  background: linear-gradient(180deg, rgba(152, 116, 233, 1) 0%, rgba(93, 58, 173, 0) 100%);
   overflow: hidden;
-  z-index: 1;
 }
 
 /* ---------- 矩形中心内容:独立层,在 gen-stage 下(不在 gen-frame 内),
@@ -6924,6 +6924,10 @@ input.ant-input.ant-input-sm {
   align-items: center;
   justify-content: center;
   z-index: 3;
+  background: rgba(25, 25, 25, 0.8);
+  backdrop-filter: blur(163px);
+  -webkit-backdrop-filter: blur(163px);
+  border-radius: 1rem;
 }
 
 .gen-text {
@@ -6937,7 +6941,7 @@ input.ant-input.ant-input-sm {
 .gen-rect {
   stroke: url(#genGrad);
   stroke-width: 2;
-  stroke-dasharray: 8 6;
+  stroke-dasharray: 0.5rem 0.25rem;
   stroke-linecap: butt;
   opacity: 0.8;
 }

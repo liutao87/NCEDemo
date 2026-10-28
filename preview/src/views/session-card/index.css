@@ -19,6 +19,7 @@
   display: flex;
   flex-direction: column;
   padding: 2rem; /* 上下左右 32px */
+  background-color: #191919;
   background-image: url("./assets/uploads/bg-1.png");
   background-size: 100%;
   background-position: center top;
