@@ -80,12 +80,12 @@ export default function AiChat() {
             title="返回"
             onClick={() => setActiveMenu("overview")}
           >
-            <Icon name="arrow-left" size="1rem" />
+            <Icon name="arrow-left" size="1.25rem" />
           </button>
           {chatTitle ? <span className="ai-nav-title">{chatTitle}</span> : null}
         </div>
         <button type="button" className="ai-nav-btn" title="更多">
-          <Icon name="ellipsis" size="1rem" />
+          <Icon name="ellipsis" size="1.25rem" />
         </button>
       </nav>
 

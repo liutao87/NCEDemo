@@ -406,26 +406,18 @@ export default function ChangeFlow(props) {
   return (
     <div className={`cf ${props.theme === "light" ? "cf--light" : ""}`}>
       <header className="cf-topbar cf-anim" style={{ animationDelay: "0.1s" }}>
-        <div className="cf-topbar-left">
-          <div className="cf-topbar-icon">
-            <Icon
-              name={props.headerIcon || "clipboard-list"}
-              size="0.875rem"
-              color="#ffffff"
-            />
-          </div>
-          <span className="cf-topbar-title">
-            {props.title || "网络变更-配置详情"}
-          </span>
-        </div>
-        <div className="cf-topbar-right">
-          {actions.map((a, i) => (
-            <button key={i} className="cf-btn" type="button">
-              <Icon name={a.icon} size="0.875rem" />
-              {a.label}
-            </button>
-          ))}
-        </div>
+        <button type="button" className="gen-canvas-btn">
+          <Icon name="layout-dashboard" size="1rem" />
+          <span>全景画布</span>
+        </button>
+        <button
+          type="button"
+          className="gen-expand-btn"
+          title="放大/缩小"
+          aria-label="放大/缩小"
+        >
+          <Icon name="maximize-2" size="1rem" />
+        </button>
       </header>
 
       <main className="cf-flow" style={{ transform: `scale(${zoom})` }}>

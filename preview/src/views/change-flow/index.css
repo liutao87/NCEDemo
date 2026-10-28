@@ -105,10 +105,11 @@
 /* ===== 顶部导航栏 ===== */
 .cf-topbar {
   flex-shrink: 0;
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 28px;
+  padding: 0 1rem;
   background: linear-gradient(180deg, #1c1c22 0%, #18181d 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }

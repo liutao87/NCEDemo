@@ -79,11 +79,12 @@
 /* ---------- 顶部导航栏(50px) ---------- */
 .ai-nav {
   flex-shrink: 0;
-  height: 3.125rem; /* 50px */
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 1rem;
+  border-bottom: 1px solid rgb(from #F3F3F3 r g b / 0.15);
 }
 
 .ai-nav-left {
@@ -94,20 +95,20 @@
 }
 
 .ai-nav-btn {
-  width: 2rem;
-  height: 2rem;
+  width: 1.25rem;
+  height: 1.25rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border: none;
   border-radius: var(--radius-full);
   background: transparent;
-  color: var(--on-surface-variant);
+  color: var(--on-surface);
   cursor: pointer;
 }
 
 .ai-nav-btn:hover {
-  background: var(--surface-variant);
+  background: transparent;
   color: var(--on-surface);
 }
 
@@ -226,7 +227,7 @@
 
 /* 暗色:导航按钮 hover 背景(默认 token 在暗色下不可见) */
 .dark .ai-chat .ai-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: transparent;
 }
 
 .ai-card-icon {
