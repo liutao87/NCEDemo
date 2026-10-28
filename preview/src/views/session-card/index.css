@@ -20,7 +20,7 @@
   flex-direction: column;
   padding: 2rem; /* 上下左右 32px */
   background-image: url("./assets/uploads/bg-1.png");
-  background-size: cover;
+  background-size: 100%;
   background-position: center top;
   background-repeat: no-repeat;
 }
@@ -321,7 +321,7 @@
 .attention-card {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem; /* 上下间距 */
+  gap: 0.75rem; /* 上下间距 */
   padding: 1rem; /* 16px */
   border-radius: 0.75rem; /* 12px */
   background: rgba(36, 36, 36, 1);
@@ -367,7 +367,6 @@
 
 /* 下行:位置图标 + 描述,间距 0.25rem */
 .attention-bottom {
-  margin-top: 0.75rem;
   display: flex;
   align-items: center;
   gap: 0.25rem;
