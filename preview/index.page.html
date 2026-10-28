@@ -5487,26 +5487,16 @@ input.ant-input.ant-input-sm {
   left: 50%;
   transform: translateX(-50%);
   width: 32rem;
-  height: 8rem;
+  height: 5.5rem;
   background: #ff9466;
   filter: blur(161px);
   opacity: 0.55;
   pointer-events: none;
 }
 
-/* 聊天背景光晕:线性渐变 #7A66FF 0% → #7A66FF 100%,高斯模糊(均匀) 195 */
+/* 聊天背景光晕已去除 */
 .ai-chat::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: 38%;
-  right: -6rem;
-  width: 26rem;
-  height: 20rem;
-  background: linear-gradient(180deg, #7a66ff 0%, #7a66ff 100%);
-  filter: blur(195px);
-  opacity: 0.4;
-  pointer-events: none;
+  content: none;
 }
 
 /* ---------- AI 面板固定深色皮肤(应用浅色/深色下均为深色) ----------
@@ -5567,7 +5557,7 @@ input.ant-input.ant-input-sm {
   border: none;
   border-radius: var(--radius-full);
   background: transparent;
-  color: var(--on-surface);
+  color: var(--on-surface-variant);
   cursor: pointer;
 }
 
@@ -5745,7 +5735,7 @@ input.ant-input.ant-input-sm {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding: 1rem 2rem 1.5rem; /* 底部留白稍大,回答卡片底圆角与输入框之间有呼吸空间 */
+  padding: 1rem 1rem 1.5rem;
 }
 
 .ai-thread::-webkit-scrollbar {
@@ -6819,7 +6809,7 @@ input.ant-input.ant-input-sm {
 }
 
 
-/* 内容生成画布:顶部工具栏 + 标题「意图确认」+ 内容生成区(彩色虚线流转动效) */
+/* 内容生成画布:顶部工具栏 + 标题「意图确认」+ 内容生成区 */
 
 .content-gen {
   flex: 1 1 0;
@@ -6829,7 +6819,7 @@ input.ant-input.ant-input-sm {
   flex-direction: column;
 }
 
-/* ---------- 顶部工具栏:高 3.5rem,space-between,底部边框线 ---------- */
+/* ---------- 顶部工具栏 ---------- */
 .gen-toolbar {
   flex-shrink: 0;
   height: 3.5rem;
@@ -6849,7 +6839,6 @@ input.ant-input.ant-input-sm {
   color: var(--on-surface);
   font: var(--font-body-m);
   cursor: pointer;
-  transition: color 0.2s ease;
 }
 
 .gen-canvas-btn:hover {
@@ -6867,7 +6856,6 @@ input.ant-input.ant-input-sm {
   background: transparent;
   color: var(--on-surface-variant);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .gen-expand-btn:hover {
@@ -6875,7 +6863,7 @@ input.ant-input.ant-input-sm {
   color: var(--on-surface);
 }
 
-/* ---------- 画布容器:上间距 0.75rem,左右 1rem,上下布局 ---------- */
+/* ---------- 画布容器 ---------- */
 .gen-body {
   flex: 1 1 0;
   min-height: 0;
@@ -6884,7 +6872,6 @@ input.ant-input.ant-input-sm {
   padding: 0.75rem 1rem 0;
 }
 
-/* 标题「意图确认」 */
 .gen-intent-title {
   flex-shrink: 0;
   padding: 0.5rem 0;
@@ -6893,48 +6880,42 @@ input.ant-input.ant-input-sm {
   color: rgb(147, 147, 147);
 }
 
-/* ---------- 内容生成区:紫色渐变底 ---------- */
+/* ---------- 内容生成区:紫色渐变底 + 定位容器 ---------- */
 .gen-stage {
-  background: linear-gradient(180deg, rgba(152, 116, 233, 1) 0%, rgba(93, 58, 173, 0) 100%);
-  border-radius: 1rem;
-}
-
-.gen-frame {
   position: relative;
-  width: 100%;
-  height: 50%; /* 高度为一半 */
-  min-height: 16.5rem;
   border-radius: 1rem;
-  background: rgba(25, 25, 25, 0.8);
-  backdrop-filter: blur(163px);
-  -webkit-backdrop-filter: blur(163px);
+  min-height: 16.5rem;
 }
 
-.gen-border {
+/* SVG:铺满 gen-stage,只画虚线渐变描边(fill:none) */
+.gen-svg {
   position: absolute;
   inset: 0;
   width: 100%;
-  height: 100%;
-  filter: drop-shadow(0 0 0.375rem rgba(37, 99, 235, 0.35));
+  height: calc(100% - 4px);
+  pointer-events: none;
+  z-index: 2;
+  overflow: visible;
 }
 
-/* 两层虚线矩形沿 stroke 流转(彩色渐变描边)
-   rect 自身 x/y 内缩 3px,尺寸需同步减去 6px,否则右/下边被 SVG 视口裁掉 */
-.gen-rect {
-  width: calc(100% - 6px);
-  height: calc(100% - 6px);
-  fill: none;
-  stroke: url(#genGrad);
-  stroke-width: 2;
-  stroke-dasharray: 10 8; /* 静态虚线边框(无动画) */
+/* ---------- div:深色底 + 毛玻璃,内缩 2px 被 SVG 描边围住 ----------
+   backdrop-filter 只作用于 div 自身的半透明背景,不影响内部文字 */
+.gen-frame {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border-radius: calc(1rem - 2px);
+  background: rgba(25, 25, 25, 0.8);
+  backdrop-filter: blur(163px);
+  -webkit-backdrop-filter: blur(163px);
+  overflow: hidden;
+  z-index: 1;
 }
 
-.gen-rect-slow {
-  opacity: 0.45;
-  stroke-dasharray: 4 10;
-}
-
-/* ---------- 矩形中心内容:只保留"内容生成中..."文本 ---------- */
+/* ---------- 矩形中心内容:独立层,在 gen-stage 下(不在 gen-frame 内),
+   不受 backdrop-filter 模糊影响,绝对定位覆盖在 div 之上 ---------- */
 .gen-center {
   position: absolute;
   inset: 0;
@@ -6942,20 +6923,28 @@ input.ant-input.ant-input-sm {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  z-index: 3;
 }
 
 .gen-text {
   font-size: 0.875rem;
   color: rgb(114, 114, 114);
+  font-weight: 500;
 }
 
-/* ---------- 深色主题:增强虚线发光 ---------- */
-.dark .content-gen .gen-border {
-  filter: drop-shadow(0 0 0.5rem rgba(37, 99, 235, 0.55));
+/* rect:只画描边(fill="none" 在 JSX 属性中设,确保内部完全透明不带颜色)
+   stroke 用渐变色,虚线 dasharray,无任何填充影响边框效果 */
+.gen-rect {
+  stroke: url(#genGrad);
+  stroke-width: 2;
+  stroke-dasharray: 8 6;
+  stroke-linecap: butt;
+  opacity: 0.8;
 }
 
-.dark .content-gen .gen-rect-slow {
-  opacity: 0.6;
+/* ---------- 深色主题:增强边框发光 ---------- */
+.dark .content-gen .gen-svg {
+  filter: drop-shadow(0 0 0.375rem rgba(102, 159, 255, 0.35));
 }
 
 
@@ -11275,49 +11264,51 @@ function AiChat() {
 (function () {
   const { Icon } = __export;
 // Layer 4: 内容生成画布 — AI 会话发送后右侧主内容区
-// 顶部工具栏(全景画布 + 放大/缩小) + 标题「意图确认」+ 内容生成区(深底毛玻璃 + 彩色虚线动效)
 function ContentGen() {
   return (
     <div className="content-gen">
-      {/* 顶部工具栏:高 3.5rem,space-between,底部边框线 */}
       <div className="gen-toolbar">
         <button type="button" className="gen-canvas-btn">
           <Icon name="layout-dashboard" size="1rem" />
           <span>全景画布</span>
         </button>
-        <button
-          type="button"
-          className="gen-expand-btn"
-          title="放大/缩小"
-          aria-label="放大/缩小"
-        >
+        <button type="button" className="gen-expand-btn" title="放大/缩小" aria-label="放大/缩小">
           <Icon name="maximize-2" size="1rem" />
         </button>
       </div>
-
-      {/* 画布容器:上间距 0.75rem,左右 1rem,上下布局 */}
       <div className="gen-body">
         <div className="gen-intent-title">意图确认</div>
-
-        {/* 内容生成区:深底毛玻璃,彩色虚线流转矩形(持续动效) */}
         <div className="gen-stage">
-          <div className="gen-frame">
-            <svg className="gen-border" aria-hidden="true">
-              <defs>
-                <linearGradient id="genGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#06b6d4" />
-                  <stop offset="35%" stopColor="#2563eb" />
-                  <stop offset="70%" stopColor="#7c3aed" />
-                  <stop offset="100%" stopColor="#ec4899" />
-                </linearGradient>
-              </defs>
-              <rect className="gen-rect gen-rect-fast" x="3" y="3" rx="1rem" />
-              <rect className="gen-rect gen-rect-slow" x="3" y="3" rx="1rem" />
-            </svg>
-
-            <div className="gen-center">
-              <div className="gen-text">内容生成中...</div>
-            </div>
+          {/* SVG 只画虚线渐变边框(fill:none 透明) */}
+          <svg className="gen-svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="genGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="2%" stopColor="#669fff" />
+                <stop offset="12%" stopColor="#7b67ff" />
+                <stop offset="39%" stopColor="#9567ff" />
+                <stop offset="50%" stopColor="#ff666b" />
+                <stop offset="61%" stopColor="#ff9566" />
+                <stop offset="89%" stopColor="#ffad66" />
+                <stop offset="99%" stopColor="#669fff" />
+              </linearGradient>
+            </defs>
+            <rect
+              className="gen-rect"
+              x="1"
+              y="1"
+              width="100%"
+              height="100%"
+              rx="16"
+              ry="16"
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+          {/* div 深色底 + 毛玻璃,内缩 2px 被 SVG 描边围住 */}
+          <div className="gen-frame" />
+          {/* 文字独立层:在 gen-stage 下(不在 gen-frame 内),不受 backdrop-filter 模糊影响 */}
+          <div className="gen-center">
+            <div className="gen-text">内容生成中...</div>
           </div>
         </div>
       </div>

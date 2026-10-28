@@ -23,26 +23,16 @@
   left: 50%;
   transform: translateX(-50%);
   width: 32rem;
-  height: 8rem;
+  height: 5.5rem;
   background: #ff9466;
   filter: blur(161px);
   opacity: 0.55;
   pointer-events: none;
 }
 
-/* 聊天背景光晕:线性渐变 #7A66FF 0% → #7A66FF 100%,高斯模糊(均匀) 195 */
+/* 聊天背景光晕已去除 */
 .ai-chat::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  top: 38%;
-  right: -6rem;
-  width: 26rem;
-  height: 20rem;
-  background: linear-gradient(180deg, #7a66ff 0%, #7a66ff 100%);
-  filter: blur(195px);
-  opacity: 0.4;
-  pointer-events: none;
+  content: none;
 }
 
 /* ---------- AI 面板固定深色皮肤(应用浅色/深色下均为深色) ----------
@@ -103,7 +93,7 @@
   border: none;
   border-radius: var(--radius-full);
   background: transparent;
-  color: var(--on-surface);
+  color: var(--on-surface-variant);
   cursor: pointer;
 }
 
@@ -281,7 +271,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding: 1rem 2rem 1.5rem; /* 底部留白稍大,回答卡片底圆角与输入框之间有呼吸空间 */
+  padding: 1rem 1rem 1.5rem;
 }
 
 .ai-thread::-webkit-scrollbar {

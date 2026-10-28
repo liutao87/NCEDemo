@@ -1,0 +1,1344 @@
+/* AI 会话:左侧 540px × 100% 面板(导航栏 + 居中欢迎内容 + AI 输入框) */
+/* 聊天背景 #191919(设计稿指定),叠两团高斯模糊光晕:导航区橙色/聊天区紫色 */
+.ai-chat {
+  position: relative;
+  isolation: isolate; /* 光晕 z-index:-1 只沉到本面板背景之上、内容之下 */
+  flex: 0 0 33.75rem; /* 540px */
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--on-surface);
+  background: #191919; /* 聊天背景色 #191919 100% */
+  border-right: var(--border-width-thin) solid var(--divider);
+}
+
+/* 导航背景光晕:#FF9466 100%,高斯模糊(均匀) 161 */
+.ai-chat::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32rem;
+  height: 5.5rem;
+  background: #ff9466;
+  filter: blur(161px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* 聊天背景光晕已去除 */
+.ai-chat::after {
+  content: none;
+}
+
+/* ---------- AI 面板固定深色皮肤(应用浅色/深色下均为深色) ----------
+   根节点自带 .dark 类 → dark.css 的 --color-* 深色值在本域生效;
+   此处补齐 theme.css 语义令牌的本域映射(令牌在 :root 处求值,需局部重声明),
+   使面板内自绘样式(气泡/卡片/输入框/思考区等)同步走深色 */
+.ai-chat.dark {
+  --primary: var(--color-brand);
+  --on-primary: var(--color-text-inverse);
+  --primary-hover: var(--color-brand-hover);
+  --primary-active: var(--color-brand-active);
+  --primary-container: var(--color-info-primary-subtler);
+  --on-primary-container: var(--color-text-primary);
+  --surface: var(--color-bg-1);
+  --on-surface: var(--color-text-primary);
+  --surface-variant: var(--color-bg-4);
+  --on-surface-variant: var(--color-text-secondary);
+  --surface-container-lowest: var(--color-bg-1); /* 面板底 */
+  --surface-container-low: var(--color-bg-2);
+  --surface-container: var(--color-bg-2);
+  --surface-container-high: var(--color-bg-2);
+  --surface-container-highest: var(--color-bg-3); /* 回答/欢迎/输入卡片 */
+  --text-placeholder: var(--color-text-placeholder);
+  --text-disabled: var(--color-text-disabled);
+  --divider: var(--color-border-separator);
+  --outline: var(--color-border);
+  --focus-ring: var(--color-border-focus);
+  --interactive-link: var(--color-link);
+  --success: var(--color-success);
+  --error: var(--color-error);
+  --info: var(--color-info-primary);
+}
+
+/* ---------- 顶部导航栏(50px) ---------- */
+.ai-nav {
+  flex-shrink: 0;
+  height: 3.125rem; /* 50px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+}
+
+.ai-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.ai-nav-btn {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.ai-nav-btn:hover {
+  background: var(--surface-variant);
+  color: var(--on-surface);
+}
+
+.ai-nav-title {
+  font: var(--font-headline-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 会话中心:水平垂直居中 ---------- */
+.ai-center {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.ai-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ai-gem {
+  width: 3.75rem; /* 60px */
+  height: 3.75rem;
+}
+
+.ai-brand-name {
+  font-size: var(--font-size-3xl); /* 24px */
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-xs);
+  color: var(--on-surface);
+}
+
+.ai-intro {
+  margin: 1.5rem 0 0; /* 24px */
+  font: var(--font-body-m);
+  color: var(--on-surface-variant);
+}
+
+/* 信息区域:左文案 | 右刷新+换一批,两端对齐 */
+.ai-scene-bar {
+  margin-top: 2.25rem; /* 36px */
+  width: 26.25rem; /* 420px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ai-scene-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+}
+
+.ai-refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0;
+  border: none;
+  background: transparent;
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.ai-refresh:hover {
+  color: var(--primary);
+}
+
+/* ---------- 三张场景卡片(420px × 72px, 间距8px, 圆角16px) ---------- */
+.ai-cards {
+  margin-top: 1rem; /* 16px */
+  width: 26.25rem; /* 420px */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* 8px */
+}
+
+.ai-card {
+  height: 4.5rem; /* 72px */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  border-radius: 1rem; /* 16px */
+  background: var(--surface-container-highest); /* 浅色白卡 */
+  box-shadow: var(--shadow-md); /* 增强阴影,浅色下轮廓清晰 */
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.ai-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 暗色:提亮卡片背景与纯黑区域拉开对比,阴影改为 hover 提亮 */
+.dark .ai-chat .ai-card {
+  background: var(--color-bg-3);
+  box-shadow: none;
+}
+
+.dark .ai-chat .ai-card:hover {
+  background: var(--color-bg-4);
+  box-shadow: none;
+}
+
+/* 暗色:导航按钮 hover 背景(默认 token 在暗色下不可见) */
+.dark .ai-chat .ai-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ai-card-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--primary);
+}
+
+.ai-card-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ai-card-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+}
+
+.ai-card-desc {
+  margin-top: 0.125rem;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- 底部 AI 输入框(复用 Composer,左右/底部留白 32px) ---------- */
+.ai-chat .session-composer {
+  padding: 0 2rem 2rem;
+}
+
+/* 模板列表弹层:左右对齐输入框(composer-frame 在 padding 2rem 内) */
+.ai-chat .session-composer .tpl-popover-custom {
+  left: 2rem;
+  right: 2rem;
+  width: auto;
+}
+
+/* ==================================================================
+   对话流(发送后):时间 + 用户蓝色卡片(三圆角) + AI 回答卡片
+   ================================================================== */
+
+/* ---------- 对话流滚动容器 ---------- */
+.ai-thread {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem 1rem 1.5rem;
+}
+
+.ai-thread::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+.ai-thread::-webkit-scrollbar-thumb {
+  background: rgba(25, 25, 25, 0.18);
+  border-radius: var(--radius-full);
+}
+
+.dark .ai-chat .ai-thread::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* 每组问答 */
+.ai-exchange {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+/* 顶部居中的本次对话时间 */
+.ai-chat-time {
+  text-align: center;
+  font: var(--font-caption-m);
+  color: var(--on-surface-variant);
+}
+
+/* 用户输入卡片:蓝色半透明背景(设计稿指定)、右上角小圆角其余三圆角、靠右、宽于回答卡片略窄 */
+.ai-msg-user {
+  align-self: flex-end;
+  max-width: 88%;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.75rem 0.25rem 0.75rem 0.75rem; /* 三个大圆角 + 右上小圆角 */
+  background: rgba(0, 103, 209, 0.4);
+  color: var(--on-primary);
+  font: var(--font-body-m);
+  line-height: var(--line-height-md);
+  word-break: break-word;
+  white-space: pre-wrap;
+  box-shadow: var(--shadow-sm);
+  animation: msg-in 0.3s ease-out;
+}
+
+/* ---------- AI 回答卡片(整卡,占满对话区宽度) ---------- */
+.answer-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  background: rgba(42, 42, 42, 1);
+  box-shadow: var(--shadow-sm);
+  animation: msg-in 0.3s ease-out;
+}
+
+.dark .ai-chat .answer-card {
+  background: rgba(42, 42, 42, 1);
+  box-shadow: none;
+}
+
+@keyframes msg-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 区块内容浮现 */
+.reveal {
+  animation: msg-in 0.35s ease-out;
+}
+
+/* 发送后短暂等待行 */
+.ac-wait {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font: var(--font-body-m);
+  color: var(--on-surface-variant);
+}
+
+/* ---------- 可折叠区头(思考 / 技能选择匹配) ---------- */
+.ac-section-head {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  width: 100%;
+  padding: 0.25rem 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--on-surface);
+}
+
+.ac-lead-icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+}
+
+/* 思考中:白色动效图标(sparkles 脉冲呼吸) */
+.ac-lead-icon.is-thinking {
+  color: #ffffff;
+  animation: think-pulse 1.1s ease-in-out infinite;
+}
+
+/* 思考完成:白色勾 */
+.ac-lead-icon.is-thinking-done {
+  color: #ffffff;
+}
+
+@keyframes think-pulse {
+  0%,
+  100% {
+    text-shadow: none;
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 0.5rem rgba(0, 103, 209, 0.9);
+    transform: scale(1.1);
+  }
+}
+
+.ac-section-title {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: left;
+  font: var(--font-body-m); /* 主文字 14px */
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ac-head-state {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--primary);
+}
+
+.ac-head-state .ac-done {
+  color: var(--success);
+}
+
+.ac-head-toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--on-surface-variant);
+}
+
+/* 旋转加载图标 */
+.is-spin {
+  animation: ac-spin 1s linear infinite;
+}
+
+@keyframes ac-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 思考过程内容:12px rgb(147,147,147)(设计稿指定) */
+.ac-think-body {
+  margin: 0.25rem 0 0.25rem 1.25rem;
+  padding: 0.5rem 0.625rem;
+  border-radius: 0.5rem;
+  background: var(--surface-variant);
+  font: var(--font-body-s);
+  color: rgb(147, 147, 147);
+}
+
+/* 多段思考过程块(无标题,位于技能选中匹配体内):完成后整块消失 */
+.ac-subthink-body {
+  margin: 0.25rem 0 0.625rem 1.25rem;
+}
+
+.dark .ai-chat .ac-think-body {
+  background: var(--color-bg-4);
+}
+
+/* ---------- 任务拆解与规划(区块标签 + 技能小步骤) ---------- */
+.ac-block-label {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-bottom: 0.875rem; /* 与下方技能行拉开层级间距(加大) */
+  padding: 0.25rem 0 0;
+}
+
+.ac-block-label .ac-lead-icon.is-ok {
+  color: var(--success);
+}
+
+.ac-block-name {
+  font: var(--font-body-m); /* 主文字 14px */
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+/* 计划主体:小缩进让规划清单卡片更宽;顶部留出与技能行的间距 */
+.ac-plan-body {
+  margin-left: 0.375rem;
+  margin-top: 0.875rem; /* 技能选中匹配 与 步骤条首项 的间距(加大) */
+  display: flex;
+  flex-direction: column;
+}
+
+/* 步骤条图标:成功色 16px 圆点(完成态白勾/进行中呼吸/等待态半透明),
+   覆盖 antd 默认 24px 数字圆 */
+.ai-chat .ac-steps .ant-steps-item-icon {
+  width: 1rem !important;
+  height: 1rem !important;
+  min-width: 1rem !important;
+  margin-inline-end: 0.5rem !important;
+  border: none !important;
+  background: transparent !important;
+  font-size: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.ai-chat .ac-steps .ant-steps-item-icon .ant-steps-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 0;
+}
+
+/* 步骤条图标:16px 圆点
+   未完成(wait/process):绿色空心圆圈(透明底+绿色描边)
+   已完成(finish):绿色实心圆+绿色勾 */
+.ai-chat .ac-step-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--radius-full);
+  background: transparent;
+  border: 1.5px solid var(--success); /* 未完成:绿色空心描边 */
+  box-sizing: border-box;
+}
+
+/* 进行中:呼吸光晕 */
+.ai-chat .ac-steps .ant-steps-item-process .ac-step-icon {
+  animation: ac-dot-breathe 1.2s ease-in-out infinite;
+}
+
+/* 等待态:半透明 */
+.ai-chat .ac-steps .ant-steps-item-wait .ac-step-icon {
+  opacity: 0.45;
+}
+
+/* 完成态:绿色空心圆(透明底 + 绿色描边),勾号颜色与圆背景同色(透明,不可见) */
+.ai-chat .ac-steps .ant-steps-item-finish .ac-step-icon {
+  background: transparent;
+  border: 1.5px solid var(--success);
+  box-sizing: border-box;
+  opacity: 1;
+}
+
+/* 勾号(Lucide check SVG):默认隐藏,完成态显示,颜色与圆描边色一致 */
+.ac-step-check {
+  display: none;
+  color: var(--success);
+}
+
+.ai-chat .ac-steps .ant-steps-item-finish .ac-step-check {
+  display: inline-flex;
+}
+
+.ai-chat .ac-steps .ant-steps-item-wait .ac-step-icon {
+  opacity: 0.45;
+}
+
+.ai-chat .ac-steps .ant-steps-item-process .ac-step-icon {
+  animation: ac-dot-breathe 1.2s ease-in-out infinite;
+}
+
+@keyframes ac-dot-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(9, 170, 113, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0.5rem 0.125rem rgba(9, 170, 113, 0.35);
+  }
+}
+
+/* 连接线:完全隐藏 antd 自带 tail,改用容器 ::after 自绘时间轴线,
+   精确从本项图标中心(顶部 8px/水平 8px)连到下一项图标中心(底部向下延伸 8px) */
+.ai-chat .ac-steps .ant-steps-item-tail {
+  display: none !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item-container {
+  position: relative;
+}
+
+.ai-chat .ac-steps .ant-steps-item-container::after {
+  content: "";
+  position: absolute;
+  left: calc(0.5rem - 0.5px);
+  top: 1.75rem; /* 图标圆心 8px + 下方 20px 间隙 */
+  bottom: 0.75rem; /* 距容器底部 12px = 下一图标圆心前 20px 停止,上下间隙对称 */
+  width: 1px;
+  background: rgba(174, 174, 174, 0.4);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* 已完成:连接线点亮为成功绿 */
+.ai-chat .ac-steps .ant-steps-item-finish .ant-steps-item-container::after {
+  background: var(--success);
+}
+
+/* 最后一项不再向下连线 */
+.ai-chat .ac-steps .ant-steps-item:last-child .ant-steps-item-container::after {
+  display: none;
+}
+
+/* 图标盖在连接线之上 */
+.ai-chat .ac-steps .ant-steps-item-icon {
+  position: relative;
+  z-index: 1;
+}
+
+/* 步骤条标题/描述:强制面板亮色令牌
+   antd 运行时注入的浅色主题样式晚于静态样式插入,须以更高优先级覆盖,
+   否则描述文字为浅色主题深灰,在深色面板上不可读 */
+.ai-chat .ac-steps .ant-steps-item .ant-steps-item-title {
+  color: var(--on-surface) !important;
+}
+
+/* 16px 圆点图标与标题文字对齐:容器改为 flex,标题行盒压缩到 16px 与圆点同心 */
+.ai-chat .ac-steps .ant-steps-item-container {
+  display: flex !important;
+  align-items: flex-start !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item-content {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0 !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item .ant-steps-item-title {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 1rem !important;
+  line-height: 1rem !important; /* 行盒 16px,与图标同高居中对齐 */
+  padding-inline-end: 0 !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item.ant-steps-item-wait .ant-steps-item-title {
+  color: var(--on-surface-variant) !important;
+}
+
+.ai-chat .ac-steps .ant-steps-item .ant-steps-item-description {
+  color: rgb(201, 201, 201) !important; /* 内层细节详情文字 */
+  font: var(--font-body-m);
+  line-height: var(--line-height-lg); /* 1.8,行距加大 */
+  max-width: 100%;
+  margin-top: 0.5rem !important; /* 标题与描述间距 */
+  padding-bottom: 1rem; /* 与下一步骤的呼吸空间 */
+}
+
+.ai-chat .ac-steps .ant-steps-item:last-child .ant-steps-item-description {
+  padding-bottom: 0.25rem;
+}
+
+/* 步骤一描述:标签文件胶囊 */
+.ac-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+  padding-bottom: 0.125rem;
+}
+
+.ac-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--primary-container);
+  color: var(--on-primary-container);
+  font: var(--font-caption-m);
+}
+
+/* ---------- 总任务规划清单小卡片 ---------- */
+.plan-card {
+  margin-top: 0.25rem; /* 进一步减小与"任务编排已完成"的间距 */
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--surface-variant);
+  animation: msg-in 0.35s ease-out;
+}
+
+.dark .ai-chat .plan-card {
+  background: var(--color-bg-4);
+}
+
+.plan-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.plan-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font: var(--font-body-m); /* 主文字 14px */
+  font-weight: var(--font-weight-semibold);
+  color: var(--on-surface);
+}
+
+.plan-fold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+}
+
+.plan-fold:hover {
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+}
+
+.dark .ai-chat .plan-fold:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.plan-card-hint {
+  margin-top: 0.625rem;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font: var(--font-body-m);
+  line-height: var(--line-height-lg);
+  color: var(--success);
+}
+
+.plan-list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 清单项:圆圈序号 + 14px rgb(201,201,201),项间 1px 细线分隔 */
+.plan-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0; /* 10px 上下 */
+  line-height: var(--line-height-lg);
+  font: var(--font-body-m);
+  color: rgb(201, 201, 201);
+  border-bottom: 1px solid rgba(174, 174, 174, 0.35);
+  animation: msg-in 0.3s ease-out both;
+}
+
+.plan-list li:last-child {
+  border-bottom: none;
+  padding-bottom: 0.125rem;
+}
+
+.plan-list li:first-child {
+  padding-top: 0.25rem;
+}
+
+/* 未轮到逐条打印的清单项:占位隐藏,保持列表高度稳定 */
+.plan-list li.is-hidden {
+  visibility: hidden;
+}
+
+.plan-idx {
+  flex: 0 0 auto;
+  width: 1.125rem;
+  height: 1.125rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: rgba(174, 174, 174, 0.15);
+  color: rgba(174, 174, 174, 1);
+  font: var(--font-caption-s);
+}
+
+/* ---------- 确认提示(位于步骤条最下方,确认后才继续) ----------
+   背景与用户输入卡片(气泡)一致:rgba(0, 103, 209, 0.4) 半透明蓝 */
+.ac-confirm {
+  margin-top: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 159, 255, 0.18),
+    rgba(123, 103, 255, 0.18)
+  );
+  animation: msg-in 0.35s ease-out;
+}
+
+.ac-confirm.is-shake {
+  animation: ac-shake 0.45s ease;
+}
+
+@keyframes ac-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  50% {
+    transform: translateX(3px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+.ac-confirm-text {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-lg);
+  color: #ffffff;
+}
+
+.ac-confirm-btns {
+  margin-top: 0.75rem;
+  display: flex;
+  gap: 0.75rem; /* 与配置详情卡片按钮间距一致 */
+}
+
+/* ---------- 最终结果与逐字打印光效 ---------- */
+.ac-result {
+  font: var(--font-body-m);
+  color: var(--on-surface);
+}
+
+.ac-tw-line {
+  margin: 0;
+  line-height: var(--line-height-md);
+}
+
+.ac-tw-line.is-item {
+  padding-left: 0.5rem;
+}
+
+/* ---------- 打印渐变蒙层(小矩形光带) ----------
+   文字本身保持原色;上方覆盖一层与原文完全重叠的渐变文本,
+   双向遮罩取交集:横向只露末端约 11em,纵向只露最后一行高度,
+   确保光带仅出现在"正在打印的最末视觉行"的行尾,
+   前面各行的行尾不再出现渐变 */
+.tw-live {
+  position: relative;
+}
+
+.ac-tw-line.is-live {
+  position: relative;
+}
+
+.tw-veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  color: transparent;
+  background-image: linear-gradient(
+    90deg,
+    #06b6d4 0%,
+    #2563eb 35%,
+    #7c3aed 70%,
+    #ec4899 100%
+  );
+  background-size: 11em 100%;
+  background-repeat: no-repeat;
+  background-position: right center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-mask-image: linear-gradient(
+      to right,
+      transparent calc(100% - 11em),
+      rgba(0, 0, 0, 0.9) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(100% - 1.5em),
+      rgba(0, 0, 0, 0.95) calc(100% - 1.2em),
+      rgba(0, 0, 0, 0.95) 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(
+      to right,
+      transparent calc(100% - 11em),
+      rgba(0, 0, 0, 0.9) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(100% - 1.5em),
+      rgba(0, 0, 0, 0.95) calc(100% - 1.2em),
+      rgba(0, 0, 0, 0.95) 100%
+    );
+  mask-composite: intersect;
+  filter: drop-shadow(0 0 0.375rem rgba(236, 72, 153, 0.5));
+}
+
+/* 打印光标:青→紫→粉三段渐变竖条,辉光与边缘粉色呼应 */
+.tw-caret {
+  display: inline-block;
+  width: 0.125rem;
+  height: 0.9em;
+  margin-left: 0.125rem;
+  vertical-align: -0.1em;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    180deg,
+    #06b6d4 0%,
+    #7c3aed 55%,
+    #ec4899 100%
+  );
+  box-shadow: 0 0 0.375rem rgba(236, 72, 153, 0.7),
+    0 0 0.75rem rgba(124, 58, 237, 0.5);
+  animation: caret-blink 0.9s ease-in-out infinite;
+}
+
+@keyframes caret-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- 结果卡片:结果输出完成后展示(配置详情文档) ----------
+   背景与用户输入卡片(气泡)一致:rgba(0, 103, 209, 0.4) 半透明蓝 */
+.ac-result-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 36rem;
+  min-height: 9.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 159, 255, 0.18),
+    rgba(123, 103, 255, 0.18)
+  );
+}
+
+.rc-doc-icon {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+}
+
+.rc-body {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 0.75rem; /* 行距 12px(三行内容在 152px 内排布) */
+}
+
+/* 第一行:标题 + 待决策标签 | 下载|∨ */
+.rc-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rc-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--on-surface);
+  white-space: nowrap;
+}
+
+.rc-tag {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  height: 1.25rem; /* 20px */
+  padding: 0 0.5rem;
+  border-radius: 0.25rem; /* 4px */
+  background: rgba(238, 105, 111, 0.15);
+  color: rgba(231, 67, 74, 1);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-normal);
+  line-height: 1.25rem;
+  text-align: left;
+}
+
+.rc-head-actions {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.rc-download {
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: rgba(201, 201, 201, 1);
+  font: var(--font-body-s);
+  cursor: pointer;
+}
+
+.rc-download:hover {
+  color: #ffffff;
+}
+
+.rc-v-divider {
+  width: 1px;
+  height: 0.75rem;
+  background: rgba(119, 119, 119, 0.6);
+}
+
+.rc-caret {
+  color: rgba(147, 147, 147, 1);
+}
+
+/* 第二行:时间 + 方案描述(正常换行,不截断) */
+.rc-desc {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-normal);
+  line-height: 1.375rem; /* 22px */
+  color: rgba(147, 147, 147, 1);
+  word-break: break-all;
+}
+
+/* 第三行:确认 / 忽略按钮 */
+.rc-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rc-confirm {
+  width: 5.5rem; /* 88px */
+  height: 2rem; /* 32px */
+  padding: 0.3125rem 1rem; /* 5px 16px */
+  border: none;
+  border-radius: 0.25rem; /* 4px */
+  background: rgba(0, 103, 209, 1);
+  color: #ffffff;
+  font: var(--font-body-m);
+  cursor: pointer;
+}
+
+.rc-confirm:hover {
+  background: rgba(46, 134, 222, 1);
+}
+
+.rc-ignore {
+  width: 5.5rem;
+  height: 2rem;
+  padding: 0.3125rem 1rem;
+  border: 1px solid rgba(119, 119, 119, 1);
+  border-radius: 0.25rem;
+  background: rgba(0, 0, 0, 0);
+  color: rgba(201, 201, 201, 1);
+  font: var(--font-body-m);
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.rc-ignore:hover {
+  color: #ffffff;
+  border-color: rgba(201, 201, 201, 1);
+}
+
+/* 点击后的收敛状态 */
+.rc-status {
+  font: var(--font-body-s);
+  color: var(--on-surface-variant);
+}
+
+.rc-status.is-ok {
+  color: var(--success);
+}
+
+/* ---------- 步骤一:网络资源确定 描述 ---------- */
+.ac-netres {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ac-netres-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ac-netres-file {
+  flex: 0 0 auto;
+  margin-top: 0.375rem;
+  color: rgb(201, 201, 201);
+}
+
+.ac-netres-text {
+  font: var(--font-body-m);
+  color: rgb(201, 201, 201);
+  line-height: var(--line-height-lg); /* 1.8 */
+  word-break: break-all;
+}
+
+.ac-netres-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.125rem;
+}
+
+.ac-netres-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem; /* 图标与文字间距加大,对齐 */
+  height: 1.5rem;
+  padding: 0 0.5rem;
+  border-radius: 0.25rem;
+  background: rgba(174, 174, 174, 0.15);
+  color: rgb(201, 201, 201);
+  font: var(--font-body-s);
+  cursor: pointer;
+}
+
+/* 关联拓扑/设备列表图标:实色品牌色(不随文字灰色) */
+.ac-netres-tag svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.dark .ac-netres-tag svg {
+  color: var(--color-link);
+}
+
+.ac-netres-tag:hover {
+  background: rgba(174, 174, 174, 0.28);
+  color: #ffffff;
+}
+
+/* ---------- 步骤二:任务编排 ---------- */
+.ac-orchestrate {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.ac-orch-line {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font: var(--font-body-m);
+  line-height: var(--line-height-lg);
+  color: rgb(255, 255, 255); /* 白色 */
+}
+
+/* "任务编排已完成"行的勾图标:白色 */
+.ac-orch-check {
+  flex: 0 0 auto;
+  color: rgb(255, 255, 255); /* 白色 */
+  line-height: 1;
+}
+
+/* ---------- 步骤三:规划步骤生成(与右侧同步的小步骤) ---------- */
+.ac-small-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* 小步骤组间距(12级) */
+}
+
+.ac-small-step {
+  animation: msg-in 0.3s ease-out;
+}
+
+.ac-small-title {
+  font: var(--font-body-m);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-md); /* 1.625 */
+  color: rgb(255, 255, 255);
+}
+
+.ac-small-sub {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem; /* 圆点行间距收小 */
+  font: var(--font-body-m);
+  line-height: var(--line-height-md);
+  color: rgb(201, 201, 201);
+}
+
+/* 小圆点:统一白色实心(无 dim 变体) */
+.ac-small-dot {
+  flex: 0 0 auto;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: var(--radius-full);
+  background: #ffffff;
+}
+
+/* ---------- 步骤四:推导动作参数(表格区域) ---------- */
+.ac-table {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 表头:三列,背景 rgba(174,174,174,0.15),白色 12px */
+.ac-table-head {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr minmax(7rem, auto);
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.ac-table-hcell {
+  border-radius: 4px;
+  background: rgba(174, 174, 174, 0.15);
+  padding: 0.375rem 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.25rem;
+  color: #ffffff;
+  text-align: left;
+}
+
+/* 数据行:同样三列栅格,行间 1px 细线,上下间距加大 */
+.ac-table-row {
+  display: grid;
+  grid-template-columns: minmax(9rem, auto) 1fr minmax(7rem, auto);
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0; /* 12px 上下 */
+  border-bottom: 1px solid rgba(174, 174, 174, 1);
+  animation: msg-in 0.3s ease-out both;
+}
+
+.ac-table-row:last-child {
+  border-bottom: none;
+}
+
+.ac-table-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* 匹配动作/匹配参数 矩形胶囊:圆角 4px、灰底、12px #AEAEAE */
+.ac-table-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 1.5rem; /* 24px */
+  padding: 0.125rem 0.5rem; /* 2px 8px */
+  border-radius: 4px;
+  background: rgba(174, 174, 174, 0.15);
+  color: rgba(174, 174, 174, 1);
+  font-size: 0.75rem; /* 12px */
+  font-weight: var(--font-weight-normal);
+  line-height: 1.25rem;
+  text-align: left;
+}
+
+/* 对应步骤列:纯文本,白色 */
+.ac-table-cell.is-step {
+  font-size: 0.75rem;
+  color: #ffffff;
+  line-height: 1.25rem;
+  word-break: break-all;
+}
+
+/* ---------- 底部操作条:左耗时(12px #939393) | 右五图标(白色 20px,间距 20px) ---------- */
+
+/* 回答卡片内所有 SVG 图标:统一 block + line-height:1,消除基线偏移,
+   确保与文字在 flex 容器中严格垂直居中(思考标题/区块标题/技能行/耗时行等全部生效) */
+.answer-card svg {
+  display: block;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.ac-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  animation: msg-in 0.35s ease-out;
+}
+
+.ac-cost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem; /* 12px */
+  line-height: 1.25rem;
+  color: rgba(147, 147, 147, 1);
+}
+
+/* 耗时行的 timer 图标:与文字严格垂直居中 */
+.ac-cost svg {
+  flex-shrink: 0;
+  display: block;
+  line-height: 1;
+}
+
+.ac-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem; /* 间距 20px */
+}
+
+.ac-action {
+  width: 1.25rem;
+  height: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: #ffffff; /* 图标白色 20px(1.25rem) */
+  cursor: pointer;
+}
+
+.ac-action:hover {
+  background: var(--surface-variant);
+}
+
+.ac-action.is-on {
+  color: var(--primary);
+}
+
+.dark .ai-chat .ac-action:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
