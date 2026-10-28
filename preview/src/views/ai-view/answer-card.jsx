@@ -433,12 +433,12 @@ export default function AnswerCard({ onDone, onRestart }) {
   const stepItems = [
     {
       title: "网络资源确定",
-      icon: <span className="ac-step-icon" />,
+      icon: <span className="ac-step-icon"><Icon name="check" size="0.625rem" className="ac-step-check" /></span>,
       description: <NetResDesc />,
     },
     {
       title: "任务编排",
-      icon: <span className="ac-step-icon" />,
+      icon: <span className="ac-step-icon"><Icon name="check" size="0.625rem" className="ac-step-check" /></span>,
       description: atLeast(stage, "orchestrate") ? (
         <div className="ac-orchestrate">
           <div className="ac-orch-line">
@@ -485,14 +485,14 @@ export default function AnswerCard({ onDone, onRestart }) {
     // 以下两步确认后才出现,逐步加载
     {
       title: "规划步骤生成",
-      icon: <span className="ac-step-icon" />,
+      icon: <span className="ac-step-icon"><Icon name="check" size="0.625rem" className="ac-step-check" /></span>,
       description: atLeast(stage, "runSync") ? (
         <SmallStepsList shown={smallShown} />
       ) : null,
     },
     {
       title: "推导动作参数",
-      icon: <span className="ac-step-icon" />,
+      icon: <span className="ac-step-icon"><Icon name="check" size="0.625rem" className="ac-step-check" /></span>,
       description: showTable ? <ActionTable /> : null,
     },
   ];

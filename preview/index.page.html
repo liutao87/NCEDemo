@@ -5991,7 +5991,9 @@ input.ant-input.ant-input-sm {
    已完成(finish):绿色实心圆+绿色勾 */
 .ai-chat .ac-step-icon {
   position: relative;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 1rem;
   height: 1rem;
   border-radius: var(--radius-full);
@@ -6010,7 +6012,7 @@ input.ant-input.ant-input-sm {
   opacity: 0.45;
 }
 
-/* 完成态:绿色空心圆(透明底 + 绿色描边) + 绿色勾 */
+/* 完成态:绿色空心圆(透明底 + 绿色描边),勾号颜色与圆背景同色(透明,不可见) */
 .ai-chat .ac-steps .ant-steps-item-finish .ac-step-icon {
   background: transparent;
   border: 1.5px solid var(--success);
@@ -6018,17 +6020,14 @@ input.ant-input.ant-input-sm {
   opacity: 1;
 }
 
-.ai-chat .ac-steps .ant-steps-item-finish .ac-step-icon::after {
-  content: "✓";
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--success); /* 绿色勾 */
-  font-size: 0.625rem;
-  font-weight: var(--font-weight-bold);
-  line-height: 1;
+/* 勾号(Lucide check SVG):默认隐藏,完成态显示,颜色与圆描边色一致 */
+.ac-step-check {
+  display: none;
+  color: var(--success);
+}
+
+.ai-chat .ac-steps .ant-steps-item-finish .ac-step-check {
+  display: inline-flex;
 }
 
 .ai-chat .ac-steps .ant-steps-item-wait .ac-step-icon {
@@ -10868,12 +10867,12 @@ function AnswerCard({ onDone, onRestart }) {
   const stepItems = [
     {
       title: "网络资源确定",
-      icon: <span className="ac-step-icon" />,
+      icon: <span className="ac-step-icon"><Icon name="check" size="0.625rem" className="ac-step-check" /></span>,
       description: <NetResDesc />,
     },
     {
       title: "任务编排",
-      icon: <span className="ac-step-icon" />,
+      icon: <span className="ac-step-icon"><Icon name="check" size="0.625rem" className="ac-step-check" /></span>,
       description: atLeast(stage, "orchestrate") ? (
         <div className="ac-orchestrate">
           <div className="ac-orch-line">
@@ -10920,14 +10919,14 @@ function AnswerCard({ onDone, onRestart }) {
     // 以下两步确认后才出现,逐步加载
     {
       title: "规划步骤生成",
-      icon: <span className="ac-step-icon" />,
+      icon: <span className="ac-step-icon"><Icon name="check" size="0.625rem" className="ac-step-check" /></span>,
       description: atLeast(stage, "runSync") ? (
         <SmallStepsList shown={smallShown} />
       ) : null,
     },
     {
       title: "推导动作参数",
-      icon: <span className="ac-step-icon" />,
+      icon: <span className="ac-step-icon"><Icon name="check" size="0.625rem" className="ac-step-check" /></span>,
       description: showTable ? <ActionTable /> : null,
     },
   ];
